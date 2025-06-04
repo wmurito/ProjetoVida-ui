@@ -1,0 +1,158 @@
+.dashboard-container {
+  padding: 10px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  .year-filters {
+    margin-bottom: 25px;
+    text-align: center;
+
+    .year-button {
+      background: #fff;
+      border: 2px solid #d94c77;
+      color: #d94c77;
+      padding: 8px 20px;
+      margin: 0 8px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+
+      &:hover {
+        background: #d94c77;
+        color: #fff;
+        transform: translateY(-2px);
+      }
+
+      &.active {
+        background: #d94c77;
+        color: #fff;
+      }
+    }
+  }
+
+  .dashboard-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .vertical-stack {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    min-width: 300px;
+
+    @media (max-width: 1200px) {
+      width: 100%;
+    }
+  }
+
+  .dashboard-card {
+    background: white;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .card-header {
+      background: #d94c77;
+      color: white;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      width: 100%;
+    }
+
+    .card-content {
+      padding: 15px;
+      height: calc(100% - 53px);
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .recharts-wrapper {
+        max-width: 95%;
+        margin: 0 auto;
+      }
+    }
+
+    &.dashboard-card-1 {
+      flex: 1;
+      min-width: 300px;
+      min-height: 300px;
+    }
+
+    &.dashboard-card-2 {
+      flex: 1;
+      min-width: 400px;
+      
+      .recharts-pie {
+        transform: translateY(-20px);
+      }
+      
+      .recharts-legend-wrapper {
+        bottom: 10px !important;
+        width: 100% !important;
+      }
+
+      @media (max-width: 1200px) {
+        min-width: 100%;
+      }
+    }
+
+    &.school-chart {
+      .recharts-bar {
+        transform: translateX(10px);
+      }
+      
+      .recharts-y-axis {
+        transform: translateX(-5px);
+      }
+    }
+  }
+
+  .loading-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    font-style: italic;
+  }
+
+  .recharts-tooltip-wrapper {
+    background: rgba(255,255,255,0.95) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  }
+
+  @media (max-width: 768px) {
+    padding: 10px;
+
+    .dashboard-card {
+      width: 100% !important;
+      margin: 10px 0;
+      
+      .card-header {
+        font-size: 14px;
+        padding: 12px;
+      }
+      
+      .card-content {
+        padding: 10px;
+        
+        .recharts-wrapper {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+}

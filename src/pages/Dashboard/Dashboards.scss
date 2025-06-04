@@ -1,0 +1,185 @@
+.dashboard-container {
+    padding: 0;
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    .dashboard-header {
+      padding: 0px;
+      
+      h1 {
+        color: #d94c77;
+        font-size: 24px;
+        margin: 0;
+        text-align: center;
+      }
+    }
+  
+    .dashboard-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 10px;
+      
+      @media (max-width: 992px) {
+        flex-direction: row;
+      }
+      
+      .dashboard-main {
+        flex: 3;
+        order: 1;
+      }
+      
+      .dashboard-sidebar {
+        //flex: 1;
+        //min-width: 300px;
+        //max-width: 350px;
+        order: 1;
+        
+        @media (max-width: 992px) {
+          max-width: 100%;
+          order: 1; // Coloca o sidebar acima em telas pequenas
+        }
+      }
+    }
+  
+    .year-filters {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+  
+      .year-button {
+        background-color: #fff;
+        border: 1px solid #d94c77;
+        color: #d94c77;
+        padding: 8px 16px;
+        margin: 0 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s, color 0.3s;
+  
+        &:hover {
+          background-color: #d94c77;
+          color: #fff;
+        }
+  
+        &.active {
+          background-color: #d94c77;
+          color: #fff;
+        }
+      }
+    }
+  
+    .dashboard-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1px;
+      margin-bottom: 10px;
+    }
+  
+    .dashboard-card {
+      flex: 1;
+      min-width: 300px;
+      margin-right: 5px;
+
+      background-color: white;
+      overflow: hidden;
+  
+      .card-header {
+        background-color: #d94c77;
+        color: white;
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+      }
+  
+      .card-content {
+        padding: 5px;
+      }
+  
+      &.full-width {
+        flex: 100%;
+      }
+  
+      &.metric-card {
+        text-align: center;
+      }
+    }
+  
+    .map-container {
+      height: 400px;
+      background-color: #f0f0f0;
+    }
+  
+    // Cores personalizadas para gráficos
+    .custom-colors {
+      .recharts-pie-sector {
+        &:nth-child(1) {
+          fill: #d94c77;
+        }
+  
+        &:nth-child(2) {
+          fill: #e06c95;
+        }
+  
+        &:nth-child(3) {
+          fill: #e78daf;
+        }
+  
+        &:nth-child(4) {
+          fill: #efafc9;
+        }
+  
+        &:nth-child(5) {
+          fill: #f7d0e3;
+        }
+      }
+    }
+  
+    // Estilização para métricas grandes
+    .big-metric {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+  
+      .metric-value {
+        font-size: 48px;
+        font-weight: bold;
+        color: #d94c77;
+      }
+    }
+  
+    // Estilos para gráficos de barras horizontais (faixa etária)
+    .horizontal-bars {
+      .bar-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+  
+        .bar-label {
+          width: 80px;
+          font-size: 12px;
+        }
+  
+        .bar-container {
+          flex: 1;
+          height: 20px;
+          background-color: #f0f0f0;
+          overflow: hidden;
+  
+          .bar-fill {
+            height: 100%;
+            background-color: #d94c77;
+          }
+        }
+  
+        .bar-value {
+          width: 40px;
+          text-align: right;
+          font-size: 12px;
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+  
