@@ -34,21 +34,22 @@ import {
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const navigate = useNavigate();
   const { login, logged, loading: authLoading } = useAuth();
 
-  // Redireciona para dashboard se estiver logado
   useEffect(() => {
     if (logged && !authLoading) {
       navigate("/dashboard");
     }
   }, [logged, navigate, authLoading]);
 
-  // Carrega dados salvos se "lembrar-me" estiver ativo
   useEffect(() => {
     const storedRememberMe = localStorage.getItem("lsRememberMe");
     if (storedRememberMe === "true") {
@@ -60,7 +61,6 @@ const Login = () => {
     }
   }, []);
 
-  // Salva ou remove o e-mail do localStorage
   useEffect(() => {
     localStorage.setItem("lsRememberMe", rememberMe);
     if (rememberMe) {
@@ -75,8 +75,25 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
-      // Não precisa navegar aqui, o useEffect vai cuidar disso
+      if (isChangingPassword && newPassword !== confirmPassword) {
+        toast.error("As novas senhas não coincidem.");
+        setLoading(false);
+        return;
+      }
+
+      const result = await login(email, password, newPassword);
+
+      if (result?.newPasswordRequired) {
+        toast.info("É necessário alterar sua senha.");
+        setIsChangingPassword(true);
+        return;
+      }
+
+      if (result?.success) {
+        toast.success("Login realizado com sucesso!");
+      } else {
+        toast.error(result?.error || "Erro ao fazer login");
+      }
     } catch (error) {
       console.error("Erro no login:", error);
       toast.error(error.message || "Erro ao fazer login");
@@ -135,6 +152,30 @@ const Login = () => {
             </ShowPasswordButton>
           </PasswordContainer>
 
+          {isChangingPassword && (
+            <>
+              <PasswordContainer>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nova senha"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+              </PasswordContainer>
+
+              <PasswordContainer>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Confirmar nova senha"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </PasswordContainer>
+            </>
+          )}
+
           <CheckContainer>
             <FormControlLabel
               control={
@@ -149,7 +190,13 @@ const Login = () => {
           </CheckContainer>
 
           <Button type="submit" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
+            {loading
+              ? isChangingPassword
+                ? "Trocando senha..."
+                : "Entrando..."
+              : isChangingPassword
+              ? "Trocar senha"
+              : "Entrar"}
           </Button>
         </Form>
 

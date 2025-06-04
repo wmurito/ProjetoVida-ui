@@ -1,4 +1,9 @@
-import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth';
+import {
+  signIn,
+  signOut,
+  fetchAuthSession,
+  confirmSignIn,
+} from 'aws-amplify/auth';
 import { useState, useEffect, createContext, useContext } from 'react';
 
 const AuthContext = createContext();
@@ -6,23 +11,37 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [logged, setLogged] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [pendingChallenge, setPendingChallenge] = useState(null); // controle de troca de senha
 
-  const login = async (username, password) => {
+  const login = async (username, password, newPassword = null) => {
     try {
-      const { nextStep } = await signIn({ username, password });
-      if (nextStep.signInStep === 'DONE') {
-        // Obter informações da sessão após login bem-sucedido
+      if (pendingChallenge && newPassword) {
+        // Envia a nova senha
+        const confirmed = await confirmSignIn({
+          challengeResponse: newPassword,
+        });
+        setPendingChallenge(null);
         const { tokens, userSub } = await fetchAuthSession();
-        
-        // Salvar o sub do usuário em sessionStorage em vez de localStorage para maior segurança
-        if (tokens && userSub) {
-          sessionStorage.setItem('userId', userSub);
-        }
-        
+        sessionStorage.setItem('userId', userSub);
         setLogged(true);
-        return true;
+        return { success: true };
       }
-      return false;
+
+      const { nextStep } = await signIn({ username, password });
+
+      if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+        setPendingChallenge(true);
+        return { newPasswordRequired: true };
+      }
+
+      if (nextStep.signInStep === 'DONE') {
+        const { tokens, userSub } = await fetchAuthSession();
+        sessionStorage.setItem('userId', userSub);
+        setLogged(true);
+        return { success: true };
+      }
+
+      return { error: 'Passo de autenticação não suportado' };
     } catch (error) {
       console.error("Erro no login:", error.message);
       throw error;
@@ -43,8 +62,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const { tokens } = await fetchAuthSession();
-      const isLoggedIn = !!tokens;
-      setLogged(isLoggedIn);
+      setLogged(!!tokens);
     } catch (error) {
       setLogged(false);
     } finally {
@@ -57,7 +75,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ logged, login, logout, loading }}>
+    <AuthContext.Provider value={{ logged, login, logout, loading, pendingChallenge }}>
       {children}
     </AuthContext.Provider>
   );
