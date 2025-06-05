@@ -59,23 +59,16 @@ export const testAuth = async () => {
 // Função para obter o token atual
 export const getAuthToken = async () => {
   try {
-    const session = await fetchAuthSession({ forceRefresh: false }); // forceRefresh: false é geralmente bom para não forçar sempre
+    const session = await fetchAuthSession({ forceRefresh: false });
     
-    // console.log('Sessão completa:', session); // Log para debug, se necessário
-    // console.log('Tokens disponíveis:', session?.tokens); // Log para debug
-
-    if (session?.tokens?.accessToken) { // <<<< MUDANÇA AQUI
-      // console.log('Access Token JWT:', session.tokens.accessToken.toString()); // Log para debug
-      return session.tokens.accessToken.toString(); // Retorna o JWT string do Access Token
+    if (session?.tokens?.accessToken) {
+      return session.tokens.accessToken.toString();
     }
     
-    logger.warn("Access Token não encontrado na sessão."); // Use um logger se tiver
-    // console.warn("Access Token não encontrado na sessão."); // Ou console.warn
+    console.warn("Access Token não encontrado na sessão.");
     return null;
   } catch (error) {
-    // Se fetchAuthSession() falhar (ex: usuário não logado), ele lança um erro.
-    logger.error('Erro ao obter sessão ou access token:', error); // Use um logger se tiver
-    // console.error('Erro ao obter sessão ou access token:', error);
+    console.error('Erro ao obter sessão ou access token:', error);
     return null;
   }
 };
