@@ -19,17 +19,7 @@ const App = () => {
       console.log("[App.jsx] Usuário logado:", currentUser.username);
       console.log("[App.jsx] Executando testes de API...");
 
-      // Teste 1: /auth/test (usa o interceptor)
-      testAuth().then(result => {
-        console.log("[App.jsx] Resultado de testAuth():", result);
-      });
-
-      // Teste 2: /auth/validate-token (envia token no corpo)
-      validateToken().then(result => {
-        console.log("[App.jsx] Resultado de validateToken():", result);
-      });
-
-      // Teste 3: Chamada para /pacientes/ (exemplo que estava falhando)
+ 
       getPacientes()
         .then(response => {
           console.log("[App.jsx] Resultado de getPacientes():", response.data);
