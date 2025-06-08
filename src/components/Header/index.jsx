@@ -1,43 +1,48 @@
-import React, { useState, useEffect } from "react";
-import { HeaderContainer, ButtonCadastro } from "./styles";
+import React, { useState, useEffect, useContext } from "react"; // Adicionado useContext
+import { HeaderContainer } from "./styles"; // Mantenha suas importações de estilo
 import Avatar from "@mui/material/Avatar";
-import User from "../../assets/images/users/avatar-5.png";
-import Modal from "react-modal";
-import { Menu, MenuItem, Box, Button, TextField } from "@mui/material";
-import { fetchAuthSession } from 'aws-amplify/auth';
-import api from '../../services/api';
+import UserIcon from "../../assets/images/users/avatar-5.png"; // Renomeado para clareza
+import Modal from "react-modal"; // Você ainda tem um modal, vamos mantê-lo por enquanto
+import { Menu, MenuItem, Box, Button } from "@mui/material"; // Removido TextField
+import { fetchAuthSession, signOut } from 'aws-amplify/auth'; // Importar signOut
 
-Modal.setAppElement("#root");
+Modal.setAppElement("#root"); // Certifique-se que #root é o ID do seu elemento raiz da aplicação
 
 const Header = () => {
-  const [modalIsOpen, setIsOpen] = useState(false);
-  const [modalSenhaIsOpen, setSenhaIsOpen] = useState(false);
+
+  const [modalIsOpen, setIsOpen] = useState(false); // Mantido para o modal de registro
   const [anchorEl, setAnchorEl] = useState(null);
-  const [senhaAtual, setSenhaAtual] = useState("");
-  const [novaSenha, setNovaSenha] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState(""); // Estado para o e-mail do usuário
+  const [loadingLogout, setLoadingLogout] = useState(false); // Estado de loading para logout
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserEmail = async () => {
       try {
-        // Obter informações da sessão atual
-        const { tokens } = await fetchAuthSession();
-        if (!tokens) {
-          console.error('Usuário não está autenticado');
-          return;
-        }
+        console.log('[Header] Tentando obter sessão para e-mail...');
+        const session = await fetchAuthSession(); // Não precisa de { tokens } aqui se só quer o ID token
+        console.log('[Header] Sessão obtida:', session);
 
-        // Extrair informações do token JWT
-        const payload = JSON.parse(atob(tokens.accessToken.toString().split('.')[1]));
-        setUserName(payload.email || payload.username || 'Usuário');
+        if (session?.tokens?.idToken) { // O e-mail geralmente está no ID Token
+          const idTokenPayload = session.tokens.idToken.payload; // Acesso direto ao payload
+          console.log('[Header] ID Token Payload:', idTokenPayload);
+          setUserEmail(idTokenPayload.email || 'Usuário'); 
+        } else if (session?.tokens?.accessToken) { // Fallback para Access Token se necessário
+            const accessTokenPayload = session.tokens.accessToken.payload;
+            console.warn('[Header] E-mail não encontrado no idToken, tentando accessToken. Access Token Payload:', accessTokenPayload);
+            setUserEmail(accessTokenPayload.email || accessTokenPayload.username || 'Usuário');
+        }
+        else {
+          console.warn('[Header] Nenhum token encontrado na sessão para buscar e-mail.');
+          setUserEmail('Usuário'); // Fallback
+        }
       } catch (error) {
-        console.error("Erro ao buscar detalhes do usuário:", error);
+        console.error("[Header] Erro ao buscar e-mail do usuário:", error);
+        setUserEmail('Erro ao carregar'); // Indica um erro no UI
       }
     };
 
-    fetchUser();
-  }, []);
+    fetchUserEmail();
+  }, []); // Roda apenas uma vez na montagem
 
   function openModal() {
     setIsOpen(true);
@@ -47,144 +52,49 @@ const Header = () => {
     setIsOpen(false);
   }
 
-  function openModalSenha() {
-    setSenhaIsOpen(true);
-  }
+  // Removidas funções open/closeModalSenha
 
-  function closeModalSenha() {
-    setSenhaIsOpen(false);
-  }
-
-  const handleClick = (event) => {
+  const handleClickAvatar = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleCloseMenu = () => {
     setAnchorEl(null);
   };
 
-  const handleChangeSenha = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await api.put('/api/usuarios/alterar-senha', {
-        senhaAtual,
-        novaSenha,
-      });
-      closeModalSenha();
-      alert('Senha alterada com sucesso!');
-    } catch (error) {
-      alert('Erro ao alterar a senha: ' + (error.response ? error.response.data : error.message));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <HeaderContainer>
       <Avatar
-        alt={userName || "Usuário"}
-        src={User}
-        sx={{ width: 46, height: 46 }}
-        onClick={handleClick}
+        alt={userEmail || "Usuário"} // Mostra o e-mail ou "Usuário"
+        src={UserIcon} // Use um ícone genérico ou o avatar do usuário se disponível
+        sx={{ width: 46, height: 46, cursor: 'pointer' }} // Adicionado cursor pointer
+        onClick={handleClickAvatar}
       />
 
       {/* Menu do Perfil */}
       <Menu
-        id="basic-menu"
+        id="profile-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
-        onClose={handleClose}
+        onClose={handleCloseMenu}
         MenuListProps={{
-          "aria-labelledby": "basic-button",
+          "aria-labelledby": "avatar-button", // Pode usar um ID no Avatar se quiser
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
         }}
       >
-        <MenuItem onClick={handleClose}>{userName || "Perfil"}</MenuItem>
-        <MenuItem onClick={() => { handleClose(); openModalSenha(); }}>Alterar Senha</MenuItem>
+        {/* Exibe o e-mail do usuário no menu */}
+        <MenuItem onClick={handleCloseMenu} sx={{ fontWeight: 'bold' }}>
+          {userEmail || "Perfil"}
+        </MenuItem>
       </Menu>
-
-      {/* Modal de Registro de Pacientes */}
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Registro de Pacientes"
-        ariaHideApp={false}
-        appElement={document.getElementById("root")}
-        style={{
-          overlay: { backgroundColor: "rgba(28, 28, 28, 0.278)" },
-          content: {
-            border: "none",
-            borderRadius: "8px",
-            padding: "20px",
-          },
-        }}
-      >
-      </Modal>
-
-      {/* Modal de Alterar Senha */}
-      <Modal
-        isOpen={modalSenhaIsOpen}
-        onRequestClose={closeModalSenha}
-        contentLabel="Alterar Senha"
-        ariaHideApp={false}
-        appElement={document.getElementById("root")}
-        style={{
-          overlay: { backgroundColor: "rgba(28, 28, 28, 0.278)" },
-          content: {
-            border: "none",
-            borderRadius: "8px",
-            padding: "0",
-            width: "300px",
-            height: "300px",
-            margin: "auto",
-          },
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: "white",
-            color: "#333",
-            padding: "20px",
-            borderRadius: "8px",
-            textAlign: "center",
-          }}
-        >
-          <div className="barra-modal">
-            <h3>ALTERAR SENHA</h3>
-            <button onClick={closeModalSenha} className="botao-fechar">
-              X
-            </button>
-          </div>
-
-          <form onSubmit={handleChangeSenha}>
-            <TextField
-              type="password"
-              placeholder="Senha Atual"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              value={senhaAtual}
-              onChange={(e) => setSenhaAtual(e.target.value)}
-            />
-            <TextField
-              type="password"
-              placeholder="Nova Senha"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              value={novaSenha}
-              onChange={(e) => setNovaSenha(e.target.value)}
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-              {loading ? 'Alterando...' : 'Alterar Senha'}
-            </Button>
-          </form>
-        </Box>
-      </Modal>
-
     </HeaderContainer>
   );
 };

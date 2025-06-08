@@ -1,67 +1,61 @@
 import React, { useEffect, useState } from 'react';
-// ... (imports de recharts e scss como antes)
-import './AreaCharts.scss';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
+import './AreaCharts.scss'; // Certifique-se de que o caminho está correto
+import { getDashboardGraficos  } from '../../services/api'; // ❗ Importe a nova função do seu api.js
+// Ou se não quiser adicionar a api.js, use diretamente a instância 'api':
+// import api from './api';
 
 const COLORS = ['#4f46e5', '#f87171', '#82ca9d', '#8884d8', '#ffc658', '#fb923c'];
 
-
 const AreaCharts = () => {
-  const [graficosData, setGraficosData] = useState(null); // Estado para todos os dados dos gráficos
+  const [graficosData, setGraficosData] = useState(null);
   const [erro, setErro] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ❗❗❗ ATUALIZE ESTA URL BASE COM A URL CORRETA PARA O SEU BUCKET E PREFIXO ❗❗❗
-  // Deve corresponder ao S3_BUCKET e S3_KEY_PREFIX do script Python
-  // const s3BaseUrl = 'https://projeto-vida-prd.s3.us-east-1.amazonaws.com/dashboard_app_data';
-  const s3BaseUrl = 'https://projeto-vida-prd.s3.us-east-1.amazonaws.com/dashboard_files'; // Ajuste a região se não for us-east-1
+  // Não precisamos mais do s3BaseUrl para este componente
+  // const s3BaseUrl = '...'; 
 
   useEffect(() => {
-    const fetchAllGraficosData = async () => {
+    const fetchAllGraficosDataFromAPI = async () => {
       setLoading(true);
       setErro(null);
       try {
-        // Os arquivos de gráficos agora estão em um subdiretório 'graficos'
-        const graficosPath = `${s3BaseUrl}/graficos`;
-        const fileNames = ['estadiamento.json', 'sobrevida.json', 'recidiva.json', 'delta_t.json'];
+        console.log('[AreaCharts] Tentando buscar dados dos gráficos da API...');
+        // Chama a função getDashboardData de api.js
+        const response = await getDashboardData(); 
+        // Se não adicionou a api.js, seria:
+        // const response = await api.get('/dashboard/dados');
         
-        const fetchPromises = fileNames.map(fileName =>
-          fetch(`${graficosPath}/${fileName}`).then(res => {
-            if (!res.ok) {
-              throw new Error(`Falha ao buscar ${fileName} para gráficos: ${res.status} ${res.statusText}`);
-            }
-            return res.json();
-          })
-        );
+        console.log('[AreaCharts] Dados recebidos da API:', response.data);
 
-        const [estadiamentoData, sobrevidaData, recidivaData, deltaTData] = await Promise.all(fetchPromises);
-
+        // A resposta.data já deve ter a estrutura { estadiamento: [...], sobrevida_global: [...], ... }
+        // conforme definido no schema DashboardDataResponse e retornado pelo seu backend FastAPI.
         setGraficosData({
-          estadiamento: estadiamentoData || [],
-          sobrevida: sobrevidaData || [],
-          recidiva: recidivaData || [],
-          delta_t: deltaTData || [],
+          estadiamento: response.data.estadiamento || [],
+          sobrevida: response.data.sobrevida_global || [], // Chave corresponde ao schema
+          recidiva: response.data.taxa_recidiva || [],   // Chave corresponde ao schema
+          delta_t: response.data.media_delta_t || [],     // Chave corresponde ao schema
         });
 
       } catch (err) {
-        console.error('Erro ao carregar dados dos gráficos do S3:', err);
-        setErro(err.message);
+        console.error('Erro ao carregar dados dos gráficos da API:', err.response?.data || err.message || err);
+        // Tenta pegar a mensagem de erro do corpo da resposta da API, se disponível
+        const errorMessage = err.response?.data?.detail || // Erro do FastAPI HTTPException
+                             err.response?.data?.error ||  // Erro genérico da sua Lambda
+                             err.message ||                // Erro de rede ou outro
+                             'Erro desconhecido ao buscar dados.';
+        setErro(errorMessage);
         setGraficosData(null);
       } finally {
         setLoading(false);
       }
     };
 
-    if (s3BaseUrl) {
-      fetchAllGraficosData();
-    } else {
-      setErro("URL base do S3 não configurada para gráficos.");
-      setLoading(false);
-    }
-  }, [s3BaseUrl]);
+    fetchAllGraficosDataFromAPI();
+  }, []); // O array de dependências vazio significa que isso roda apenas uma vez na montagem do componente
 
   if (loading) {
     return <div className="dashboard-container loading-message">Carregando gráficos...</div>;
@@ -72,12 +66,10 @@ const AreaCharts = () => {
   }
 
   if (!graficosData) {
-    return <div className="dashboard-container error-message">Não foi possível carregar os dados dos gráficos.</div>;
+    // Este estado pode ocorrer se a API retornar com sucesso, mas os dados internos estiverem vazios/nulos
+    // ou se o setGraficosData(null) foi chamado no catch.
+    return <div className="dashboard-container error-message">Não foi possível carregar os dados dos gráficos ou não há dados disponíveis.</div>;
   }
-
-  // Renderiza os gráficos usando graficosData.estadiamento, graficosData.sobrevida, etc.
-  // O restante do JSX para os gráficos permanece o mesmo da sua versão anterior que funcionava com múltiplos arquivos.
-  // Apenas certifique-se de acessar os dados corretamente via `graficosData.nomeDaSecao`
 
   return (
     <div className="dashboard-container">
@@ -87,6 +79,7 @@ const AreaCharts = () => {
           <div className="dashboard-card small-chart dashboard-card-1">
             <div className="card-header">Estadiamento no Diagnóstico</div>
             <div className="card-content">
+              {/* Acessa diretamente graficosData.estadiamento, que é a lista */}
               {graficosData.estadiamento && graficosData.estadiamento.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={graficosData.estadiamento}>
@@ -110,7 +103,7 @@ const AreaCharts = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={graficosData.sobrevida}
+                      data={graficosData.sobrevida} // Agora é graficosData.sobrevida (antes sobrevida_global)
                       dataKey="quantidade"
                       nameKey="status"
                       cx="50%"
@@ -140,7 +133,7 @@ const AreaCharts = () => {
             <div className="card-content">
               {graficosData.recidiva && graficosData.recidiva.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={graficosData.recidiva}>
+                  <BarChart data={graficosData.recidiva}> 
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="tipo" />
                     <YAxis allowDecimals={false}/>
