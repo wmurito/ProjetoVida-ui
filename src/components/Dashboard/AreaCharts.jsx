@@ -25,7 +25,7 @@ const AreaCharts = () => {
       try {
         console.log('[AreaCharts] Tentando buscar dados dos gráficos da API...');
         // Chama a função getDashboardData de api.js
-        const response = await getDashboardData(); 
+        const response = await getDashboardGraficos(); 
         // Se não adicionou a api.js, seria:
         // const response = await api.get('/dashboard/dados');
         
