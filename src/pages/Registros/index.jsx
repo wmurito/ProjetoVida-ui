@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react'; // Adicionado useCallback
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api'; // Seu arquivo api.js
-// Se getPacientes estiver em api.js, pode ser:
-// import { getPacientes, getPacienteById, updatePaciente, deletePaciente } from '../../services/api';
+// Se você tiver funções específicas em api.js, pode importá-las também:
+// import { getPacientes, getPacienteById, updatePaciente, deletePaciente, exportPacientesExcel } from '../../services/api';
 
 import {
   Container, TableWrapper, TableTitle, Title, Search, TableContainer, Table, Th, Td, ActionIcons, StyledButton,
@@ -12,7 +12,6 @@ import { FaSearch, FaEye, FaEdit, FaTrash, FaFileExcel, FaPlus } from 'react-ico
 
 import Modal from '../../components/Modal'; // Seu componente Modal genérico
 
-// Importação dos modais de visualização e edição
 import ViewPacienteModal from '../../components/ModalsPaciente/ViewModal';
 import EditPacienteFormModal from "../../components/ModalsPaciente/EditModal";
 
@@ -25,57 +24,51 @@ const ListaPacientes = () => {
 
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Novo estado para modal de exclusão
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPaciente, setSelectedPaciente] = useState(null);
-  const [pacienteParaExcluir, setPacienteParaExcluir] = useState(null); // Novo estado
-  const [loadingAction, setLoadingAction] = useState(false); // Para ações como delete, save, fetch details
+  const [pacienteParaExcluir, setPacienteParaExcluir] = useState(null);
+  const [loadingAction, setLoadingAction] = useState(false);
 
-  // 🔄 Buscar lista de pacientes
   const fetchPacientes = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Para paginação, você passaria skip e limit aqui
-      // Ex: const response = await api.get('/pacientes/?skip=0&limit=20');
-      const response = await api.get('/pacientes/'); // Busca os primeiros 100 por padrão (ou o que seu backend definir)
+      const response = await api.get('/pacientes/');
       setPacientes(response.data);
     } catch (err) {
       console.error('Erro ao buscar pacientes:', err);
-      const errorMessage = err.response?.data?.detail || // Erro do FastAPI HTTPException
-                           err.response?.data?.error ||  // Erro genérico
-                           err.message ||                // Erro de rede ou outro
+      const errorMessage = err.response?.data?.detail ||
+                           err.response?.data?.error ||
+                           err.message ||
                            'Falha ao carregar a lista de pacientes.';
       setError(errorMessage);
-      setPacientes([]); // Limpa pacientes em caso de erro
+      setPacientes([]);
     } finally {
       setLoading(false);
     }
-  }, []); // useCallback com array de dependências vazio
+  }, []);
 
   useEffect(() => {
     fetchPacientes();
-  }, [fetchPacientes]); // fetchPacientes é agora uma dependência estável
+  }, [fetchPacientes]);
 
-  // 🔍 Buscar detalhes do paciente para modais
   const fetchPacienteDetailsForModal = async (pacienteId) => {
-    setLoadingAction(true); // Usar um loading específico para esta ação
-    setSelectedPaciente(null); // Limpa o paciente selecionado anterior
+    setLoadingAction(true);
+    setSelectedPaciente(null);
     try {
-      // Use o endpoint que retorna todos os detalhes necessários
-      const response = await api.get(`/paciente/view/${pacienteId}`); 
+      const response = await api.get(`/paciente/view/${pacienteId}`);
       setSelectedPaciente(response.data);
-      return response.data; // Retorna para uso imediato
+      return response.data;
     } catch (err) {
       console.error(`Erro ao buscar detalhes do paciente ${pacienteId}:`, err);
       const errorMsg = err.response?.data?.detail || err.response?.data?.error || 'Erro ao carregar detalhes do paciente.';
-      alert(errorMsg); // Ou use um sistema de notificação melhor
+      alert(errorMsg);
       return null;
     } finally {
       setLoadingAction(false);
     }
   };
 
-  // 📖 Ações de abrir/fechar modal
   const handleOpenViewModal = async (paciente) => {
     const detailedPaciente = await fetchPacienteDetailsForModal(paciente.paciente_id);
     if (detailedPaciente) {
@@ -91,19 +84,18 @@ const ListaPacientes = () => {
   };
   
   const handleOpenDeleteModal = (paciente) => {
-    setPacienteParaExcluir(paciente); // Define qual paciente será excluído
+    setPacienteParaExcluir(paciente);
     setIsDeleteModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false); // Fecha o modal de exclusão também
+    setIsDeleteModalOpen(false);
     setSelectedPaciente(null);
-    setPacienteParaExcluir(null); // Limpa o paciente para excluir
+    setPacienteParaExcluir(null);
   };
 
-  // 💾 Salvar alterações no paciente
   const handleSaveChanges = async (updatedPacienteData) => {
     if (!selectedPaciente?.paciente_id) {
         alert("Nenhum paciente selecionado para edição.");
@@ -112,16 +104,15 @@ const ListaPacientes = () => {
     setLoadingAction(true);
     try {
       const response = await api.put(`/pacientes/${selectedPaciente.paciente_id}`, updatedPacienteData);
-      // Atualiza a lista de pacientes no frontend
       setPacientes(prevPacientes => 
         prevPacientes.map(p => 
           p.paciente_id === selectedPaciente.paciente_id 
-            ? { ...p, ...response.data } // response.data deve ser o paciente atualizado
+            ? { ...p, ...response.data }
             : p
         )
       );
       alert('Paciente atualizado com sucesso!');
-      handleCloseModal(); // Fecha o modal de edição
+      handleCloseModal();
     } catch (err) {
       console.error('Erro ao salvar paciente:', err);
       const errorMsg = err.response?.data?.detail || err.response?.data?.error || 'Erro ao salvar as alterações.';
@@ -131,17 +122,15 @@ const ListaPacientes = () => {
     }
   };
 
-  // ❌ Confirmar e Excluir paciente
   const confirmarExclusaoPaciente = async () => {
     if (!pacienteParaExcluir?.paciente_id) return;
 
     setLoadingAction(true);
     try {
       await api.delete(`/pacientes/${pacienteParaExcluir.paciente_id}`);
-      // Remove o paciente da lista local
       setPacientes(prevPacientes => prevPacientes.filter(p => p.paciente_id !== pacienteParaExcluir.paciente_id));
       alert('Paciente excluído com sucesso!');
-      handleCloseModal(); // Fecha o modal de confirmação de exclusão
+      handleCloseModal();
     } catch (err) {
       console.error('Erro ao excluir paciente:', err);
       const errorMsg = err.response?.data?.detail || err.response?.data?.error || 'Erro ao excluir paciente.';
@@ -151,24 +140,53 @@ const ListaPacientes = () => {
     }
   };
 
-  // 📤 Exportar Excel
-  const exportarParaExcelBackend = () => {
-    // Assume que api.defaults.baseURL está definido corretamente em api.js
-    const backendBaseUrl = api.defaults.baseURL;
-    // Certifique-se que seu backend tem o endpoint /pacientes/exportar_excel
-    const exportUrl = `${backendBaseUrl}/pacientes/exportar_excel`; 
-    console.log("Tentando exportar Excel de:", exportUrl);
-    window.open(exportUrl, '_blank'); // Abre em uma nova aba para download
+  const exportarParaExcelBackend = async () => { // Tornada async para o setLoadingAction
+    console.log("Tentando exportar Excel via API com token...");
+    setLoadingAction(true);
+    try {
+
+      const response = await api.get('/pacientes/exportar_excel', {
+        responseType: 'blob', 
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      
+      let filename = 'relatorio_pacientes.xlsx';
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
+        if (filenameMatch && filenameMatch.length > 1) {
+          filename = filenameMatch[1];
+        }
+      }
+      link.setAttribute('download', filename);
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+    } catch (err) {
+      console.error('Erro ao exportar Excel:', err.response || err);
+      const errorMsg = err.response?.data?.detail ||
+                       (err.response?.data instanceof Blob ? "Erro ao processar arquivo do servidor. Verifique o console do backend." : err.response?.data?.error) || 
+                       err.message || 
+                       'Erro ao gerar o relatório Excel.';
+      alert(errorMsg);
+    } finally {
+      setLoadingAction(false);
+    }
   };
 
-  // 🔎 Filtro de busca (local)
   const pacientesFiltrados = pacientes.filter(p =>
     (p.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (p.cidade?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (p.paciente_id?.toString().includes(searchTerm)) // Busca por ID também
+    (p.paciente_id?.toString().includes(searchTerm))
   );
 
-  // Feedback inicial de carregamento ou erro
   if (loading && pacientes.length === 0) {
     return <Container><div style={{ textAlign: 'center', padding: '2rem' }}>Carregando pacientes...</div></Container>;
   }
@@ -194,11 +212,12 @@ const ListaPacientes = () => {
         <TableTitle>
           <Title>Registro de Pacientes</Title>
           <Search>
-            <StyledButton onClick={() => navigate('/novo-cadastro')} className="primary"> {/* Ajuste o caminho se necessário */}
+            <StyledButton onClick={() => navigate('/novo-cadastro')} className="primary">
               <FaPlus style={{ marginRight: '0.5em' }} /> Novo Paciente
             </StyledButton>
-            <StyledButton onClick={exportarParaExcelBackend} className="secondary">
-              <FaFileExcel style={{ marginRight: '0.5em' }} /> Exportar
+            <StyledButton onClick={exportarParaExcelBackend} className="secondary" disabled={loadingAction}>
+              <FaFileExcel style={{ marginRight: '0.5em' }} /> 
+              {loadingAction && pacientesFiltrados.length > 0 ? 'Gerando...' : 'Exportar'}
             </StyledButton>
           </Search>
         </TableTitle>
@@ -228,7 +247,7 @@ const ListaPacientes = () => {
           />
         </div>
 
-        {pacientesFiltrados.length === 0 && !loading ? ( // Adicionado !loading aqui
+        {pacientesFiltrados.length === 0 && !loading ? (
           <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
             Nenhum paciente encontrado com os critérios de busca ou nenhum paciente cadastrado.
           </div>
@@ -277,9 +296,9 @@ const ListaPacientes = () => {
         isOpen={isViewModalOpen}
         onClose={handleCloseModal}
         title="Detalhes do Paciente"
-        maxWidth="850px" // Ajuste conforme o conteúdo do ViewPacienteModal
+        maxWidth="850px"
       >
-        {loadingAction ? (
+        {loadingAction && !selectedPaciente ? (
           <div style={{ textAlign: 'center', padding: '2rem' }}>Carregando detalhes...</div>
         ) : (
           selectedPaciente && <ViewPacienteModal paciente={selectedPaciente} onClose={handleCloseModal} />
@@ -291,14 +310,14 @@ const ListaPacientes = () => {
         isOpen={isEditModalOpen}
         onClose={handleCloseModal}
         title="Editar Paciente"
-        maxWidth="950px" // Ajuste conforme o conteúdo do EditPacienteFormModal
+        maxWidth="950px"
       >
-        {loadingAction ? (
+        {loadingAction && !selectedPaciente ? (
           <div style={{ textAlign: 'center', padding: '2rem' }}>Carregando formulário...</div>
         ) : (
           selectedPaciente && (
             <EditPacienteFormModal
-              pacienteInitialData={selectedPaciente} // Renomeado para clareza
+              pacienteInitialData={selectedPaciente}
               onSave={handleSaveChanges}
               onClose={handleCloseModal}
             />
@@ -309,9 +328,9 @@ const ListaPacientes = () => {
       {/* Modal de Confirmação de Exclusão */}
       <Modal
         isOpen={isDeleteModalOpen}
-        onClose={handleCloseDeleteModal}
+        onClose={handleCloseModal} 
         title="Confirmar Exclusão"
-        maxWidth="450px" // Um modal menor para confirmação
+        maxWidth="450px"
       >
         {pacienteParaExcluir && (
           <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -321,12 +340,12 @@ const ListaPacientes = () => {
               Esta ação não pode ser desfeita.
             </p>
             <div style={{ marginTop: '25px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <StyledButton onClick={handleCloseDeleteModal} className="secondary">
+              <StyledButton onClick={handleCloseModal} className="secondary" disabled={loadingAction}>
                 Cancelar
               </StyledButton>
               <StyledButton 
                 onClick={confirmarExclusaoPaciente} 
-                className="danger" // Você precisará de um estilo para .danger ou use uma prop de cor
+                className="danger"
                 disabled={loadingAction}
               >
                 {loadingAction ? 'Excluindo...' : 'Confirmar Exclusão'}
