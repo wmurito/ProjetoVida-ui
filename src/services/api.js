@@ -1,127 +1,186 @@
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { validateJwtFormat, sanitizeInput } from './securityConfig';
+import { addCSRFToken, initCSRFProtection } from './csrf';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// Inicializar proteção CSRF
+initCSRFProtection();
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
+    'X-Content-Type-Options': 'nosniff',
+    'X-XSS-Protection': '1; mode=block',
+    'Referrer-Policy': 'strict-origin-when-cross-origin'
   },
-  withCredentials: false // Geralmente false para APIs baseadas em token Bearer
+  withCredentials: true
 });
 
-// Função para obter o token atual com logs detalhados
+// Função para verificar autorização
+const checkAuthorization = async () => {
+  try {
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('Token não disponível');
+    }
+    
+    // Verificar se o token é válido e não expirou
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    
+    if (payload.exp < currentTime) {
+      throw new Error('Token expirado');
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Erro de autorização:', sanitizeInput(error.message));
+    return false;
+  }
+};
+
+// Função para obter o token atual
 export const getAuthToken = async () => {
   try {
-    // console.log('[getAuthToken] Tentando obter sessão...'); // Pode ser muito verboso, comente se necessário
-    const session = await fetchAuthSession({ forceRefresh: false }); // forceRefresh: false é bom para performance
-    // console.log('[getAuthToken] Sessão obtida:', session);
+    const session = await fetchAuthSession({ forceRefresh: false });
 
     if (session?.tokens?.accessToken) {
-      // console.log('[getAuthToken] Access Token JWT (toString):', session.tokens.accessToken.toString());
-      return session.tokens.accessToken.toString();
-    } else {
-      console.warn('[getAuthToken] Access Token não encontrado na sessão.');
-      return null;
+      const token = session.tokens.accessToken.toString();
+      if (validateJwtFormat(token)) {
+        return token;
+      }
     }
+    
+    return null;
   } catch (error) {
-    // Erro comum aqui é 'UserNotAuthenticatedException' se não houver sessão
-    // console.error('[getAuthToken] Erro ao obter sessão ou tokens:', error.name, error.message);
-    if (error.name !== 'UserNotAuthenticatedException') { // Loga apenas erros inesperados
-        console.error('[getAuthToken] Erro inesperado ao obter sessão ou tokens:', error);
+    if (!import.meta.env.PROD && error.name !== 'UserNotAuthenticatedException') {
+      console.error('[Auth] Erro de autenticação');
     }
     return null;
   }
 };
 
-// Interceptor para adicionar token de autenticação
+// Interceptor para adicionar token de autenticação e CSRF
 api.interceptors.request.use(
   async (config) => {
-    // Não logar a URL para todas as requisições em produção para não poluir os logs
-    // console.log('[Interceptor Request] Configuração original:', config.url);
-    
-    // Verifica se a URL é para os endpoints de dashboard que podem ser públicos
-    const publicDashboardPaths = ['/dashboard/graficos', '/dashboard/kpis'];
-    const isPublicDashboardRequest = publicDashboardPaths.some(path => config.url.endsWith(path));
-
-    if (isPublicDashboardRequest) {
-      // Para os endpoints de dashboard (se forem públicos no backend),
-      // podemos decidir não enviar o token.
-      // Se eles forem protegidos no backend, o interceptor abaixo cuidará disso.
-      // Se eles são públicos, mas o usuário ESTÁ logado, o token será enviado de qualquer forma
-      // pela lógica abaixo, o que não é um problema, mas se quiser evitar:
-      // console.log('[Interceptor Request] Endpoint público de dashboard, não adicionando token:', config.url);
-      // return config; // Se quiser explicitamente não enviar token para endpoints públicos
+    // Verificar autorização antes de fazer a requisição
+    const isAuthorized = await checkAuthorization();
+    if (!isAuthorized) {
+      throw new Error('Não autorizado');
     }
-    
+
+    // Adicionar token de autenticação
     const token = await getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      // console.log('[Interceptor Request] Token adicionado ao cabeçalho Authorization para:', config.url);
-    } else {
-      // console.warn('[Interceptor Request] Token não disponível. Requisição seguirá sem Authorization header para:', config.url);
     }
+    
+    // Adicionar token CSRF para métodos não seguros
+    if (['post', 'put', 'delete', 'patch'].includes(config.method?.toLowerCase())) {
+      config.headers = addCSRFToken(config.headers);
+    }
+    
+    // Sanitizar parâmetros de consulta
+    if (config.params) {
+      Object.keys(config.params).forEach(key => {
+        if (typeof config.params[key] === 'string') {
+          config.params[key] = sanitizeInput(config.params[key]);
+        }
+      });
+    }
+    
+    // Sanitizar dados de requisição
+    if (config.data && typeof config.data === 'object') {
+      Object.keys(config.data).forEach(key => {
+        if (typeof config.data[key] === 'string') {
+          config.data[key] = sanitizeInput(config.data[key]);
+        }
+      });
+    }
+    
     return config;
   },
   (error) => {
-    console.error('[Interceptor Request] Erro no interceptor de request:', error);
+    if (!import.meta.env.PROD) {
+      console.error('[API] Erro na requisição:', sanitizeInput(error.message));
+    }
     return Promise.reject(error);
   }
 );
 
-// Interceptor de resposta (opcional, mas útil para lidar com erros 401/403 globalmente)
+// Interceptor de resposta
 api.interceptors.response.use(
-  (response) => response, // Simplesmente retorna a resposta se for bem-sucedida
+  (response) => response,
   (error) => {
-    console.error('[Interceptor Response] Erro na resposta da API:', error.response?.status, error.response?.data || error.message);
     if (error.response) {
-      // O servidor respondeu com um status de erro (4xx ou 5xx)
+      // Redirecionar para login em caso de erro de autenticação
       if (error.response.status === 401) {
-        // Ex: Token inválido ou expirado. Poderia redirecionar para login ou tentar refresh.
-        console.warn('[Interceptor Response] Erro 401 - Não autorizado. O token pode ter expirado.');
-        // window.location.href = '/login'; // Exemplo de redirecionamento
+        toast.error('Sessão expirada. Redirecionando para login...');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
       } else if (error.response.status === 403) {
-        // Ex: Usuário autenticado, mas não tem permissão para o recurso.
-        console.warn('[Interceptor Response] Erro 403 - Proibido. O usuário não tem permissão.');
+        toast.error('Acesso negado. Você não tem permissão para esta operação.');
+      } else {
+        toast.error('Erro na operação. Tente novamente.');
       }
-    } else if (error.request) {
-      // A requisição foi feita, mas nenhuma resposta foi recebida (ex: problema de rede)
-      console.error('[Interceptor Response] Nenhuma resposta recebida:', error.request);
+      
+      // Log seguro do erro
+      console.error('[API Error]', {
+        status: error.response.status,
+        url: sanitizeInput(error.config?.url || ''),
+        method: error.config?.method?.toUpperCase()
+      });
     } else {
-      // Algo aconteceu ao configurar a requisição que acionou um erro
-      console.error('[Interceptor Response] Erro na configuração da requisição:', error.message);
+      toast.error('Erro de conexão. Verifique sua internet.');
     }
-    return Promise.reject(error); // Importante rejeitar o erro para que os catch() nos componentes funcionem
+    return Promise.reject(error);
   }
 );
 
-
-// --- Funções de API ---
-
-// Endpoints de Pacientes
-export const getPacientes = (skip = 0, limit = 100) => {
-  console.log('[API] getPacientes chamado.');
-  return api.get(`/pacientes/?skip=${skip}&limit=${limit}`);
+// Endpoints de Pacientes com verificação de autorização
+export const getPacientes = async (skip = 0, limit = 100) => {
+  try {
+    const isAuthorized = await checkAuthorization();
+    if (!isAuthorized) {
+      throw new Error('Não autorizado para acessar dados de pacientes');
+    }
+    return api.get(`/pacientes/?skip=${skip}&limit=${limit}`);
+  } catch (error) {
+    console.error('Erro ao buscar pacientes:', sanitizeInput(error.message));
+    throw error;
+  }
 };
 
-// Adicione outras funções CRUD para pacientes aqui (createPaciente, getPacienteById, updatePaciente, deletePaciente)
-// Exemplo:
-// export const getPacienteById = (pacienteId) => api.get(`/pacientes/${pacienteId}`);
-// export const createPaciente = (pacienteData) => api.post('/pacientes/', pacienteData);
-// export const updatePaciente = (pacienteId, pacienteData) => api.put(`/pacientes/${pacienteId}`, pacienteData);
-// export const deletePaciente = (pacienteId) => api.delete(`/pacientes/${pacienteId}`);
-
-
-// Endpoints do Dashboard
-export const getDashboardGraficos = () => { // Renomeado de getDashboardData para clareza
-  console.log('[API] getDashboardGraficos chamado.');
-  return api.get(`/dashboard/graficos`); // Caminho ajustado para o endpoint de gráficos
+// Endpoints do Dashboard com verificação de autorização
+export const getDashboardGraficos = async () => {
+  try {
+    const isAuthorized = await checkAuthorization();
+    if (!isAuthorized) {
+      throw new Error('Não autorizado para acessar dashboard');
+    }
+    return api.get(`/dashboard/graficos`);
+  } catch (error) {
+    console.error('Erro ao buscar gráficos:', sanitizeInput(error.message));
+    throw error;
+  }
 };
 
-export const getDashboardKpis = () => { // ✨ FUNÇÃO ADICIONADA ✨
-  console.log('[API] getDashboardKpis chamado.');
-  return api.get(`/dashboard/kpis`);
+export const getDashboardKpis = async () => {
+  try {
+    const isAuthorized = await checkAuthorization();
+    if (!isAuthorized) {
+      throw new Error('Não autorizado para acessar KPIs');
+    }
+    return api.get(`/dashboard/kpis`);
+  } catch (error) {
+    console.error('Erro ao buscar KPIs:', sanitizeInput(error.message));
+    throw error;
+  }
 };
 
 export default api;

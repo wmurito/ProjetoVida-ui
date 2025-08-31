@@ -2,10 +2,9 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   grid-area: CT; 
-
-  //padding: 10px;
+  padding: 20px;
   color: #8a8a8a;
-  height: calc(100vh - 70px);
+  height: 100vh;
   overflow-y: auto;
 
   /* Estilos da barra de rolagem */

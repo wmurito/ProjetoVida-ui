@@ -3,119 +3,216 @@ import {
   signOut,
   fetchAuthSession,
   confirmSignIn,
-  getCurrentUser // Adicionado para logar o usuário atual
+  getCurrentUser
 } from 'aws-amplify/auth';
 import { useState, useEffect, createContext, useContext } from 'react';
+import { clearSensitiveData } from '../services/securityConfig';
+import { initCSRFProtection } from '../services/csrf';
 
 const AuthContext = createContext();
+
+// Constantes para limitar tentativas de login
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutos em milissegundos
 
 export const AuthProvider = ({ children }) => {
   const [logged, setLogged] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pendingChallenge, setPendingChallenge] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null); // Para armazenar dados do usuário
+  const [currentUser, setCurrentUser] = useState(null);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  
+  // Estado para controle de tentativas de login
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState(null);
+  
+  // Estado para registro de auditoria
+  const [securityEvents, setSecurityEvents] = useState([]);
 
-  const login = async (username, password, newPassword = null) => {
-    console.log('[AuthProvider] Tentativa de login para usuário:', username);
+  // Função para registrar eventos de segurança
+  const logSecurityEvent = (eventType, details) => {
+    const event = {
+      timestamp: new Date().toISOString(),
+      eventType,
+      details,
+      userAgent: navigator.userAgent,
+      ipAddress: 'client-side' // O IP real seria capturado pelo backend
+    };
+    
+    setSecurityEvents(prev => [...prev, event]);
+    
+    // Em produção, enviar para o backend para armazenamento
+    if (import.meta.env.PROD) {
+      // Implementar envio para API de auditoria
+      // api.post('/security-events', event);
+    }
+  };
+
+  const login = async (username, password, newPassword = null, mfaCode = null) => {
     try {
+      // Verificar se a conta está bloqueada
+      if (lockoutUntil && new Date() < lockoutUntil) {
+        const remainingMinutes = Math.ceil((lockoutUntil - new Date()) / (60 * 1000));
+        logSecurityEvent('LOGIN_BLOCKED', { username, reason: 'account_locked' });
+        return { 
+          error: `Conta temporariamente bloqueada. Tente novamente em ${remainingMinutes} minutos.` 
+        };
+      }
+
+      // Fluxo de troca de senha
       if (pendingChallenge && newPassword) {
-        console.log('[AuthProvider] Confirmando login com nova senha...');
         await confirmSignIn({ challengeResponse: newPassword });
         setPendingChallenge(null);
-        console.log('[AuthProvider] Nova senha confirmada.');
-        await checkUser(true); // Força a atualização do estado após confirmação
+        await checkUser(true);
+        
+        // Resetar tentativas após login bem-sucedido
+        setLoginAttempts(0);
+        setLockoutUntil(null);
+        logSecurityEvent('PASSWORD_CHANGED', { username });
+        return { success: true };
+      }
+      
+      // Fluxo de verificação MFA
+      if (mfaRequired && mfaCode) {
+        await confirmSignIn({ challengeResponse: mfaCode });
+        setMfaRequired(false);
+        await checkUser(true);
+        
+        // Resetar tentativas após login bem-sucedido
+        setLoginAttempts(0);
+        setLockoutUntil(null);
+        logSecurityEvent('MFA_SUCCESS', { username });
         return { success: true };
       }
 
+      // Fluxo de login inicial
       const { nextStep } = await signIn({ username, password });
-      console.log('[AuthProvider] Resultado do signIn:', nextStep);
 
       if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-        console.log('[AuthProvider] Nova senha requerida.');
         setPendingChallenge(true);
+        logSecurityEvent('NEW_PASSWORD_REQUIRED', { username });
         return { newPasswordRequired: true };
+      }
+      
+      if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_MFA') {
+        setMfaRequired(true);
+        logSecurityEvent('MFA_REQUIRED', { username });
+        return { mfaRequired: true };
       }
 
       if (nextStep.signInStep === 'DONE') {
-        console.log('[AuthProvider] Login bem-sucedido (DONE).');
-        await checkUser(true); // Força a atualização do estado e busca de tokens
+        await checkUser(true);
+        // Marcar como logado em sessionStorage para detecção de inatividade
+        sessionStorage.setItem('isLoggedIn', 'true');
+        // Inicializar proteção CSRF
+        initCSRFProtection();
+        
+        // Resetar tentativas após login bem-sucedido
+        setLoginAttempts(0);
+        setLockoutUntil(null);
+        logSecurityEvent('LOGIN_SUCCESS', { username });
         return { success: true };
       }
 
-      console.warn('[AuthProvider] Passo de autenticação não suportado:', nextStep.signInStep);
+      logSecurityEvent('LOGIN_UNKNOWN_STEP', { username, step: nextStep.signInStep });
       return { error: 'Passo de autenticação não suportado' };
     } catch (error) {
-      console.error("[AuthProvider] Erro no login:", error);
-      // Não relance o erro aqui se quiser tratar no componente de Login
-      // throw error;
-      return { error: error.message || "Erro desconhecido no login" };
+      // Incrementar tentativas de login em caso de falha
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+      
+      // Bloquear conta após muitas tentativas
+      if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+        const lockTime = new Date(Date.now() + LOCKOUT_TIME);
+        setLockoutUntil(lockTime);
+        logSecurityEvent('ACCOUNT_LOCKED', { username, attempts: newAttempts });
+        return { 
+          error: `Muitas tentativas de login. Conta bloqueada por 15 minutos.` 
+        };
+      }
+      
+      logSecurityEvent('LOGIN_FAILED', { username, attempts: newAttempts });
+      return { error: "Credenciais inválidas" };
     }
   };
 
   const logout = async () => {
-    console.log('[AuthProvider] Tentativa de logout...');
     try {
-      await signOut({ global: true }); // global: true invalida tokens em todos os dispositivos
+      const username = currentUser?.username;
+      await signOut({ global: true });
       setLogged(false);
       setCurrentUser(null);
-      sessionStorage.removeItem('userId'); // Limpar se estiver usando
-      console.log('[AuthProvider] Logout bem-sucedido.');
+      
+      // Limpar dados sensíveis
+      clearSensitiveData();
+      sessionStorage.removeItem('isLoggedIn');
+      
+      logSecurityEvent('LOGOUT', { username });
     } catch (error) {
-      console.error("[AuthProvider] Erro no logout:", error);
-      throw error; // Pode relançar para tratamento no UI se necessário
+      logSecurityEvent('LOGOUT_ERROR', { error: error.name });
+      throw error;
     }
   };
 
-  // Adicionado parâmetro 'isAfterLoginOrConfirmation' para log mais específico
   const checkUser = async (isAfterLoginOrConfirmation = false) => {
-    if (!isAfterLoginOrConfirmation) setLoading(true); // Só mostra loading se não for chamado após login
-    console.log('[AuthProvider] Verificando sessão do usuário...');
+    if (!isAfterLoginOrConfirmation) setLoading(true);
     try {
-      // fetchAuthSession já é chamado em getAuthToken, mas aqui também para estado inicial
-      const session = await fetchAuthSession(); // { forceRefresh: true } pode ser útil em alguns casos de debug
-      console.log('[AuthProvider] checkUser - Sessão:', session);
+      const session = await fetchAuthSession();
       
-      // A existência de tokens implica que o usuário está logado
-      // A validade é verificada pelo Amplify internamente; se expirados, fetchAuthSession tentaria refresh.
-      // Se o refresh falhar (ex: refresh token expirado), ele lançaria um erro.
       if (session && session.tokens) {
         setLogged(true);
-        console.log('[AuthProvider] checkUser - Usuário está logado (tokens encontrados).');
-        // Opcional: buscar detalhes do usuário
         try {
           const cognitoUser = await getCurrentUser();
-          console.log('[AuthProvider] checkUser - Usuário atual do Cognito:', cognitoUser);
           setCurrentUser({
             username: cognitoUser.username,
             userId: cognitoUser.userId,
-            // Outros atributos se disponíveis e necessários
           });
-          // sessionStorage.setItem('userId', cognitoUser.userId); // Pode ser redundante se já feito no login
+          
+          // Marcar como logado em sessionStorage para detecção de inatividade
+          sessionStorage.setItem('isLoggedIn', 'true');
         } catch (userError) {
-          console.warn('[AuthProvider] checkUser - Não foi possível obter detalhes do usuário Cognito, mas tokens existem:', userError);
-          // Mantém logado se tokens existem, mesmo que getCurrentUser falhe por algum motivo
+          // Manter logado se tokens existem, mesmo que getCurrentUser falhe
         }
       } else {
         setLogged(false);
         setCurrentUser(null);
-        console.log('[AuthProvider] checkUser - Usuário não está logado (sem tokens na sessão).');
+        sessionStorage.removeItem('isLoggedIn');
       }
     } catch (error) {
-      // Erro aqui geralmente significa que não há sessão válida (nem tokens, nem refresh token válido)
       setLogged(false);
       setCurrentUser(null);
-      console.log('[AuthProvider] checkUser - Erro ao buscar sessão (usuário provavelmente não logado):', error.message || error);
+      sessionStorage.removeItem('isLoggedIn');
     } finally {
       if (!isAfterLoginOrConfirmation) setLoading(false);
     }
   };
 
+  // Verificar sessão periodicamente para segurança
   useEffect(() => {
     checkUser();
+    
+    // Verificar a sessão a cada 5 minutos
+    const interval = setInterval(() => {
+      if (logged) {
+        checkUser();
+      }
+    }, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ logged, login, logout, loading, pendingChallenge, currentUser }}>
+    <AuthContext.Provider value={{ 
+      logged, 
+      login, 
+      logout, 
+      loading, 
+      pendingChallenge, 
+      currentUser,
+      loginAttempts,
+      lockoutUntil,
+      mfaRequired
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { sanitizeInput } from "../../services/securityConfig";
 
 import Input from "../../components/Input";
 import Button from "../../components/Button";
@@ -40,6 +41,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const navigate = useNavigate();
   const { login, logged, loading: authLoading } = useAuth();
@@ -51,10 +53,11 @@ const Login = () => {
   }, [logged, navigate, authLoading]);
 
   useEffect(() => {
-    const storedRememberMe = localStorage.getItem("lsRememberMe");
+    // Usar sessionStorage em vez de localStorage para maior segurança
+    const storedRememberMe = sessionStorage.getItem("rememberMe");
     if (storedRememberMe === "true") {
       setRememberMe(true);
-      const storedEmail = localStorage.getItem("username");
+      const storedEmail = sessionStorage.getItem("username");
       if (storedEmail) {
         setEmail(storedEmail);
       }
@@ -62,41 +65,74 @@ const Login = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("lsRememberMe", rememberMe);
+    // Armazenar em sessionStorage em vez de localStorage
+    sessionStorage.setItem("rememberMe", rememberMe);
     if (rememberMe) {
-      localStorage.setItem("username", email);
+      sessionStorage.setItem("username", sanitizeInput(email));
     } else {
-      localStorage.removeItem("username");
+      sessionStorage.removeItem("username");
     }
   }, [rememberMe, email]);
+
+  // Validação de senha forte
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+      return "A senha deve ter pelo menos 8 caracteres";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "A senha deve conter pelo menos uma letra maiúscula";
+    }
+    if (!/[a-z]/.test(password)) {
+      return "A senha deve conter pelo menos uma letra minúscula";
+    }
+    if (!/[0-9]/.test(password)) {
+      return "A senha deve conter pelo menos um número";
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      return "A senha deve conter pelo menos um caractere especial";
+    }
+    return "";
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      if (isChangingPassword && newPassword !== confirmPassword) {
-        toast.error("As novas senhas não coincidem.");
-        setLoading(false);
-        return;
+      // Sanitizar entradas
+      const sanitizedEmail = sanitizeInput(email);
+
+      if (isChangingPassword) {
+        // Validar força da senha
+        const passwordValidation = validatePassword(newPassword);
+        if (passwordValidation) {
+          setPasswordError(passwordValidation);
+          setLoading(false);
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          setPasswordError("As novas senhas não coincidem");
+          setLoading(false);
+          return;
+        }
       }
 
-      const result = await login(email, password, newPassword);
+      const result = await login(sanitizedEmail, password, newPassword);
 
       if (result?.newPasswordRequired) {
-        toast.info("É necessário alterar sua senha.");
+        toast.info("É necessário alterar sua senha");
         setIsChangingPassword(true);
         return;
       }
 
       if (result?.success) {
-        toast.success("Login realizado com sucesso!");
+        toast.success("Login realizado com sucesso");
       } else {
-        toast.error(result?.error || "Erro ao fazer login");
+        toast.error("Credenciais inválidas");
       }
     } catch (error) {
-      console.error("Erro no login:", error);
-      toast.error(error.message || "Erro ao fazer login");
+      toast.error("Erro ao fazer login");
     } finally {
       setLoading(false);
     }
@@ -159,7 +195,10 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Nova senha"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setPasswordError("");
+                  }}
                   required
                 />
               </PasswordContainer>
@@ -169,10 +208,19 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirmar nova senha"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setPasswordError("");
+                  }}
                   required
                 />
               </PasswordContainer>
+              
+              {passwordError && (
+                <div style={{ color: 'red', marginBottom: '10px', fontSize: '14px' }}>
+                  {passwordError}
+                </div>
+              )}
             </>
           )}
 

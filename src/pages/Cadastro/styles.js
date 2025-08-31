@@ -33,7 +33,7 @@ export const SectionTitle = styled.h2`
   color: #343a40; // Dark gray
   font-weight: 600;
   padding-bottom: 6px;
-  border-bottom: 2px solid #4f46e5;
+  border-bottom: 2px solid #b01950ff;
   display: inline-block;
 `;
 
@@ -94,9 +94,38 @@ const inputStyles = `
     color: #6c757d;
   }
 `;
+const inputStyles2 = `
+  padding: 9px 12px; // Adjusted padding
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 0.95rem; // Slightly smaller input text
+  box-sizing: border-box;
+  width: 40%;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+  }
+
+  &::placeholder {
+    color: #adb5bd;
+  }
+
+  &:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    color: #6c757d;
+  }
+`;
 
 export const StyledInput = styled.input`
   ${inputStyles}
+`;
+
+export const StyledInput2 = styled.input`
+  ${inputStyles2}
 `;
 
 export const StyledSelect = styled.select`
@@ -143,7 +172,7 @@ export const CheckboxLabel = styled.label`
 `;
 
 export const Button = styled.button`
-  background-color: #4f46e5;
+  background-color: #b71550;
   color: white;
   padding: 11px 26px;
   border-radius: 6px;
@@ -154,7 +183,7 @@ export const Button = styled.button`
   transition: background-color 0.2s ease-in-out, transform 0.1s ease;
 
   &:hover {
-    background-color: #3730a3;
+    background-color: #d81b60;
   }
   &:active {
     transform: translateY(1px);
@@ -194,4 +223,305 @@ export const ApiErrorContainer = styled.div`
   color: #58151c; // Bootstrap danger text
   border-radius: 5px;
   text-align: left;
+`;
+
+export const SectionContent = styled.div`
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 20px; /* Adicionado para separar do título */
+  border: 1px solid #e9ecef;
+`;
+
+export const AddMemberButton = styled.button`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0;
+  min-height: 50px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 18px 20px;
+    font-size: 1.1rem;
+  }
+`;
+
+// Estilos para campos de textarea
+export const TextAreaInput = styled.textarea`
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid ${props => props.$hasError ? '#e74c3c' : '#e1e5e9'};
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.$hasError ? '#e74c3c' : '#667eea'};
+    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(231, 76, 60, 0.1)' : 'rgba(102, 126, 234, 0.1)'};
+  }
+
+  &::placeholder {
+    color: #a0a0a0;
+  }
+`;
+
+// Atualização do StyledInput para suportar textarea
+export const StyledInputUpdated = styled.input`
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid ${props => props.$hasError ? '#e74c3c' : '#e1e5e9'};
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.$hasError ? '#e74c3c' : '#667eea'};
+    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(231, 76, 60, 0.1)' : 'rgba(102, 126, 234, 0.1)'};
+  }
+
+  &::placeholder {
+    color: #a0a0a0;
+  }
+
+  /* Suporte para textarea */
+  ${props => props.as === 'textarea' && `
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+  `}
+`;
+
+// Estilos para indicadores de status
+export const StatusIndicator = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  ${props => {
+    switch (props.status) {
+      case 'success':
+        return `
+          background-color: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+        `;
+      case 'warning':
+        return `
+          background-color: #fff3cd;
+          color: #856404;
+          border: 1px solid #ffeaa7;
+        `;
+      case 'danger':
+        return `
+          background-color: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+        `;
+      default:
+        return `
+          background-color: #e2e3e5;
+          color: #383d41;
+          border: 1px solid #d6d8db;
+        `;
+    }
+  }}
+`;
+
+// Estilos para loading states
+export const LoadingSpinner = styled.div`
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+// Estilos responsivos adicionais
+export const ResponsiveContainer = styled.div`
+  @media (max-width: 768px) {
+    padding: 15px;
+    
+    ${FormGrid} {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    
+    ${FieldContainer} {
+      grid-column: span 1 !important;
+    }
+  }
+`;
+
+// Estilos para animações
+export const FadeIn = styled.div`
+  animation: fadeIn 0.3s ease-in;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+// Estilos para tooltips (se necessário)
+export const Tooltip = styled.div`
+  position: relative;
+  display: inline-block;
+
+  &:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+
+  &:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #333;
+    z-index: 1000;
+  }
+`;
+
+
+
+
+export const AddMoreButton = styled.button`
+  background-color: #fce4ec; /* Rosa bem claro */
+  color: #d81b60; /* Rosa principal */
+  border: 1px solid #f8bbd0; /* Borda rosa clara */
+  padding: 8px 16px; /* Menor que o botão principal */
+  border-radius: 20px; /* Mais arredondado */
+  font-size: 0.9rem; /* Fonte menor */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+
+  &:hover {
+    background-color: #f8bbd0;
+    color: #b71550;
+    box-shadow: 0 2px 8px rgba(216, 27, 96, 0.15);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+`;
+
+export const ListContainer = styled.div`
+    width: 100%;
+    margin-top: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+`;
+
+export const ListItem = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+
+    &:last-child {
+        border-bottom: none;
+    }
+`;
+
+export const ListItemText = styled.div`
+    font-size: 0.9rem;
+    color: #495057;
+`;
+
+export const ActionButtons = styled.div`
+    display: flex;
+    gap: 10px;
+`;
+
+export const EditButton = styled(Button)`
+    background-color: #ffc107;
+    color: #212529;
+
+    &:hover {
+        background-color: #e0a800;
+    }
+`;
+
+export const RemoveButton = styled(Button)`
+    background-color: #dc3545;
+    color: white;
+
+    &:hover {
+        background-color: #c82333;
+    }
 `;

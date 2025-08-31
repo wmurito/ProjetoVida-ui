@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const HeaderContainer = styled.div`
+export const Container = styled.div`
   grid-area: HE;
   color: #8A8A8A;
   background-color: #FFF;
