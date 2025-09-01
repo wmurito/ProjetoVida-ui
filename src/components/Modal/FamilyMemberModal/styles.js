@@ -1,280 +1,191 @@
-// src/components/Modal/FamilyMemberModal/styles.js
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export const ModalBackdrop = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 20px;
-  box-sizing: border-box;
+// --- Cores ---
+const primaryPink = '#e91e63';
+const lightPink = '#fce4ec';
+const textDark = '#333';
+const textLight = '#666';
+const borderColor = '#ddd';
+const dangerRed = '#f44336';
+const successGreen = '#4CAF50';
+const greyButton = '#9e9e9e';
+
+// --- Modal Base ---
+export const ModalOverlay = styled.div`
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; justify-content: center; align-items: center; z-index: 1000;
+  backdrop-filter: blur(3px);
 `;
 
 export const ModalContent = styled.div`
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 900px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  animation: modalSlideIn 0.3s ease-out;
-
-  @keyframes modalSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-50px) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  @media (max-width: 768px) {
-    margin: 10px;
-    max-height: 95vh;
-  }
+  background: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const ModalHeader = styled.div`
+  padding: 20px 30px;
+  border-bottom: 1px solid ${borderColor};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 25px 30px 20px;
-  border-bottom: 2px solid #f0f0f0;
-  background: linear-gradient(135deg, #eba4c8 0%, #df1ead 100%);
-  color: white;
-  border-radius: 12px 12px 0 0;
-
-  @media (max-width: 768px) {
-    padding: 20px 20px 15px;
-  }
-`;
-
-export const ModalTitle = styled.h2`
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
-
-  @media (max-width: 768px) {
-    font-size: 1.3rem;
-  }
+  h2 { margin: 0; font-size: 1.5rem; color: ${textDark}; }
 `;
 
 export const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: white;
+  background: none; border: none; font-size: 2.5rem;
+  cursor: pointer; color: ${textLight};
+  transition: all 0.2s;
+  &:hover { color: ${primaryPink}; transform: rotate(90deg); }
+`;
+
+export const ModalBody = styled.div`
+  padding: 30px;
+  overflow-y: auto;
+  flex-grow: 1;
+`;
+
+export const ModalFooter = styled.div`
+  display: flex; justify-content: flex-end; gap: 15px;
+  padding: 20px 30px; border-top: 1px solid ${borderColor};
+  background: #fff;
+`;
+
+// --- Grade de Parentes ---
+export const RelativeGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+`;
+
+export const RelativeCard = styled.div`
+  border: 2px solid ${borderColor};
+  border-radius: 10px;
+  overflow: hidden;
   cursor: pointer;
-  padding: 0;
-  width: 40px;
-  height: 40px;
+  transition: all 0.3s ease;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+  ${({ $isSelected }) => $isSelected && css`
+    border-color: ${primaryPink};
+    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.2);
+    transform: translateY(-5px);
+  `}
+`;
+
+export const RelativeName = styled.h3`
+  margin: 0;
+  padding: 15px;
+  font-size: 1.1rem;
+  text-align: center;
+  background-color: #f7f7f7;
+  color: ${textDark};
+  transition: all 0.3s ease;
+  font-weight: 600;
+
+  ${RelativeCard}:hover & {
+    background-color: ${lightPink};
+    color: ${primaryPink};
+  }
+
+  ${({ $isSelected }) => $isSelected && css`
+    background-color: ${primaryPink};
+    color: white;
+  `}
+`;
+
+// --- Seção do Formulário dentro do Card ---
+export const FormSection = styled.div`
+  padding: 20px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  flex-direction: column;
+  gap: 20px;
+  cursor: default;
 `;
 
-export const FormContainer = styled.form`
-  padding: 10px;
-
-  @media (max-width: 768px) {
-    padding: 5px;
-  }
-`;
-
-export const FormGroup = styled.div`
-  margin-bottom: 15px;
-
-  &:last-of-type {
-    margin-bottom: 30px;
-  }
-`;
+export const InputGroup = styled.div``;
 
 export const Label = styled.label`
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #333;
-  font-size: 0.95rem;
+  color: ${props => props.$pinkTheme ? primaryPink : textDark};
+  font-size: 0.9rem;
 `;
 
 export const Input = styled.input`
-  width: 60%;
-  padding: 12px 16px;
-  border: 2px solid ${props => props.$hasError ? '#e74c3c' : '#e1e5e9'};
-  border-radius: 8px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid ${props => props.$hasError ? dangerRed : borderColor};
+  border-radius: 6px;
   font-size: 1rem;
-  transition: all 0.3s ease;
   box-sizing: border-box;
-
   &:focus {
+    border-color: ${primaryPink};
     outline: none;
-    border-color: ${props => props.$hasError ? '#e74c3c' : '#667eea'};
-    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(231, 76, 60, 0.1)' : 'rgba(102, 126, 234, 0.1)'};
-  }
-
-  &::placeholder {
-    color: #a0a0a0;
-  }
-`;
-
-export const Select = styled.select`
-  width: 120%;
-  padding: 12px 16px;
-  border: 2px solid ${props => props.$hasError ? '#e74c3c' : '#e1e5e9'};
-  border-radius: 8px;
-  font-size: 1rem;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.$hasError ? '#e74c3c' : '#667eea'};
-    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(231, 76, 60, 0.1)' : 'rgba(102, 126, 234, 0.1)'};
-  }
-
-  option {
-    padding: 8px;
+    box-shadow: 0 0 0 2px ${lightPink};
   }
 `;
 
 export const RadioGroup = styled.div`
   display: flex;
-  flex-wrap: wrap;
   gap: 15px;
-  margin-top: 8px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 10px;
-  }
+  flex-wrap: wrap;
 `;
 
-export const RadioOption = styled.label`
+export const RadioButtonLabel = styled.label`
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #f8f9fa;
+  font-size: 0.9rem;
+  input { 
+    margin-right: 6px; 
+    accent-color: ${primaryPink};
   }
 `;
 
-export const RadioInput = styled.input`
-  margin-right: 8px;
-  cursor: pointer;
-  transform: scale(1.2);
+export const ErrorText = styled.p`
+  color: ${dangerRed};
+  font-size: 0.8rem;
+  margin: 5px 0 0;
 `;
 
-export const RadioLabel = styled.span`
-  font-size: 0.95rem;
-  color: #333;
-  cursor: pointer;
-  user-select: none;
-`;
-
-export const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #e1e5e9;
-
-  @media (max-width: 768px) {
-    flex-direction: column-reverse;
-    gap: 10px;
-  }
-`;
-
-export const Button = styled.button`
-  padding: 12px 24px;
+// --- Botões do Footer ---
+const Button = styled.button`
+  padding: 12px 28px;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 120px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 
-  &:active {
-    transform: translateY(1px);
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    min-width: auto;
-  }
+  &:hover { transform: translateY(-2px); }
+  &:active { transform: translateY(0); }
 `;
 
-export const CancelButton = styled(Button)`
-  background-color: #6c757d;
+export const SaveButton = styled(Button)`
+  background-color: ${successGreen};
   color: white;
-
-  &:hover {
-    background-color: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
-  }
-`;
-
-export const SubmitButton = styled(Button)`
-  background: linear-gradient(135deg, #eba4c8 0%, #df1ead 100%);
-  color: white;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-  }
-
+  &:hover { background-color: #45a049; }
   &:disabled {
-    background: #cccccc;
+    background-color: #ccc;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
   }
 `;
 
-export const RemoveButton = styled(Button)`
-  background-color: #e74c3c;
+export const CancelButton = styled(Button)`
+  background-color: ${greyButton};
   color: white;
-
-  &:hover {
-    background-color: #c0392b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-  }
-`;
-
-export const ErrorText = styled.span`
-  display: block;
-  color: #e74c3c;
-  font-size: 0.85rem;
-  margin-top: 5px;
-  font-weight: 500;
+  &:hover { background-color: #8e8e8e; }
 `;

@@ -1,10 +1,12 @@
 import React from 'react';
 import { FormGrid, FieldContainer, InputLabel, StyledInput, ErrorText, SectionContent, AddMemberButton } from '../../pages/Cadastro/styles';
-import FamilyMembersList from '../Modal/FamilyMemberModal';
+// CORREÇÃO: O caminho deve apontar para o componente da LISTA, não do MODAL
+import FamilyMembersList from '../FamilyMembersList'; 
 
 const HistoriaFamiliarSection = ({ familiares, historiaFamiliar, errors, handleInputChange, onAddMember, onEditMember, onRemoveMember }) => {
     return (
         <SectionContent>
+            {/* Agora está usando o componente correto para renderizar a lista */}
             <FamilyMembersList
                 members={familiares}
                 onEdit={onEditMember}

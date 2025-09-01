@@ -1,62 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { FieldContainer, InputLabel, StyledInput, Button } from '../../pages/Cadastro/styles'; // Reutilize seus estilos!
+import { ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, CloseButton, Input, InputGroup, Label, SaveButton, CancelButton } from './styles';
 
 const PalliativeChemoModal = ({ isOpen, onClose, onSubmit, chemoData }) => {
-    const [formData, setFormData] = useState({
+    const initialState = {
         linha_tratamento_paliativo: '',
         qual_quimioterapia_paliativa: '',
         inicio_quimioterapia_paliativa: '',
         fim_quimioterapia_paliativa: ''
-    });
+    };
+
+    const [formData, setFormData] = useState(initialState);
 
     useEffect(() => {
         if (chemoData) {
             setFormData(chemoData);
         } else {
-            setFormData({
-                linha_tratamento_paliativo: '',
-                qual_quimioterapia_paliativa: '',
-                inicio_quimioterapia_paliativa: '',
-                fim_quimioterapia_paliativa: ''
-            });
+            setFormData(initialState);
         }
     }, [chemoData, isOpen]);
 
     if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit(formData);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = () => {
+        onSubmit(formData); // Envia os dados para a página principal
     };
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1050 }}>
-            <div style={{ background: 'white', padding: '25px', borderRadius: '8px', width: '90%', maxWidth: '500px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)' }}>
-                <h2>{chemoData ? 'Editar' : 'Adicionar'} Quimioterapia Paliativa</h2>
-                <form onSubmit={handleSubmit}>
-                    <FieldContainer>
-                        <InputLabel>Linha de Tratamento</InputLabel>
-                        <StyledInput value={formData.linha_tratamento_paliativo} onChange={e => setFormData({...formData, linha_tratamento_paliativo: e.target.value})} />
-                    </FieldContainer>
-                    <FieldContainer>
-                        <InputLabel>Qual Quimioterapia (Esquema)</InputLabel>
-                        <StyledInput value={formData.qual_quimioterapia_paliativa} onChange={e => setFormData({...formData, qual_quimioterapia_paliativa: e.target.value})} />
-                    </FieldContainer>
-                    <FieldContainer>
-                        <InputLabel>Data de Início</InputLabel>
-                        <StyledInput type="date" value={formData.inicio_quimioterapia_paliativa} onChange={e => setFormData({...formData, inicio_quimioterapia_paliativa: e.target.value})} />
-                    </FieldContainer>
-                    <FieldContainer>
-                        <InputLabel>Data de Fim</InputLabel>
-                        <StyledInput type="date" value={formData.fim_quimioterapia_paliativa} onChange={e => setFormData({...formData, fim_quimioterapia_paliativa: e.target.value})} />
-                    </FieldContainer>
-                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button type="button" onClick={onClose} style={{ marginRight: '10px', background: '#6c757d' }}>Cancelar</Button>
-                        <Button type="submit">Salvar</Button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <ModalOverlay onClick={onClose}>
+            <ModalContent onClick={(e) => e.stopPropagation()}>
+                <ModalHeader>
+                    <h2>{chemoData ? 'Editar' : 'Adicionar'} Quimio Paliativa</h2>
+                    <CloseButton onClick={onClose}>&times;</CloseButton>
+                </ModalHeader>
+                <ModalBody>
+                    <InputGroup>
+                        <Label>Linha de Tratamento</Label>
+                        <Input 
+                            name="linha_tratamento_paliativo" 
+                            value={formData.linha_tratamento_paliativo} 
+                            onChange={handleChange} 
+                        />
+                    </InputGroup>
+                    <InputGroup>
+                        <Label>Qual Quimioterapia (Esquema)</Label>
+                        <Input 
+                            name="qual_quimioterapia_paliativa" 
+                            value={formData.qual_quimioterapia_paliativa} 
+                            onChange={handleChange} 
+                        />
+                    </InputGroup>
+                    <InputGroup>
+                        <Label>Data de Início</Label>
+                        <Input 
+                            type="date" 
+                            name="inicio_quimioterapia_paliativa" 
+                            value={formData.inicio_quimioterapia_paliativa} 
+                            onChange={handleChange} 
+                        />
+                    </InputGroup>
+                    <InputGroup>
+                        <Label>Data de Fim (opcional)</Label>
+                        <Input 
+                            type="date" 
+                            name="fim_quimioterapia_paliativa" 
+                            value={formData.fim_quimioterapia_paliativa} 
+                            onChange={handleChange} 
+                        />
+                    </InputGroup>
+                </ModalBody>
+                <ModalFooter>
+                    <CancelButton type="button" onClick={onClose}>Cancelar</CancelButton>
+                    <SaveButton type="button" onClick={handleSubmit}>Salvar</SaveButton>
+                </ModalFooter>
+            </ModalContent>
+        </ModalOverlay>
     );
 };
 

@@ -22,15 +22,15 @@ import TemposDiagnosticoSection from '../../components/FormSections/TemposDiagno
 
 // --- Importação dos Estilos da Página ---
 import {
-  Container,
-  FormContainer,
-  Section,
-  SectionTitle,
-  Button,
-  FixedSubmitButton,
-  SuccessMessage,
-  ApiErrorContainer,
-  ErrorText
+    Container,
+    FormContainer,
+    Section,
+    SectionTitle,
+    Button,
+    FixedSubmitButton,
+    SuccessMessage,
+    ApiErrorContainer,
+    ErrorText
 } from './styles';
 
 // --- Funções Auxiliares ---
@@ -52,7 +52,7 @@ const CadastroPacientePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [apiErrors, setApiErrors] = useState([]);
-    
+
     // Estados do Modal de Membros da Família
     const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
     const [editingMember, setEditingMember] = useState(null);
@@ -62,7 +62,7 @@ const CadastroPacientePage = () => {
     const [isPalliativeChemoModalOpen, setIsPalliativeChemoModalOpen] = useState(false);
     const [editingPalliativeChemo, setEditingPalliativeChemo] = useState(null);
     const [editingPalliativeChemoIndex, setEditingPalliativeChemoIndex] = useState(null);
-    
+
     // Estados do Modal de Terapia Alvo
     const [isTargetedTherapyModalOpen, setIsTargetedTherapyModalOpen] = useState(false);
     const [editingTargetedTherapy, setEditingTargetedTherapy] = useState(null);
@@ -130,6 +130,7 @@ const CadastroPacientePage = () => {
         }
     };
     const handleSubmitMember = (memberData) => {
+        console.log('Adicionando membro:', memberData);
         setFormData(prev => {
             const newFamiliares = [...prev.familiares];
             if (editingIndex !== null) {
@@ -137,12 +138,14 @@ const CadastroPacientePage = () => {
             } else {
                 newFamiliares.push(memberData);
             }
+            console.log('Familiares atualizados:', newFamiliares);
             return { ...prev, familiares: newFamiliares };
         });
-        setIsFamilyModalOpen(false);
     };
     const handleCloseFamilyModal = () => {
         setIsFamilyModalOpen(false);
+        setEditingIndex(null);
+        setEditingMember(null);
     };
 
     // Funções para o Modal de Quimioterapia Paliativa
@@ -276,27 +279,27 @@ const CadastroPacientePage = () => {
                 setIsLoading(false);
                 return;
             }
-            
+
             const dataToSubmit = {
                 ...formData,
                 data_nascimento: toDateOrNull(formData.data_nascimento),
-                habitos_vida: { 
-                    ...formData.habitos_vida, 
-                    tabagismo_carga: toNumberOrNull(formData.habitos_vida.tabagismo_carga), 
-                    tabagismo_tempo_anos: toNumberOrNull(formData.habitos_vida.tabagismo_tempo_anos), 
+                habitos_vida: {
+                    ...formData.habitos_vida,
+                    tabagismo_carga: toNumberOrNull(formData.habitos_vida.tabagismo_carga),
+                    tabagismo_tempo_anos: toNumberOrNull(formData.habitos_vida.tabagismo_tempo_anos),
                     etilismo_tempo_anos: toNumberOrNull(formData.habitos_vida.etilismo_tempo_anos),
                     tempo_atividade_semanal_min: toNumberOrNull(formData.habitos_vida.tempo_atividade_semanal_min, true)
                 },
                 paridade: { ...formData.paridade, gesta: toNumberOrNull(formData.paridade.gesta, true), para: toNumberOrNull(formData.paridade.para, true), aborto: toNumberOrNull(formData.paridade.aborto, true), idade_primeiro_filho: toNumberOrNull(formData.paridade.idade_primeiro_filho, true), tempo_amamentacao_meses: toNumberOrNull(formData.paridade.tempo_amamentacao_meses, true), menarca_idade: toNumberOrNull(formData.paridade.menarca_idade, true), idade_menopausa: toNumberOrNull(formData.paridade.idade_menopausa, true), tempo_uso_trh: toNumberOrNull(formData.paridade.tempo_uso_trh), },
                 historia_doenca: { ...formData.historia_doenca, idade_diagnostico: toNumberOrNull(formData.historia_doenca.idade_diagnostico, true), score_tyrer_cuzick: toNumberOrNull(formData.historia_doenca.score_tyrer_cuzick), score_canrisk: toNumberOrNull(formData.historia_doenca.score_canrisk), score_gail: toNumberOrNull(formData.historia_doenca.score_gail), },
                 histologia: { ...formData.histologia, tamanho_tumoral: toNumberOrNull(formData.histologia.tamanho_tumoral), bls_numerador: toNumberOrNull(formData.histologia.bls_numerador, true), bls_denominador: toNumberOrNull(formData.histologia.bls_denominador, true), ea_numerador: toNumberOrNull(formData.histologia.ea_numerador, true), ea_denominador: toNumberOrNull(formData.histologia.ea_denominador, true), },
-                tratamento: { 
-                    ...formData.tratamento, 
-                    inicio_neoadjuvante: toDateOrNull(formData.tratamento.inicio_neoadjuvante), 
+                tratamento: {
+                    ...formData.tratamento,
+                    inicio_neoadjuvante: toDateOrNull(formData.tratamento.inicio_neoadjuvante),
                     termino_neoadjuvante: toDateOrNull(formData.tratamento.termino_neoadjuvante),
                     inicio_quimioterapia_neoadjuvante: toDateOrNull(formData.tratamento.inicio_quimioterapia_neoadjuvante),
                     fim_quimioterapia_neoadjuvante: toDateOrNull(formData.tratamento.fim_quimioterapia_neoadjuvante),
-                    inicio_adjuvante: toDateOrNull(formData.tratamento.inicio_adjuvante), 
+                    inicio_adjuvante: toDateOrNull(formData.tratamento.inicio_adjuvante),
                     termino_adjuvante: toDateOrNull(formData.tratamento.termino_adjuvante),
                     inicio_quimioterapia_adjuvante: toDateOrNull(formData.tratamento.inicio_quimioterapia_adjuvante),
                     fim_quimioterapia_adjuvante: toDateOrNull(formData.tratamento.fim_quimioterapia_adjuvante),
@@ -311,15 +314,15 @@ const CadastroPacientePage = () => {
                         fim_terapia_alvo: toDateOrNull(therapy.fim_terapia_alvo),
                     })),
                     radioterapia_sessoes: toNumberOrNull(formData.tratamento.radioterapia_sessoes, true),
-                    inicio_radioterapia: toDateOrNull(formData.tratamento.inicio_radioterapia), 
-                    fim_radioterapia: toDateOrNull(formData.tratamento.fim_radioterapia), 
-                    inicio_endocrino: toDateOrNull(formData.tratamento.inicio_endocrino), 
+                    inicio_radioterapia: toDateOrNull(formData.tratamento.inicio_radioterapia),
+                    fim_radioterapia: toDateOrNull(formData.tratamento.fim_radioterapia),
+                    inicio_endocrino: toDateOrNull(formData.tratamento.inicio_endocrino),
                     fim_endocrino: toDateOrNull(formData.tratamento.fim_endocrino),
                 },
-                desfecho: { 
-                    ...formData.desfecho, 
+                desfecho: {
+                    ...formData.desfecho,
                     data_morte: toDateOrNull(formData.desfecho.data_morte),
-                    data_recorrencia: toDateOrNull(formData.desfecho.data_recorrencia), 
+                    data_recorrencia: toDateOrNull(formData.desfecho.data_recorrencia),
                     metastases: formData.desfecho.metastases.map(m => ({
                         ...m,
                         data_metastase: toDateOrNull(m.data_metastase)
@@ -369,6 +372,7 @@ const CadastroPacientePage = () => {
                 onSubmit={handleSubmitMember}
                 member={editingMember}
             />
+
             <PalliativeChemoModal
                 isOpen={isPalliativeChemoModalOpen}
                 onClose={handleClosePalliativeChemoModal}
@@ -400,10 +404,10 @@ const CadastroPacientePage = () => {
                     <SectionTitle>Dados Pessoais</SectionTitle>
                     <DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} />
                 </Section>
-                
+
                 <Section>
                     <SectionTitle>História Patológica</SectionTitle>
-                    <HistoriaPatologicaSection 
+                    <HistoriaPatologicaSection
                         formData={formData.historia_patologica}
                         errors={errors}
                         handleInputChange={(e) => handleNestedChange(e, 'historia_patologica')}
@@ -462,7 +466,7 @@ const CadastroPacientePage = () => {
                         handleCheckboxChange={(e) => handleNestedCheckbox(e, 'histologia')}
                     />
                 </Section>
-                
+
                 <Section>
                     <SectionTitle>Tratamento</SectionTitle>
                     <TratamentoSection
