@@ -30,7 +30,9 @@ import {
     FixedSubmitButton,
     SuccessMessage,
     ApiErrorContainer,
-    ErrorText
+    ErrorText,
+    TabNav,
+    TabButton
 } from './styles';
 
 // --- Funções Auxiliares ---
@@ -44,6 +46,28 @@ const toNumberOrNull = (value, isInteger = false) => {
     return isInteger ? parseInt(value) : parseFloat(value);
 };
 
+// --- Definição das Abas (Estrutura Consolidada) ---
+const tabs = [
+    { key: 'identificacao', label: 'Identificação e Social' },
+    { key: 'historico', label: 'Histórico e Hábitos' },
+    { key: 'dadosClinicos', label: 'Dados Clínicos e Doença' },
+    { key: 'tratamentoEvolucao', label: 'Tratamento e Evolução' },
+];
+
+// Mapeamento de erros ATUALIZADO para as novas abas
+const errorFieldToTabMap = {
+    'nome_completo': 'identificacao', 'idade': 'identificacao', 'endereco': 'identificacao', 'cidade': 'identificacao', 'data_nascimento': 'identificacao', 'naturalidade': 'identificacao', 'cor_etnia': 'identificacao', 'escolaridade': 'identificacao', 'renda_familiar': 'identificacao',
+    'historia_patologica': 'historico',
+    'familiares': 'historico', 'historia_familiar': 'historico',
+    'habitos_vida': 'historico',
+    'paridade': 'dadosClinicos',
+    'historia_doenca': 'dadosClinicos',
+    'histologia': 'dadosClinicos',
+    'tratamento': 'tratamentoEvolucao',
+    'desfecho': 'tratamentoEvolucao',
+    'tempos_diagnostico': 'tratamentoEvolucao',
+};
+
 // --- Componente Principal da Página ---
 const CadastroPacientePage = () => {
     // --- Estados do Formulário e UI ---
@@ -52,23 +76,18 @@ const CadastroPacientePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [apiErrors, setApiErrors] = useState([]);
+    const [activeTab, setActiveTab] = useState(tabs[0].key);
 
-    // Estados do Modal de Membros da Família
+    // Estados dos Modais
     const [isFamilyModalOpen, setIsFamilyModalOpen] = useState(false);
     const [editingMember, setEditingMember] = useState(null);
     const [editingIndex, setEditingIndex] = useState(null);
-
-    // Estados do Modal de Quimioterapia Paliativa
     const [isPalliativeChemoModalOpen, setIsPalliativeChemoModalOpen] = useState(false);
     const [editingPalliativeChemo, setEditingPalliativeChemo] = useState(null);
     const [editingPalliativeChemoIndex, setEditingPalliativeChemoIndex] = useState(null);
-
-    // Estados do Modal de Terapia Alvo
     const [isTargetedTherapyModalOpen, setIsTargetedTherapyModalOpen] = useState(false);
     const [editingTargetedTherapy, setEditingTargetedTherapy] = useState(null);
     const [editingTargetedTherapyIndex, setEditingTargetedTherapyIndex] = useState(null);
-
-    // Estados para o Modal de Metástase
     const [isMetastaseModalOpen, setIsMetastaseModalOpen] = useState(false);
     const [editingMetastase, setEditingMetastase] = useState(null);
     const [editingMetastaseIndex, setEditingMetastaseIndex] = useState(null);
@@ -84,6 +103,46 @@ const CadastroPacientePage = () => {
             setFormData(prev => ({ ...prev, imc: '' }));
         }
     }, [formData.altura, formData.peso]);
+
+    useEffect(() => {
+        const { tratamento, histologia } = formData;
+        
+        const datasDeTratamento = [
+            tratamento.inicio_neoadjuvante,
+            tratamento.inicio_adjuvante,
+            tratamento.inicio_radioterapia,
+            tratamento.inicio_endocrino,
+            tratamento.quimioterapias_paliativas?.[0]?.inicio_quimioterapia_paliativa,
+            tratamento.terapias_alvo?.[0]?.inicio_terapia_alvo,
+        ].filter(Boolean);
+
+        let dataInicioTratamento = '';
+        if (datasDeTratamento.length > 0) {
+            const datasComoObjetos = datasDeTratamento.map(d => new Date(d));
+            const dataMaisAntiga = new Date(Math.min.apply(null, datasComoObjetos));
+            dataInicioTratamento = dataMaisAntiga.toISOString().split('T')[0];
+        }
+
+        setFormData(prev => {
+            if (prev.tempos_diagnostico.data_inicio_tratamento !== dataInicioTratamento) {
+                return {
+                    ...prev,
+                    tempos_diagnostico: {
+                        ...prev.tempos_diagnostico,
+                        data_inicio_tratamento: dataInicioTratamento,
+                    }
+                };
+            }
+            return prev;
+        });
+    }, [
+        formData.tratamento.inicio_neoadjuvante,
+        formData.tratamento.inicio_adjuvante,
+        formData.tratamento.inicio_radioterapia,
+        formData.tratamento.inicio_endocrino,
+        formData.tratamento.quimioterapias_paliativas,
+        formData.tratamento.terapias_alvo,
+    ]);
 
     // --- Manipuladores de Eventos (Handlers) ---
     const handleChange = (e) => {
@@ -110,7 +169,7 @@ const CadastroPacientePage = () => {
         }
     };
 
-    // Funções para o Modal de Membros da Família
+    // --- Funções dos Modais ---
     const handleAddMember = () => {
         setEditingMember(null);
         setEditingIndex(null);
@@ -130,7 +189,6 @@ const CadastroPacientePage = () => {
         }
     };
     const handleSubmitMember = (memberData) => {
-        console.log('Adicionando membro:', memberData);
         setFormData(prev => {
             const newFamiliares = [...prev.familiares];
             if (editingIndex !== null) {
@@ -138,7 +196,6 @@ const CadastroPacientePage = () => {
             } else {
                 newFamiliares.push(memberData);
             }
-            console.log('Familiares atualizados:', newFamiliares);
             return { ...prev, familiares: newFamiliares };
         });
     };
@@ -148,7 +205,6 @@ const CadastroPacientePage = () => {
         setEditingMember(null);
     };
 
-    // Funções para o Modal de Quimioterapia Paliativa
     const handleAddPalliativeChemo = () => {
         setEditingPalliativeChemo(null);
         setEditingPalliativeChemoIndex(null);
@@ -161,32 +217,19 @@ const CadastroPacientePage = () => {
     };
     const handleRemovePalliativeChemo = (indexToRemove) => {
         if (window.confirm('Tem certeza que deseja remover este registro?')) {
-            setFormData(prev => ({
-                ...prev,
-                tratamento: {
-                    ...prev.tratamento,
-                    quimioterapias_paliativas: prev.tratamento.quimioterapias_paliativas.filter((_, index) => index !== indexToRemove)
-                }
-            }));
+            setFormData(prev => ({ ...prev, tratamento: { ...prev.tratamento, quimioterapias_paliativas: prev.tratamento.quimioterapias_paliativas.filter((_, index) => index !== indexToRemove) } }));
         }
     };
     const handleSubmitPalliativeChemo = (chemoData) => {
         setFormData(prev => {
             const newChemos = [...prev.tratamento.quimioterapias_paliativas];
-            if (editingPalliativeChemoIndex !== null) {
-                newChemos[editingPalliativeChemoIndex] = chemoData;
-            } else {
-                newChemos.push(chemoData);
-            }
+            if (editingPalliativeChemoIndex !== null) { newChemos[editingPalliativeChemoIndex] = chemoData; } else { newChemos.push(chemoData); }
             return { ...prev, tratamento: { ...prev.tratamento, quimioterapias_paliativas: newChemos } };
         });
         setIsPalliativeChemoModalOpen(false);
     };
-    const handleClosePalliativeChemoModal = () => {
-        setIsPalliativeChemoModalOpen(false);
-    };
+    const handleClosePalliativeChemoModal = () => setIsPalliativeChemoModalOpen(false);
 
-    // Funções para a Terapia Alvo
     const handleAddTargetedTherapy = () => {
         setEditingTargetedTherapy(null);
         setEditingTargetedTherapyIndex(null);
@@ -199,23 +242,13 @@ const CadastroPacientePage = () => {
     };
     const handleRemoveTargetedTherapy = (indexToRemove) => {
         if (window.confirm('Tem certeza que deseja remover este registro?')) {
-            setFormData(prev => ({
-                ...prev,
-                tratamento: {
-                    ...prev.tratamento,
-                    terapias_alvo: prev.tratamento.terapias_alvo.filter((_, index) => index !== indexToRemove)
-                }
-            }));
+            setFormData(prev => ({ ...prev, tratamento: { ...prev.tratamento, terapias_alvo: prev.tratamento.terapias_alvo.filter((_, index) => index !== indexToRemove) } }));
         }
     };
     const handleSubmitTargetedTherapy = (therapyData) => {
         setFormData(prev => {
             const newTherapies = [...prev.tratamento.terapias_alvo];
-            if (editingTargetedTherapyIndex !== null) {
-                newTherapies[editingTargetedTherapyIndex] = therapyData;
-            } else {
-                newTherapies.push(therapyData);
-            }
+            if (editingTargetedTherapyIndex !== null) { newTherapies[editingTargetedTherapyIndex] = therapyData; } else { newTherapies.push(therapyData); }
             return { ...prev, tratamento: { ...prev.tratamento, terapias_alvo: newTherapies } };
         });
         setIsTargetedTherapyModalOpen(false);
@@ -226,7 +259,6 @@ const CadastroPacientePage = () => {
         setEditingTargetedTherapyIndex(null);
     };
 
-    // Funções para o Modal de Metástase
     const handleAddMetastase = () => {
         setEditingMetastase(null);
         setEditingMetastaseIndex(null);
@@ -239,30 +271,18 @@ const CadastroPacientePage = () => {
     };
     const handleRemoveMetastase = (indexToRemove) => {
         if (window.confirm('Tem certeza que deseja remover este registro de metástase?')) {
-            setFormData(prev => ({
-                ...prev,
-                desfecho: {
-                    ...prev.desfecho,
-                    metastases: prev.desfecho.metastases.filter((_, index) => index !== indexToRemove)
-                }
-            }));
+            setFormData(prev => ({ ...prev, desfecho: { ...prev.desfecho, metastases: prev.desfecho.metastases.filter((_, index) => index !== indexToRemove) } }));
         }
     };
     const handleSubmitMetastase = (metastaseData) => {
         setFormData(prev => {
             const newMetastases = [...prev.desfecho.metastases];
-            if (editingMetastaseIndex !== null) {
-                newMetastases[editingMetastaseIndex] = metastaseData;
-            } else {
-                newMetastases.push(metastaseData);
-            }
+            if (editingMetastaseIndex !== null) { newMetastases[editingMetastaseIndex] = metastaseData; } else { newMetastases.push(metastaseData); }
             return { ...prev, desfecho: { ...prev.desfecho, metastases: newMetastases } };
         });
         setIsMetastaseModalOpen(false);
     };
-    const handleCloseMetastaseModal = () => {
-        setIsMetastaseModalOpen(false);
-    };
+    const handleCloseMetastaseModal = () => setIsMetastaseModalOpen(false);
 
     // --- Submissão Principal do Formulário ---
     const handleSubmit = async (e) => {
@@ -322,7 +342,8 @@ const CadastroPacientePage = () => {
                 desfecho: {
                     ...formData.desfecho,
                     data_morte: toDateOrNull(formData.desfecho.data_morte),
-                    data_recorrencia: toDateOrNull(formData.desfecho.data_recorrencia),
+                    data_recidiva_local: toDateOrNull(formData.desfecho.data_recidiva_local),
+                    data_recidiva_regional: toDateOrNull(formData.desfecho.data_recidiva_regional),
                     metastases: formData.desfecho.metastases.map(m => ({
                         ...m,
                         data_metastase: toDateOrNull(m.data_metastase)
@@ -339,6 +360,7 @@ const CadastroPacientePage = () => {
             if (response.status === 201 || response.status === 200) {
                 setSuccessMessage('Paciente cadastrado com sucesso!');
                 setFormData(initialState);
+                setActiveTab(tabs[0].key);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setTimeout(() => setSuccessMessage(''), 5000);
             }
@@ -347,11 +369,11 @@ const CadastroPacientePage = () => {
                 const validationErrors = {};
                 error.inner.forEach(err => { validationErrors[err.path] = err.message; });
                 setErrors(validationErrors);
-                if (error.inner.length > 0 && error.inner[0].path) {
-                    const firstErrorField = document.getElementsByName(error.inner[0].path)[0];
-                    if (firstErrorField) {
-                        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+
+                if (error.inner.length > 0) {
+                    const firstErrorPath = error.inner[0].path.split('.')[0];
+                    const tabWithError = errorFieldToTabMap[firstErrorPath] || tabs[0].key;
+                    setActiveTab(tabWithError);
                 }
             } else if (error.response) {
                 const errorMessage = error.response.data?.detail || error.response.data?.message || `Erro ${error.response.status || ''}: Falha ao comunicar com o servidor.`;
@@ -366,31 +388,10 @@ const CadastroPacientePage = () => {
 
     return (
         <Container>
-            <FamilyMemberModal
-                isOpen={isFamilyModalOpen}
-                onClose={handleCloseFamilyModal}
-                onSubmit={handleSubmitMember}
-                member={editingMember}
-            />
-
-            <PalliativeChemoModal
-                isOpen={isPalliativeChemoModalOpen}
-                onClose={handleClosePalliativeChemoModal}
-                onSubmit={handleSubmitPalliativeChemo}
-                chemoData={editingPalliativeChemo}
-            />
-            <TargetedTherapyModal
-                isOpen={isTargetedTherapyModalOpen}
-                onClose={handleCloseTargetedTherapyModal}
-                onSubmit={handleSubmitTargetedTherapy}
-                therapyData={editingTargetedTherapy}
-            />
-            <MetastaseModal
-                isOpen={isMetastaseModalOpen}
-                onClose={handleCloseMetastaseModal}
-                onSubmit={handleSubmitMetastase}
-                metastaseData={editingMetastase}
-            />
+            <FamilyMemberModal isOpen={isFamilyModalOpen} onClose={handleCloseFamilyModal} onSubmit={handleSubmitMember} member={editingMember} />
+            <PalliativeChemoModal isOpen={isPalliativeChemoModalOpen} onClose={handleClosePalliativeChemoModal} onSubmit={handleSubmitPalliativeChemo} chemoData={editingPalliativeChemo} />
+            <TargetedTherapyModal isOpen={isTargetedTherapyModalOpen} onClose={handleCloseTargetedTherapyModal} onSubmit={handleSubmitTargetedTherapy} therapyData={editingTargetedTherapy} />
+            <MetastaseModal isOpen={isMetastaseModalOpen} onClose={handleCloseMetastaseModal} onSubmit={handleSubmitMetastase} metastaseData={editingMetastase} />
 
             <FormContainer onSubmit={handleSubmit} noValidate>
                 {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
@@ -400,110 +401,76 @@ const CadastroPacientePage = () => {
                     </ApiErrorContainer>
                 )}
 
-                <Section>
-                    <SectionTitle>Dados Pessoais</SectionTitle>
-                    <DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} />
-                </Section>
+                <TabNav>
+                    {tabs.map(tab => (
+                        <TabButton
+                            key={tab.key}
+                            type="button"
+                            $isActive={activeTab === tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                        >
+                            {tab.label}
+                        </TabButton>
+                    ))}
+                </TabNav>
+                
+                {activeTab === 'identificacao' && (
+                    <Section>
+                        <SectionTitle>Identificação e Dados Sociais</SectionTitle>
+                        <DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} />
+                    </Section>
+                )}
 
-                <Section>
-                    <SectionTitle>História Patológica</SectionTitle>
-                    <HistoriaPatologicaSection
-                        formData={formData.historia_patologica}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'historia_patologica')}
-                        handleCheckboxChange={(e) => handleNestedCheckbox(e, 'historia_patologica')}
-                    />
-                </Section>
+                {activeTab === 'historico' && (
+                    <>
+                        <Section>
+                            <SectionTitle>História Patológica Pregressa</SectionTitle>
+                            <HistoriaPatologicaSection formData={formData.historia_patologica} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_patologica')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'historia_patologica')} />
+                        </Section>
+                        <Section>
+                            <SectionTitle>História Familiar</SectionTitle>
+                            <HistoriaFamiliarSection familiares={formData.familiares} historiaFamiliar={formData.historia_familiar} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_familiar')} onAddMember={handleAddMember} onEditMember={handleEditMember} onRemoveMember={handleRemoveMember} />
+                        </Section>
+                        <Section>
+                            <SectionTitle>Hábitos de Vida</SectionTitle>
+                            <HabitosDeVidaSection formData={formData.habitos_vida} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'habitos_vida')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'habitos_vida')} />
+                        </Section>
+                    </>
+                )}
 
-                <Section>
-                    <SectionTitle>História Familiar</SectionTitle>
-                    <HistoriaFamiliarSection
-                        familiares={formData.familiares}
-                        historiaFamiliar={formData.historia_familiar}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'historia_familiar')}
-                        onAddMember={handleAddMember}
-                        onEditMember={handleEditMember}
-                        onRemoveMember={handleRemoveMember}
-                    />
-                </Section>
+                {activeTab === 'dadosClinicos' && (
+                    <>
+                        <Section>
+                            <SectionTitle>Paridade</SectionTitle>
+                            <ParidadeSection formData={formData.paridade} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'paridade')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'paridade')} />
+                        </Section>
+                        <Section>
+                            <SectionTitle>História da Doença Atual</SectionTitle>
+                            <HistoriaDoencaSection formData={formData.historia_doenca} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_doenca')} />
+                        </Section>
+                        <Section>
+                            <SectionTitle>Histologia</SectionTitle>
+                            <HistologiaSection formData={formData.histologia} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'histologia')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'histologia')} />
+                        </Section>
+                    </>
+                )}
 
-                <Section>
-                    <SectionTitle>Hábitos de Vida</SectionTitle>
-                    <HabitosDeVidaSection
-                        formData={formData.habitos_vida}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'habitos_vida')}
-                        handleCheckboxChange={(e) => handleNestedCheckbox(e, 'habitos_vida')}
-                    />
-                </Section>
-
-                <Section>
-                    <SectionTitle>Paridade</SectionTitle>
-                    <ParidadeSection
-                        formData={formData.paridade}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'paridade')}
-                        handleCheckboxChange={(e) => handleNestedCheckbox(e, 'paridade')}
-                    />
-                </Section>
-
-                <Section>
-                    <SectionTitle>História da Doença</SectionTitle>
-                    <HistoriaDoencaSection
-                        formData={formData.historia_doenca}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'historia_doenca')}
-                    />
-                </Section>
-
-                <Section>
-                    <SectionTitle>Histologia</SectionTitle>
-                    <HistologiaSection
-                        formData={formData.histologia}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'histologia')}
-                        handleCheckboxChange={(e) => handleNestedCheckbox(e, 'histologia')}
-                    />
-                </Section>
-
-                <Section>
-                    <SectionTitle>Tratamento</SectionTitle>
-                    <TratamentoSection
-                        formData={formData.tratamento}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'tratamento')}
-                        handleCheckboxChange={(e) => handleNestedCheckbox(e, 'tratamento')}
-                        onAddPalliativeChemo={handleAddPalliativeChemo}
-                        onEditPalliativeChemo={handleEditPalliativeChemo}
-                        onRemovePalliativeChemo={handleRemovePalliativeChemo}
-                        onAddTargetedTherapy={handleAddTargetedTherapy}
-                        onEditTargetedTherapy={handleEditTargetedTherapy}
-                        onRemoveTargetedTherapy={handleRemoveTargetedTherapy}
-                    />
-                </Section>
-
-                <Section>
-                    <SectionTitle>Desfecho</SectionTitle>
-                    <DesfechoSection
-                        formData={formData.desfecho}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'desfecho')}
-                        handleCheckboxChange={(e) => handleNestedCheckbox(e, 'desfecho')}
-                        onAddMetastase={handleAddMetastase}
-                        onEditMetastase={handleEditMetastase}
-                        onRemoveMetastase={handleRemoveMetastase}
-                    />
-                </Section>
-
-                <Section>
-                    <SectionTitle>Tempos de Diagnóstico</SectionTitle>
-                    <TemposDiagnosticoSection
-                        formData={formData.tempos_diagnostico}
-                        errors={errors}
-                        handleInputChange={(e) => handleNestedChange(e, 'tempos_diagnostico')}
-                    />
-                </Section>
+                {activeTab === 'tratamentoEvolucao' && (
+                    <>
+                        <Section>
+                            <SectionTitle>Tratamento</SectionTitle>
+                            <TratamentoSection formData={formData.tratamento} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'tratamento')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'tratamento')} onAddPalliativeChemo={handleAddPalliativeChemo} onEditPalliativeChemo={handleEditPalliativeChemo} onRemovePalliativeChemo={handleRemovePalliativeChemo} onAddTargetedTherapy={handleAddTargetedTherapy} onEditTargetedTherapy={handleEditTargetedTherapy} onRemoveTargetedTherapy={handleRemoveTargetedTherapy} />
+                        </Section>
+                        <Section>
+                            <SectionTitle>Desfecho</SectionTitle>
+                            <DesfechoSection formData={formData.desfecho} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'desfecho')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'desfecho')} onAddMetastase={handleAddMetastase} onEditMetastase={handleEditMetastase} onRemoveMetastase={handleRemoveMetastase} />
+                        </Section>
+                        <Section>
+                            <SectionTitle>Tempos de Diagnóstico</SectionTitle>
+                            <TemposDiagnosticoSection formData={formData.tempos_diagnostico} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'tempos_diagnostico')} />
+                        </Section>
+                    </>
+                )}
 
                 <FixedSubmitButton>
                     <Button type="submit" disabled={isLoading}>

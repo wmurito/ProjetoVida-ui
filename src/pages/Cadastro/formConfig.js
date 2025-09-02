@@ -211,12 +211,6 @@ export const validationSchema = yup.object().shape({
                 otherwise: schema => schema.nullable(),
             }),
         
-        // REMOVIDO
-        // metastase: yup.boolean().nullable(),
-        // data_metastase: yup.string().nullable()...
-        // local_metastase: yup.string().transform(value => (value === '' ? null : value))...
-
-        // NOVO
         metastase_ocorreu: yup.boolean().nullable(),
         metastases: yup.array().of(
             yup.object().shape({
@@ -229,20 +223,30 @@ export const validationSchema = yup.object().shape({
             otherwise: schema => schema.optional(),
         }),
 
-        recorrencia: yup.boolean().nullable(),
-        data_recorrencia: yup.string().nullable().transform(value => (value === '' ? null : value))
-            .when('recorrencia', {
-                is: true,
-                then: schema => schema.required('Data da recorrência é obrigatória.')
-                                        .test('is-date', 'Data inválida.', value => !value || !isNaN(new Date(value).getTime())),
-                otherwise: schema => schema.test('is-date', 'Data inválida se preenchida incorretamente', value => !value || !isNaN(new Date(value).getTime())),
-            }),
-        local_recorrencia: yup.string().transform(value => (value === '' ? null : value))
-            .when('recorrencia', {
-                is: true,
-                then: schema => schema.required('Local da recorrência é obrigatório.'),
-                otherwise: schema => schema.nullable(),
-            }),
+        recidiva_local: yup.boolean().nullable(),
+        data_recidiva_local: yup.string().when('recidiva_local', {
+            is: true,
+            then: schema => schema.required('A data é obrigatória.'),
+            otherwise: schema => schema.nullable(),
+        }),
+        cirurgia_recidiva_local: yup.string().when('recidiva_local', {
+            is: true,
+            then: schema => schema.required('A cirurgia é obrigatória.'),
+            otherwise: schema => schema.nullable(),
+        }),
+    
+        recidiva_regional: yup.boolean().nullable(),
+        data_recidiva_regional: yup.string().when('recidiva_regional', {
+            is: true,
+            then: schema => schema.required('A data é obrigatória.'),
+            otherwise: schema => schema.nullable(),
+        }),
+        cirurgia_recidiva_regional: yup.string().when('recidiva_regional', {
+            is: true,
+            then: schema => schema.required('A cirurgia é obrigatória.'),
+            otherwise: schema => schema.nullable(),
+        }),
+
         status_vital: yup.string().transform(value => value === '' ? null : value).nullable(),
     }).nullable().default(undefined),
 
@@ -333,19 +337,16 @@ export const initialState = {
         morte: false, 
         data_morte: '', 
         causa_morte: '', 
-        
-        // REMOVIDO
-        // metastase: false, 
-        // data_metastase: '', 
-        // local_metastase: '', 
-
-        // NOVO
         metastase_ocorreu: false,
         metastases: [],
 
-        recorrencia: false, 
-        data_recorrencia: '', 
-        local_recorrencia: '', 
+        recidiva_local: false,
+        data_recidiva_local: '',
+        cirurgia_recidiva_local: '',
+        recidiva_regional: false,
+        data_recidiva_regional: '',
+        cirurgia_recidiva_regional: '',
+
         status_vital: '', 
     },
     tempos_diagnostico: { data_primeira_consulta: '', data_diagnostico: '', data_cirurgia: '', data_inicio_tratamento: '', },

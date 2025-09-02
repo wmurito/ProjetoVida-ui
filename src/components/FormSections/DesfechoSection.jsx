@@ -1,13 +1,13 @@
 import React from 'react';
 import { FormGrid, FieldContainer, InputLabel, StyledInput, StyledCheckbox, CheckboxLabel, ErrorText, SectionContent, AddMoreButton } from '../../pages/Cadastro/styles';
-import MetastaseList from '../MetastaseList'; // NOVO IMPORT
+import MetastaseList from '../MetastaseList';
 
 const DesfechoSection = ({ 
     formData, 
     errors, 
     handleInputChange, 
     handleCheckboxChange,
-    onAddMetastase, // NOVAS PROPS
+    onAddMetastase,
     onEditMetastase,
     onRemoveMetastase
 }) => {
@@ -32,11 +32,7 @@ const DesfechoSection = ({
                         {formData.metastase_ocorreu && (
                             <FieldContainer style={{ gridColumn: 'span 6', marginTop: '10px' }}>
                                 <InputLabel style={{ fontSize: '1.1rem', fontWeight: 600, color: '#343a40' }}>Registros de Metástase</InputLabel>
-                                <MetastaseList
-                                    metastases={formData.metastases}
-                                    onEdit={onEditMetastase}
-                                    onRemove={onRemoveMetastase}
-                                />
+                                <MetastaseList metastases={formData.metastases} onEdit={onEditMetastase} onRemove={onRemoveMetastase} />
                                 <AddMoreButton type="button" onClick={onAddMetastase} style={{ marginTop: '15px' }}>
                                     + Adicionar Metástase
                                 </AddMoreButton>
@@ -46,13 +42,55 @@ const DesfechoSection = ({
                     </FormGrid>
                 </FieldContainer>
 
-                {/* --- Recorrência --- */}
-                <FieldContainer style={{ gridColumn: 'span 2', justifyContent: 'center', borderTop: '1px solid #e9ecef', marginTop: '15px', paddingTop: '15px' }}><CheckboxLabel><StyledCheckbox name="recorrencia" checked={!!formData.recorrencia} onChange={handleCheckboxChange} />Recorrência</CheckboxLabel></FieldContainer>
-                <FieldContainer style={{ gridColumn: 'span 2', borderTop: '1px solid #e9ecef', marginTop: '15px', paddingTop: '15px' }}><InputLabel>Data da Recorrência</InputLabel><StyledInput type="date" name="data_recorrencia" value={formData.data_recorrencia} onChange={handleInputChange} disabled={!formData.recorrencia} />{errors['desfecho.data_recorrencia'] && <ErrorText>{errors['desfecho.data_recorrencia']}</ErrorText>}</FieldContainer>
-                <FieldContainer style={{ gridColumn: 'span 2', borderTop: '1px solid #e9ecef', marginTop: '15px', paddingTop: '15px' }}><InputLabel>Local da Recorrência</InputLabel><StyledInput name="local_recorrencia" value={formData.local_recorrencia} onChange={handleInputChange} disabled={!formData.recorrencia} />{errors['desfecho.local_recorrencia'] && <ErrorText>{errors['desfecho.local_recorrencia']}</ErrorText>}</FieldContainer>
+                {/* --- Recidiva Local --- */}
+                <FieldContainer style={{ gridColumn: 'span 6', borderTop: '1px solid #e9ecef', marginTop: '15px', paddingTop: '15px' }}>
+                    <FormGrid>
+                        <FieldContainer style={{ gridColumn: 'span 2', justifyContent: 'center' }}>
+                           <CheckboxLabel>
+                               <StyledCheckbox name="recidiva_local" checked={!!formData.recidiva_local} onChange={handleCheckboxChange} />
+                               Recidiva Local
+                           </CheckboxLabel>
+                        </FieldContainer>
+                        <FieldContainer style={{ gridColumn: 'span 2' }}>
+                            <InputLabel>Data Recidiva Local</InputLabel>
+                            <StyledInput type="date" name="data_recidiva_local" value={formData.data_recidiva_local} onChange={handleInputChange} disabled={!formData.recidiva_local} />
+                            {errors['desfecho.data_recidiva_local'] && <ErrorText>{errors['desfecho.data_recidiva_local']}</ErrorText>}
+                        </FieldContainer>
+                        <FieldContainer style={{ gridColumn: 'span 2' }}>
+                            <InputLabel>Cirurgia Realizada</InputLabel>
+                            <StyledInput name="cirurgia_recidiva_local" value={formData.cirurgia_recidiva_local} onChange={handleInputChange} disabled={!formData.recidiva_local} />
+                            {errors['desfecho.cirurgia_recidiva_local'] && <ErrorText>{errors['desfecho.cirurgia_recidiva_local']}</ErrorText>}
+                        </FieldContainer>
+                    </FormGrid>
+                </FieldContainer>
+                
+                {/* --- Recidiva Regional --- */}
+                <FieldContainer style={{ gridColumn: 'span 6', borderTop: '1px solid #e9ecef', marginTop: '15px', paddingTop: '15px' }}>
+                    <FormGrid>
+                        <FieldContainer style={{ gridColumn: 'span 2', justifyContent: 'center' }}>
+                           <CheckboxLabel>
+                               <StyledCheckbox name="recidiva_regional" checked={!!formData.recidiva_regional} onChange={handleCheckboxChange} />
+                               Recidiva Regional
+                           </CheckboxLabel>
+                        </FieldContainer>
+                        <FieldContainer style={{ gridColumn: 'span 2' }}>
+                            <InputLabel>Data Recidiva Regional</InputLabel>
+                            <StyledInput type="date" name="data_recidiva_regional" value={formData.data_recidiva_regional} onChange={handleInputChange} disabled={!formData.recidiva_regional} />
+                            {errors['desfecho.data_recidiva_regional'] && <ErrorText>{errors['desfecho.data_recidiva_regional']}</ErrorText>}
+                        </FieldContainer>
+                        <FieldContainer style={{ gridColumn: 'span 2' }}>
+                            <InputLabel>Cirurgia Realizada</InputLabel>
+                            <StyledInput name="cirurgia_recidiva_regional" value={formData.cirurgia_recidiva_regional} onChange={handleInputChange} disabled={!formData.recidiva_regional} />
+                             {errors['desfecho.cirurgia_recidiva_regional'] && <ErrorText>{errors['desfecho.cirurgia_recidiva_regional']}</ErrorText>}
+                        </FieldContainer>
+                    </FormGrid>
+                </FieldContainer>
                 
                 {/* --- Status Vital --- */}
-                <FieldContainer style={{ gridColumn: 'span 6' }}><InputLabel>Status Vital</InputLabel><StyledInput name="status_vital" value={formData.status_vital} onChange={handleInputChange} /></FieldContainer>
+                <FieldContainer style={{ gridColumn: 'span 6', borderTop: '1px solid #e9ecef', marginTop: '15px', paddingTop: '15px' }}>
+                    <InputLabel>Status Vital</InputLabel>
+                    <StyledInput name="status_vital" value={formData.status_vital} onChange={handleInputChange} />
+                </FieldContainer>
             </FormGrid>
         </SectionContent>
     );

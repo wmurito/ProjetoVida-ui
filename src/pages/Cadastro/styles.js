@@ -525,3 +525,36 @@ export const RemoveButton = styled(Button)`
         background-color: #c82333;
     }
 `;
+
+export const TabNav = styled.div`
+    display: flex;
+    flex-wrap: wrap; // Permite que as abas quebrem a linha em telas menores
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 25px;
+`;
+
+export const TabButton = styled.button`
+    padding: 12px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6c757d;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+
+    /* Estilo da aba ativa */
+    ${({ $isActive }) =>
+        $isActive &&
+        `
+        color: #e91e63; /* Cor rosa do tema */
+        border-bottom-color: #e91e63;
+        font-weight: 600;
+    `}
+
+    &:hover {
+        background-color: #f8f9fa;
+        color: #343a40;
+    }
+`;
