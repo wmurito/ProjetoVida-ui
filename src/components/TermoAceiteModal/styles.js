@@ -1,0 +1,101 @@
+import styled from 'styled-components';
+
+export const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; // Z-index alto para ficar sobre tudo
+`;
+
+export const ModalContent = styled.div`
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+`;
+
+export const ModalHeader = styled.div`
+    margin-bottom: 20px;
+    h2 {
+        margin: 0;
+        color: #333;
+    }
+`;
+
+export const ModalBody = styled.div`
+    p {
+        text-align: justify;
+        color: #555;
+        line-height: 1.6;
+    }
+`;
+
+export const CheckboxLabel = styled.label`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 25px 0;
+    font-size: 1.1rem;
+    cursor: pointer;
+    
+    input {
+        margin-right: 10px;
+        transform: scale(1.3);
+    }
+`;
+
+export const FileInput = styled.input`
+    display: none; // O input real fica escondido
+`;
+
+export const FileInputLabel = styled.label`
+    display: block;
+    padding: 12px 20px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 15px;
+
+    &:hover {
+        border-color: #e91e63;
+        background-color: #fce4ec;
+    }
+`;
+
+export const ErrorMessage = styled.p`
+    color: #e53935;
+    font-weight: 500;
+    margin: 10px 0;
+`;
+
+export const ContinueButton = styled.button`
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #45a049;
+    }
+
+    &:disabled {
+        background-color: #bdbdbd;
+        cursor: not-allowed;
+    }
+`;
