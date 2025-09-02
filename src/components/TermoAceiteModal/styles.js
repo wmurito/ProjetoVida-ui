@@ -78,8 +78,34 @@ export const ErrorMessage = styled.p`
     margin: 10px 0;
 `;
 
+// NOVO: Container para os botões
+export const ButtonGroup = styled.div`
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+`;
+
+// NOVO: Estilo para o botão de cancelar/voltar
+export const CancelButton = styled.button`
+    flex: 1; /* Ocupa metade do espaço */
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #e0e0e0;
+    }
+`;
+
+// AJUSTE: ContinueButton agora ocupa a outra metade
 export const ContinueButton = styled.button`
-    width: 100%;
+    flex: 1; /* Ocupa a outra metade do espaço */
     padding: 15px;
     font-size: 1.1rem;
     font-weight: bold;
