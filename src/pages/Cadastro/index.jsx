@@ -3,7 +3,7 @@ import { validationSchema, initialState } from './formConfig';
 import api, { getAuthToken } from '../../services/api';
 
 // --- Importação dos Componentes Reutilizáveis ---
-import FamilyMemberModal from '../../components/Modal/FamilyMemberModal';
+import FamilyMemberModal from '../../components/FamilyMemberModal';
 import PalliativeChemoModal from '../../components/PalliativeChemoModal';
 import TargetedTherapyModal from '../../components/TargetedTherapyModal';
 import MetastaseModal from '../../components/MetastaseModal';
