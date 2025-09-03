@@ -146,17 +146,64 @@ const CadastroPacientePage = () => {
     const handleNestedChange = (e, section) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [section]: { ...prev[section], [name]: value } })); if (errors[`${section}.${name}`]) setErrors(prev => ({ ...prev, [`${section}.${name}`]: '' })); };
     const handleNestedCheckbox = (e, section) => { const { name, checked } = e.target; setFormData(prev => ({ ...prev, [section]: { ...prev[section], [name]: checked } })); if (errors[`${section}.${name}`]) setErrors(prev => ({ ...prev, [`${section}.${name}`]: '' })); };
 
-    // Handlers Modais
+    // --- Handlers dos Modais ---
     const handleAddMember = () => { setEditingMember(null); setEditingIndex(null); setIsFamilyModalOpen(true); };
     const handleEditMember = (member, index) => { setEditingMember(member); setEditingIndex(index); setIsFamilyModalOpen(true); };
     const handleRemoveMember = (indexToRemove) => { if (window.confirm('Tem certeza?')) setFormData(prev => ({ ...prev, familiares: prev.familiares.filter((_, index) => index !== indexToRemove) })); };
-    const handleSubmitMember = (memberData) => { setFormData(prev => { const newFamiliares = [...prev.familiares]; if (editingIndex !== null) { newFamiliares[editingIndex] = memberData; } else { newFamiliares.push(memberData); } return { ...prev, familiares: newFamiliares }; }); };
+    const handleSubmitMember = (memberData) => {
+        setFormData(prev => {
+            const newFamiliares = [...prev.familiares];
+            if (editingIndex !== null) { newFamiliares[editingIndex] = memberData; } else { newFamiliares.push(memberData); }
+            return { ...prev, familiares: newFamiliares };
+        });
+    };
     const handleCloseFamilyModal = () => { setIsFamilyModalOpen(false); setEditingIndex(null); setEditingMember(null); };
     
-    // ... (Handlers para os outros modais permanecem aqui)
+    const handleAddPalliativeChemo = () => { setEditingPalliativeChemo(null); setEditingPalliativeChemoIndex(null); setIsPalliativeChemoModalOpen(true); };
+    const handleEditPalliativeChemo = (chemo, index) => { setEditingPalliativeChemo(chemo); setEditingPalliativeChemoIndex(index); setIsPalliativeChemoModalOpen(true); };
+    const handleRemovePalliativeChemo = (indexToRemove) => { if (window.confirm('Tem certeza?')) setFormData(prev => ({ ...prev, tratamento: { ...prev.tratamento, quimioterapias_paliativas: prev.tratamento.quimioterapias_paliativas.filter((_, index) => index !== indexToRemove) } })); };
+    const handleSubmitPalliativeChemo = (chemoData) => {
+        setFormData(prev => {
+            const newChemos = [...prev.tratamento.quimioterapias_paliativas];
+            if (editingPalliativeChemoIndex !== null) { newChemos[editingPalliativeChemoIndex] = chemoData; } else { newChemos.push(chemoData); }
+            return { ...prev, tratamento: { ...prev.tratamento, quimioterapias_paliativas: newChemos } };
+        });
+        setIsPalliativeChemoModalOpen(false);
+    };
+    const handleClosePalliativeChemoModal = () => {
+        setIsPalliativeChemoModalOpen(false);
+        setEditingPalliativeChemo(null);
+        setEditingPalliativeChemoIndex(null);
+    };
+
+    const handleAddTargetedTherapy = () => { setEditingTargetedTherapy(null); setEditingTargetedTherapyIndex(null); setIsTargetedTherapyModalOpen(true); };
+    const handleEditTargetedTherapy = (therapy, index) => { setEditingTargetedTherapy(therapy); setEditingTargetedTherapyIndex(index); setIsTargetedTherapyModalOpen(true); };
+    const handleRemoveTargetedTherapy = (indexToRemove) => { if (window.confirm('Tem certeza?')) setFormData(prev => ({ ...prev, tratamento: { ...prev.tratamento, terapias_alvo: prev.tratamento.terapias_alvo.filter((_, index) => index !== indexToRemove) } })); };
+    const handleSubmitTargetedTherapy = (therapyData) => {
+        setFormData(prev => {
+            const newTherapies = [...prev.tratamento.terapias_alvo];
+            if (editingTargetedTherapyIndex !== null) { newTherapies[editingTargetedTherapyIndex] = therapyData; } else { newTherapies.push(therapyData); }
+            return { ...prev, tratamento: { ...prev.tratamento, terapias_alvo: newTherapies } };
+        });
+        setIsTargetedTherapyModalOpen(false);
+    };
+    const handleCloseTargetedTherapyModal = () => { setIsTargetedTherapyModalOpen(false); setEditingTargetedTherapy(null); setEditingTargetedTherapyIndex(null); };
+
+    const handleAddMetastase = () => { setEditingMetastase(null); setEditingMetastaseIndex(null); setIsMetastaseModalOpen(true); };
+    const handleEditMetastase = (metastase, index) => { setEditingMetastase(metastase); setEditingMetastaseIndex(index); setIsMetastaseModalOpen(true); };
+    const handleRemoveMetastase = (indexToRemove) => { if (window.confirm('Tem certeza?')) setFormData(prev => ({ ...prev, desfecho: { ...prev.desfecho, metastases: prev.desfecho.metastases.filter((_, index) => index !== indexToRemove) } })); };
+    const handleSubmitMetastase = (metastaseData) => {
+        setFormData(prev => {
+            const newMetastases = [...prev.desfecho.metastases];
+            if (editingMetastaseIndex !== null) { newMetastases[editingMetastaseIndex] = metastaseData; } else { newMetastases.push(metastaseData); }
+            return { ...prev, desfecho: { ...prev.desfecho, metastases: newMetastases } };
+        });
+        setIsMetastaseModalOpen(false);
+    };
+    const handleCloseMetastaseModal = () => setIsMetastaseModalOpen(false);
 
     const handleConfirmarAceite = () => {
-        if (!termoAceito || !arquivoTermo) { setErroTermo('É necessário aceitar os termos e anexar o arquivo para continuar.'); return; }
+        if (!termoAceito || !arquivoTermo) { setErroTermo('É necessário aceitar os termos e anexar o arquivo.'); return; }
         setErroTermo(''); setAcessoLiberado(true);
     };
     const handleCancelarAceite = () => navigate(-1);
@@ -171,7 +218,17 @@ const CadastroPacientePage = () => {
             const token = await getAuthToken();
             if (!token) throw new Error('Token de autenticação não encontrado.');
 
-            const dataToSubmit = { /* ... objeto completo para conversão ... */ };
+            const dataToSubmit = {
+                ...formData,
+                data_nascimento: toDateOrNull(formData.data_nascimento),
+                habitos_vida: { ...formData.habitos_vida, tabagismo_carga: toNumberOrNull(formData.habitos_vida.tabagismo_carga), tabagismo_tempo_anos: toNumberOrNull(formData.habitos_vida.tabagismo_tempo_anos), etilismo_tempo_anos: toNumberOrNull(formData.habitos_vida.etilismo_tempo_anos), tempo_atividade_semanal_min: toNumberOrNull(formData.habitos_vida.tempo_atividade_semanal_min, true) },
+                paridade: { ...formData.paridade, gesta: toNumberOrNull(formData.paridade.gesta, true), para: toNumberOrNull(formData.paridade.para, true), aborto: toNumberOrNull(formData.paridade.aborto, true), idade_primeiro_filho: toNumberOrNull(formData.paridade.idade_primeiro_filho, true), tempo_amamentacao_meses: toNumberOrNull(formData.paridade.tempo_amamentacao_meses, true), menarca_idade: toNumberOrNull(formData.paridade.menarca_idade, true), idade_menopausa: toNumberOrNull(formData.paridade.idade_menopausa, true), tempo_uso_trh: toNumberOrNull(formData.paridade.tempo_uso_trh), },
+                historia_doenca: { ...formData.historia_doenca, idade_diagnostico: toNumberOrNull(formData.historia_doenca.idade_diagnostico, true), score_tyrer_cuzick: toNumberOrNull(formData.historia_doenca.score_tyrer_cuzick), score_canrisk: toNumberOrNull(formData.historia_doenca.score_canrisk), score_gail: toNumberOrNull(formData.historia_doenca.score_gail), },
+                histologia: { ...formData.histologia, tamanho_tumoral: toNumberOrNull(formData.histologia.tamanho_tumoral), bls_numerador: toNumberOrNull(formData.histologia.bls_numerador, true), bls_denominador: toNumberOrNull(formData.histologia.bls_denominador, true), ea_numerador: toNumberOrNull(formData.histologia.ea_numerador, true), ea_denominador: toNumberOrNull(formData.histologia.ea_denominador, true), },
+                tratamento: { ...formData.tratamento, inicio_neoadjuvante: toDateOrNull(formData.tratamento.inicio_neoadjuvante), termino_neoadjuvante: toDateOrNull(formData.tratamento.termino_neoadjuvante), inicio_quimioterapia_neoadjuvante: toDateOrNull(formData.tratamento.inicio_quimioterapia_neoadjuvante), fim_quimioterapia_neoadjuvante: toDateOrNull(formData.tratamento.fim_quimioterapia_neoadjuvante), inicio_adjuvante: toDateOrNull(formData.tratamento.inicio_adjuvante), termino_adjuvante: toDateOrNull(formData.tratamento.termino_adjuvante), inicio_quimioterapia_adjuvante: toDateOrNull(formData.tratamento.inicio_quimioterapia_adjuvante), fim_quimioterapia_adjuvante: toDateOrNull(formData.tratamento.fim_quimioterapia_adjuvante), quimioterapias_paliativas: formData.tratamento.quimioterapias_paliativas.map(c => ({...c, inicio_quimioterapia_paliativa: toDateOrNull(c.inicio_quimioterapia_paliativa), fim_quimioterapia_paliativa: toDateOrNull(c.fim_quimioterapia_paliativa),})), terapias_alvo: formData.tratamento.terapias_alvo.map(t => ({...t, inicio_terapia_alvo: toDateOrNull(t.inicio_terapia_alvo), fim_terapia_alvo: toDateOrNull(t.fim_terapia_alvo),})), radioterapia_sessoes: toNumberOrNull(formData.tratamento.radioterapia_sessoes, true), inicio_radioterapia: toDateOrNull(formData.tratamento.inicio_radioterapia), fim_radioterapia: toDateOrNull(formData.tratamento.fim_radioterapia), inicio_endocrino: toDateOrNull(formData.tratamento.inicio_endocrino), fim_endocrino: toDateOrNull(formData.tratamento.fim_endocrino), },
+                desfecho: { ...formData.desfecho, data_morte: toDateOrNull(formData.desfecho.data_morte), data_recidiva_local: toDateOrNull(formData.desfecho.data_recidiva_local), data_recidiva_regional: toDateOrNull(formData.desfecho.data_recidiva_regional), metastases: formData.desfecho.metastases.map(m => ({ ...m, data_metastase: toDateOrNull(m.data_metastase) })) },
+                tempos_diagnostico: { ...formData.tempos_diagnostico, data_primeira_consulta: toDateOrNull(formData.tempos_diagnostico.data_primeira_consulta), data_diagnostico: toDateOrNull(formData.tempos_diagnostico.data_diagnostico), data_cirurgia: toDateOrNull(formData.tempos_diagnostico.data_cirurgia), data_inicio_tratamento: toDateOrNull(formData.tempos_diagnostico.data_inicio_tratamento), },
+            };
             
             const dadosFormulario = new FormData();
             dadosFormulario.append('termo_consentimento', arquivoTermo);
@@ -183,7 +240,7 @@ const CadastroPacientePage = () => {
                 setSuccessMessage('Paciente cadastrado com sucesso!');
                 setFormData(initialState);
                 setActiveTab(tabs[0].key);
-                setAcessoLiberado(false); // Opcional: força o termo de aceite para o próximo cadastro
+                setAcessoLiberado(false);
                 setTermoAceito(false);
                 setArquivoTermo(null);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -245,3 +302,4 @@ const CadastroPacientePage = () => {
 };
 
 export default CadastroPacientePage;
+
