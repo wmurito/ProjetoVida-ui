@@ -9,6 +9,14 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  width: ${props => props.$isCollapsed ? '70px' : '250px'};
+  transition: width 0.3s ease;
+  overflow: hidden;
+  position: relative;
+
+  &:hover .toggle-button {
+    opacity: 1;
+  }
 `;
 
 export const MenuAside = styled.nav`
@@ -33,6 +41,7 @@ export const MenuItens = styled.div`
 
 export const Title = styled.span`
   margin: 0 10px;
+  white-space: nowrap;
 `;
 
 export const Menu = styled.div`
@@ -43,6 +52,7 @@ export const Menu = styled.div`
   > svg {
     font-size: 20px;
     color: #ff7bac;
+    min-width: 20px;
   }
 `;
 
@@ -74,8 +84,38 @@ export const Header = styled.header`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
 `;
 
 export const LogImg = styled.img`
-  width: 140px;
+  width: ${({ $isCollapsed }) => ($isCollapsed ? '40px' : '140px')};
+  height: ${({ $isCollapsed }) => ($isCollapsed ? '40px' : 'auto')};
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+`;
+
+export const ToggleButton = styled.button`
+  background: none;
+  border: none;
+  color: #ff7bac;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 20px;
+  right: -15px; /* Posiciona o botão fora da borda do Container */
+  opacity: 0;
+  z-index: 20; /* Garantir que fique acima de tudo */
+
+  &:hover {
+    background-color: #ffe3ee;
+    opacity: 1 !important;
+  }
+
+  &.toggle-button {
+    opacity: 0;
+  }
 `;

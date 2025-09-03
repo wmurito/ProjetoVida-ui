@@ -1,40 +1,52 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
-import { testAuth, validateToken, getPacientes } from './services/api'; // Adicionado getPacientes
+import { getPacientes } from './services/api';
+import { sanitizeInput } from './services/securityConfig';
+import { toast } from 'react-toastify';
 
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Registro from './pages/Registros'; // Renomeado para seguir padrão
+import Registro from './pages/Registros';
 import Cadastro from './pages/Cadastro';
-import Relatorio from './pages/Relatorios'; // Renomeado para seguir padrão
+import Relatorio from './pages/Relatorios';
 
-import Layout from './components/Layout'; // Certifique-se que o caminho está correto
+import Layout from './components/Layout';
 
 const App = () => {
   const { logged, loading, currentUser } = useAuth();
 
   React.useEffect(() => {
-    if (logged && currentUser) { // Adicionado currentUser para garantir que temos dados do usuário
-      console.log("[App.jsx] Usuário logado:", currentUser.username);
-      console.log("[App.jsx] Executando testes de API...");
-
- 
+    // Remover logs de informações sensíveis em produção
+    if (logged && currentUser && !import.meta.env.PROD) {
+      // Logs apenas em ambiente de desenvolvimento com sanitização
       getPacientes()
-        .then(response => {
-          console.log("[App.jsx] Resultado de getPacientes():", response.data);
-        })
         .catch(error => {
-          console.error("[App.jsx] Erro em getPacientes():", error.response?.data || error.message);
+          // Log seguro com sanitização
+          console.error('Erro ao carregar dados iniciais:', {
+            message: sanitizeInput(error.message || 'Erro desconhecido'),
+            timestamp: new Date().toISOString(),
+            user: sanitizeInput(currentUser.username || 'unknown')
+          });
+          
+          // Notificação amigável ao usuário
+          toast.error('Erro ao carregar dados iniciais. Alguns recursos podem não funcionar corretamente.');
         });
-
-    } else if (!loading && !logged) {
-      console.log("[App.jsx] Usuário não está logado.");
     }
-  }, [logged, loading, currentUser]); // Adicionado currentUser à dependência
+  }, [logged, loading, currentUser]);
 
   if (loading) {
-    return <div>Carregando autenticação...</div>;
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Carregando autenticação...
+      </div>
+    );
   }
 
   return (
@@ -47,15 +59,12 @@ const App = () => {
         path="/"
         element={logged ? <Layout /> : <Navigate to="/login" replace />}
       >
-        {/* Redireciona de "/" para "/dashboard" se logado e na raiz */}
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="registros" element={<Registro />} />
         <Route path="novocadastro" element={<Cadastro />} />
         <Route path="relatorios" element={<Relatorio />} />
-        {/* Adicione outras rotas privadas aqui dentro do Layout */}
       </Route>
-      {/* Rota de fallback para qualquer caminho não correspondido */}
       <Route path="*" element={<Navigate to={logged ? "/dashboard" : "/login"} replace />} />
     </Routes>
   );

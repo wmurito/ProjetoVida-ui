@@ -2,24 +2,28 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import { AuthProvider } from "./hooks/useAuth"; // Verifique o caminho correto
+import { AuthProvider } from "./hooks/useAuth";
 
 import { Amplify } from 'aws-amplify';
-import awsConfig from './aws-exports'; // Verifique se este arquivo existe e está correto
-// import { setupCSP } from './services/securityConfig'; // Descomente se estiver usando
+import awsConfig from './aws-exports';
+import { setupCSP } from './services/securityConfig';
 
-// Configurar Content Security Policy (opcional, mas bom para segurança)
-// setupCSP();
+// Configurar Content Security Policy para proteção contra XSS
+setupCSP();
 
-// Configurar Amplify (removido cookieStorage, voltando para o padrão localStorage)
+// Configurar Amplify com opções de segurança aprimoradas
 Amplify.configure({
-  ...awsConfig
-  // Se awsConfig já tem uma seção Auth, ela será usada.
-  // Se precisar sobrescrever algo específico do Auth, pode fazer aqui:
-  // Auth: {
-  //   ...awsConfig.Auth, // Mantém configurações existentes de aws-exports
-  //   // algumaConfiguracaoEspecifica: "valor"
-  // }
+  ...awsConfig,
+  Auth: {
+    ...awsConfig.Auth,
+    cookieStorage: import.meta.env.PROD ? {
+      domain: window.location.hostname,
+      secure: true,
+      path: '/',
+      expires: 1,
+      sameSite: 'strict'
+    } : undefined
+  }
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(

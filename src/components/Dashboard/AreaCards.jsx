@@ -42,7 +42,7 @@ const AreaCards = () => {
         setMediaRiscoTyrer(kpiData.media_risco_tyrer_cuzick !== undefined ? kpiData.media_risco_tyrer_cuzick : 0);
 
       } catch (err) {
-        console.error('Erro ao carregar KPIs da API:', err.response?.data || err.message || err);
+        console.error('Erro ao carregar KPIs da API: [Erro sanitizado por segurança]');
         const errorMessage = err.response?.data?.detail ||
                              err.response?.data?.error ||
                              err.message ||

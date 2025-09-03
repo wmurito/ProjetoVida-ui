@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, Button, CircularProgress } from '@mui/material';
 import { format } from 'date-fns';
-import axios from 'axios';
+import api, { getAuthToken } from '../../services/api';
 import styled from 'styled-components';
 
 // --- Styled Components ---
@@ -54,7 +54,13 @@ const ViewModal = ({ open, onClose, pacienteId }) => {
 
       setLoading(true);
       try {
-        const response = await axios.get(`/paciente/view/${pacienteId}`);
+        const token = await getAuthToken();
+        if (!token) {
+          throw new Error('Token de autenticação não encontrado');
+        }
+        const response = await api.get(`/pacientes/${pacienteId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         setPacienteData(response.data);
       } catch (error) {
         console.error('Erro ao buscar paciente:', error);
