@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { sanitizeInput, validateInput, detectAttack } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
+import { t } from '../../i18n';
 
 const EditModal = ({ paciente, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -152,7 +153,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Editar Paciente</h2>
+          <h2>{t('editPatient')}</h2>
           <button 
             className="close-button" 
             onClick={handleClose}
@@ -164,7 +165,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
-            <label htmlFor="nome">Nome *</label>
+            <label htmlFor="nome">{t('name')} *</label>
             <input
               id="nome"
               type="text"
@@ -178,7 +179,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="cpf">CPF *</label>
+            <label htmlFor="cpf">{t('cpf')} *</label>
             <input
               id="cpf"
               type="text"
@@ -192,7 +193,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email *</label>
+            <label htmlFor="email">{t('email')} *</label>
             <input
               id="email"
               type="email"
@@ -206,7 +207,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="telefone">Telefone</label>
+            <label htmlFor="telefone">{t('phone')}</label>
             <input
               id="telefone"
               type="tel"
@@ -219,7 +220,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="endereco">Endereço</label>
+            <label htmlFor="endereco">{t('address')}</label>
             <textarea
               id="endereco"
               value={formData.endereco}
@@ -232,7 +233,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="dataNascimento">Data de Nascimento</label>
+            <label htmlFor="dataNascimento">{t('birthDate')}</label>
             <input
               id="dataNascimento"
               type="date"
@@ -249,14 +250,14 @@ const EditModal = ({ paciente, onClose, onSave }) => {
               disabled={loading}
               className="cancel-button"
             >
-              Cancelar
+              {t('cancel')}
             </button>
             <button 
               type="submit" 
               disabled={loading}
               className="save-button"
             >
-              {loading ? 'Salvando...' : 'Salvar'}
+              {loading ? t('saving') : t('save')}
             </button>
           </div>
         </form>
@@ -265,4 +266,4 @@ const EditModal = ({ paciente, onClose, onSave }) => {
   );
 };
 
-export default EditModal;
+export default memo(EditModal);

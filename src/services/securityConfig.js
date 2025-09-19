@@ -54,7 +54,10 @@ export const setupInactivityTimeout = () => {
       // Verificar se o usuário está logado antes de deslogar
       if (sessionStorage.getItem('isLoggedIn') === 'true') {
         clearSensitiveData();
-        alert('Sua sessão expirou por inatividade. Por favor, faça login novamente.');
+        // Usar toast em vez de alert para melhor UX
+        if (window.showToast) {
+          window.showToast('Sua sessão expirou por inatividade. Por favor, faça login novamente.', 'warning');
+        }
         window.location.href = '/login';
       }
     }, INACTIVITY_TIMEOUT);
