@@ -2,6 +2,8 @@ import React, { useState, useEffect, memo } from 'react';
 import { sanitizeInput, validateInput, detectAttack } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
 import { t } from '../../i18n';
+import httpClient from '../../services/httpClient';
+import { rateLimiter } from '../../services/rateLimiter';
 
 const EditModal = ({ paciente, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -101,6 +103,13 @@ const EditModal = ({ paciente, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Verificar rate limiting
+    const userId = sessionStorage.getItem('userId') || 'anonymous';
+    if (rateLimiter.isBlocked(userId)) {
+      toast.error('Muitas tentativas. Aguarde antes de tentar novamente.');
+      return;
+    }
     
     if (!validateForm()) {
       toast.error('Por favor, corrija os erros no formulário');

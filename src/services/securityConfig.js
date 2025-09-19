@@ -187,6 +187,7 @@ export const detectAttack = (input) => {
   if (typeof input !== 'string') return false;
   
   const attackPatterns = [
+    // XSS patterns
     /<script/i,
     /javascript:/i,
     /data:text\/html/i,
@@ -197,15 +198,38 @@ export const detectAttack = (input) => {
     /url\s*\(/i,
     /import\s*\(/i,
     /@import/i,
+    
+    // SQL Injection patterns
     /\bUNION\b.*\bSELECT\b/i,
     /\bSELECT\b.*\bFROM\b/i,
     /\bINSERT\b.*\bINTO\b/i,
     /\bDELETE\b.*\bFROM\b/i,
     /\bUPDATE\b.*\bSET\b/i,
-    /\bDROP\b.*\bTABLE\b/i
+    /\bDROP\b.*\bTABLE\b/i,
+    
+    // Code injection patterns
+    /\$\{.*\}/,
+    /<%.*%>/,
+    /\{\{.*\}\}/,
+    
+    // Path traversal
+    /\.\.\/|\.\.\\/,
+    
+    // Command injection
+    /[;&|`$()]/
   ];
   
-  return attackPatterns.some(pattern => pattern.test(input));
+  const hasAttack = attackPatterns.some(pattern => pattern.test(input));
+  
+  // Log tentativa de ataque se detectada
+  if (hasAttack && typeof window !== 'undefined' && window.securityLogger) {
+    window.securityLogger.logAttackAttempt('INPUT_VALIDATION', {
+      input: input.substring(0, 100),
+      patterns: attackPatterns.filter(p => p.test(input)).map(p => p.toString())
+    }, 'high');
+  }
+  
+  return hasAttack;
 };
 
 // Configurações de segurança para requisições HTTP

@@ -9,6 +9,7 @@ import { Amplify } from 'aws-amplify';
 import awsConfig from './aws-exports';
 import { setupCSP } from './services/securityConfig';
 import { toast } from 'react-toastify';
+import { securityLogger } from './services/securityLogger';
 
 // Configurar Content Security Policy para proteção contra XSS
 setupCSP();
@@ -17,6 +18,14 @@ setupCSP();
 window.showToast = (message, type = 'info') => {
   toast[type](message);
 };
+
+// Expor logger de segurança globalmente
+window.securityLogger = securityLogger;
+
+// Forçar HTTPS em produção
+if (import.meta.env.PROD && window.location.protocol !== 'https:') {
+  window.location.replace(`https:${window.location.href.substring(window.location.protocol.length)}`);
+}
 
 // Configurar Amplify com opções de segurança aprimoradas
 Amplify.configure({

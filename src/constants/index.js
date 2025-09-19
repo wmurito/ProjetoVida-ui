@@ -1,9 +1,11 @@
-// Constantes da aplicação
+// Constantes da aplicação - usando variáveis de ambiente
 export const API_ENDPOINTS = {
-  PATIENTS: '/api/patients',
-  AUTH: '/api/auth',
-  DASHBOARD: '/api/dashboard'
+  PATIENTS: import.meta.env.VITE_API_PATIENTS_ENDPOINT || '/api/patients',
+  AUTH: import.meta.env.VITE_API_AUTH_ENDPOINT || '/api/auth',
+  DASHBOARD: import.meta.env.VITE_API_DASHBOARD_ENDPOINT || '/api/dashboard'
 };
+
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export const VALIDATION_RULES = {
   NAME_MIN_LENGTH: 2,
