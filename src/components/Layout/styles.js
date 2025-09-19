@@ -1,20 +1,19 @@
-import styled from 'styled-components';
-
-// Layout:
-// AS = Aside;
-// CT = Content;
+import styled from "styled-components";
 
 export const Grid = styled.div`
-   display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: 1fr;
-    grid-template-areas: 'AS CT';
+    display: grid;
+    /* A largura do menu lateral (primeira coluna) muda dinamicamente.
+      70px quando recolhido, 250px quando expandido.
+    */
+    grid-template-columns: ${props => (props.$isAsideCollapsed ? '70px' : '250px')} auto;
+    
+    grid-template-rows: 100vh;
+    
+    grid-template-areas:
+        'AS CT';
+    
     height: 100vh;
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-        grid-template-areas: 
-            'AS'
-            'CT';
-    }
+    
+    /* Adiciona uma transição suave quando a largura do grid muda */
+    transition: grid-template-columns 0.3s ease-in-out;
 `;

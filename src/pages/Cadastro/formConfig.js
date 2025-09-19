@@ -223,3 +223,22 @@ export const initialState = {
     },
     tempos_diagnostico: { data_primeira_consulta: '', data_diagnostico: '', data_cirurgia: '', data_inicio_tratamento: '', eventos: [] },
 };
+export const tabs = [
+    { key: 'identificacao', label: 'Identificação e Social' },
+    { key: 'historico', label: 'Histórico e Hábitos' },
+    { key: 'dadosClinicos', label: 'Dados Clínicos e Doença' },
+    { key: 'tratamentoEvolucao', label: 'Tratamento e Evolução' },
+];
+
+export const errorFieldToTabMap = {
+    'nome_completo': 'identificacao', 'idade': 'identificacao', 'endereco': 'identificacao', 'cidade': 'identificacao', 'data_nascimento': 'identificacao', 'naturalidade': 'identificacao', 'cor_etnia': 'identificacao', 'escolaridade': 'identificacao', 'renda_familiar': 'identificacao', 'telefone': 'identificacao',
+    'historia_patologica': 'historico',
+    'familiares': 'historico', 'historia_familiar': 'historico',
+    'habitos_vida': 'historico',
+    'paridade': 'dadosClinicos',
+    'historia_doenca': 'dadosClinicos',
+    'histologia': 'dadosClinicos',
+    'tratamento': 'tratamentoEvolucao',
+    'desfecho': 'tratamentoEvolucao',
+    'tempos_diagnostico': 'tratamentoEvolucao',
+};
