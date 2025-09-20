@@ -1,121 +1,94 @@
 import styled from 'styled-components';
+import { NavLink as RouterNavLink } from 'react-router-dom';
 
-export const Container = styled.div`
-  grid-area: AS;
-  background-color: #fff;
-  border-right: 0.5px solid #ccc;
-  color: #8A8A8A;
-  height: 100vh;
+export const Container = styled.aside`
+  grid-area: aside;
+  background-color: var(--secondary-color);
+  color: var(--side-text-color);
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  width: ${props => props.$isCollapsed ? '70px' : '250px'};
-  transition: width 0.3s ease;
-  overflow: hidden;
-  position: relative;
+  
+  width: ${({ $isClosed }) => ($isClosed ? '44px' : '150px')};
+  transition: width 0.3s ease-in-out;
+  
+  border-right: 1px solid var(--border-color-inverted);
+  z-index: 1000;
+  overflow-x: hidden;
 
-  &:hover .toggle-button {
-    opacity: 1;
-  }
+  /* ADICIONADO PARA O MENU TER SEU PRÓPRIO SCROLL SE NECESSÁRIO */
+  overflow-y: auto;
 `;
 
-export const MenuAside = styled.nav`
+// O STYLED COMPONENT 'LOGO' FOI REMOVIDO DAQUI
+
+// O STYLED COMPONENT 'TOGGLEBUTTON' FOI REMOVIDO DAQUI
+
+export const NavMenu = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+`;
+
+export const NavItem = styled.li`
+  margin-bottom: 0.5rem;
+`;
+
+export const NavLink = styled(RouterNavLink)`
   display: flex;
-  flex-direction: column;
-`;
-
-export const MenuItens = styled.div`
-  margin: 8px 20px;
-  font-size: 16px;
-  cursor: pointer;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--side-text-color);
   text-decoration: none;
-  border-radius: 8px;
-  padding: 8px;
-  transition: background-color 0.2s, transform 0.2s;
-
-  &:hover {
-    background-color: #ffe3ee;
-    transform: scale(1.02);
-  }
-`;
-
-export const Title = styled.span`
-  margin: 0 10px;
+  border-radius: 6px;
   white-space: nowrap;
-`;
 
-export const Menu = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  > svg {
-    font-size: 20px;
-    color: #ff7bac;
-    min-width: 20px;
+  svg {
+    font-size: 1.5rem; /* Ícones um pouco maiores para destaque */
+    min-width: 24px;
+    margin-right: ${({ 'data-is-closed': isClosed }) => (isClosed ? 0 : '0.5rem')};
+    transition: margin-right 0.3s ease-in-out;
   }
-`;
 
-export const Logout = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 8px;
-  transition: background-color 0.2s, transform 0.2s;
+  span {
+    opacity: ${({ 'data-is-closed': isClosed }) => (isClosed ? 0 : 1)};
+    transition: opacity 0.2s ease-in-out;
+  }
 
+  &.active,
   &:hover {
-    background-color: #ffe3ee;
-    transform: scale(1.02);
-  }
-
-  > svg {
-    font-size: 20px;
-    margin-right: 8px;
-    color: #ff7bac;
+    background-color: var(--primary-color);
+    color: black;
   }
 `;
 
-export const Header = styled.header`
-  margin: 20px 0;
+export const LogoutButton = styled.button`
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-`;
-
-export const LogImg = styled.img`
-  width: ${({ $isCollapsed }) => ($isCollapsed ? '40px' : '140px')};
-  height: ${({ $isCollapsed }) => ($isCollapsed ? '40px' : 'auto')};
-  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-`;
-
-export const ToggleButton = styled.button`
+  padding: 0.75rem 1rem;
+  width: 100%;
+  color: var(--side-text-color);
   background: none;
   border: none;
-  color: #ff7bac;
-  font-size: 24px;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  position: absolute;
-  top: 20px;
-  right: -15px; /* Posiciona o botão fora da borda do Container */
-  opacity: 0;
-  z-index: 20; /* Garantir que fique acima de tudo */
-
-  &:hover {
-    background-color: #ffe3ee;
-    opacity: 1 !important;
+  border-radius: 6px;
+  white-space: nowrap;
+  
+  svg {
+    font-size: 1.5rem;
+    min-width: 24px;
+    margin-right: ${({ $isClosed }) => ($isClosed ? 0 : '0.5rem')};
+    transition: margin-right 0.3s ease-in-out;
   }
 
-  &.toggle-button {
-    opacity: 0;
+  span {
+    opacity: ${({ $isClosed }) => ($isClosed ? 0 : 1)};
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:hover {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: var(--red-color);
   }
 `;

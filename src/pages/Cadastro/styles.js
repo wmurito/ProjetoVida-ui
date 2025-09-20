@@ -1,18 +1,18 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  padding: 20px;
-  background-color: #f8f9fa; // Lighter, cleaner background
-  min-height: 100vh;
+  padding: 10px;
+  background-color: #f8f9fa;
   box-sizing: border-box;
+  height: 100%; /* Usa altura disponível sem forçar 100vh */
 `;
 
 export const FormContainer = styled.form`
   background: white;
-  padding: 25px 35px; // Slightly adjusted padding
+  padding: 10px 35px;
   border-radius: 10px;
-  max-width: 1200px; // Max width for large forms
-  margin: 20px auto;
+  max-width: 100%;
+  margin-bottom: 20px; /* Espaço no final para scroll */
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 `;
 

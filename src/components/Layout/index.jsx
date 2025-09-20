@@ -1,30 +1,30 @@
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
-import Aside from "../Aside";
-import Content from "../Content";
-import { Grid } from "./styles";
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import Header from '../Header'; // Importa o novo Header
+import Aside from '../Aside';
+import { Grid, Main } from './styles';
 
 const Layout = () => {
-    // Estado para controlar se o menu lateral está recolhido ou não
-    const [isAsideCollapsed, setAsideCollapsed] = useState(false);
+  const [isAsideClosed, setIsAsideClosed] = useState(false);
 
-    // Função para alternar o estado
-    const handleToggleAside = () => {
-        setAsideCollapsed(!isAsideCollapsed);
-    };
+  const toggleAside = () => {
+    setIsAsideClosed(prevState => !prevState);
+  };
 
-    return (
-        // Passamos o estado para o Grid ajustar o layout
-        <Grid $isAsideCollapsed={isAsideCollapsed}>
-            <Aside 
-                isCollapsed={isAsideCollapsed} 
-                toggleAside={handleToggleAside} 
-            />
-            <Content>
-                <Outlet />
-            </Content>
-        </Grid>
-    );
+  return (
+    <Grid>
+      {/* Renderiza o Header, passando o controle do menu */}
+      <Header isAsideClosed={isAsideClosed} toggleAside={toggleAside} />
+      
+      {/* O Aside continua recebendo o estado para controlar sua largura */}
+      <Aside isClosed={isAsideClosed} />
+      
+      {/* O Main ajusta sua margem com base no estado do Aside */}
+      <Main $isAsideClosed={isAsideClosed}>
+        <Outlet />
+      </Main>
+    </Grid>
+  );
 };
 
 export default Layout;

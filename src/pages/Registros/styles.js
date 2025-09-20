@@ -4,7 +4,9 @@ import styled from 'styled-components';
 export const Container = styled.div`
   padding: 2rem;
   background-color: #f5f7fa;
-  min-height: 100vh;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
 `;
 
 export const Header = styled.div`
@@ -77,7 +79,7 @@ export const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 50vh;
   font-size: 1.2rem;
   color: #6c757d;
 `;

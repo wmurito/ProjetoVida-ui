@@ -3,7 +3,7 @@ import ImageCarousel from '../../components/Carrossel'; // Ajuste o caminho conf
 
 const Relatorio = () => {
     return (
-        <div>
+        <div style={{ height: '100%', overflow: 'auto', boxSizing: 'border-box' }}>
             <ImageCarousel />
         </div>
     )
