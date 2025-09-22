@@ -4,7 +4,7 @@ import {
     Section, FormGrid, FieldContainer, InputLabel, StyledInput, StyledSelect,
     CheckboxLabel, StyledCheckbox, SectionTitle,
     ListContainer, ActionButtons, RemoveButton,
-    SubSectionTitle, SubSectionHeader, AddSubButton
+    SubSectionTitle, SubSectionHeader, AddSubButton, TreatmentSubSection
 } from '../../pages/Cadastro/styles';
 
 import CirurgiaList from '../CirurgiaList';
@@ -111,7 +111,7 @@ const TerapiaSection = ({ sectionTitle, formData, setFormData, basePath, paliati
     const camposPadrao = [ { name: 'data_inicio', label: 'Data Início', type: 'date', span: 2 }, { name: 'data_termino', label: 'Data Término', type: 'date', span: 2 }, { name: 'esquema', label: 'Esquema', span: 2 }, { name: 'intercorrencias', label: 'Intercorrências', span: 6 }, ];
     
     return (
-        <Section>
+        <TreatmentSubSection>
             <SectionTitle>{sectionTitle}</SectionTitle>
             <SubSectionHeader><SubSectionTitle>{sectionTitle} Neoadjuvante</SubSectionTitle></SubSectionHeader>
             <FormGrid>{camposPadrao.map(campo => (<FieldContainer key={`neo-${campo.name}`} style={{ gridColumn: `span ${campo.span || 2}` }}><InputLabel>{campo.label}</InputLabel><StyledInput type={campo.type || 'text'} name={campo.name} value={neoadjuvanteData[campo.name] || ''} onChange={(e) => handleTerapiaChange(e, 'neoadjuvante')} /></FieldContainer>))}</FormGrid>
@@ -119,7 +119,7 @@ const TerapiaSection = ({ sectionTitle, formData, setFormData, basePath, paliati
             <FormGrid>{camposPadrao.map(campo => (<FieldContainer key={`adj-${campo.name}`} style={{ gridColumn: `span ${campo.span || 2}` }}><InputLabel>{campo.label}</InputLabel><StyledInput type={campo.type || 'text'} name={campo.name} value={adjuvanteData[campo.name] || ''} onChange={(e) => handleTerapiaChange(e, 'adjuvante')} /></FieldContainer>))}</FormGrid>
             <SubSectionHeader style={{ marginTop: '2rem' }}><SubSectionTitle>{sectionTitle} Paliativa</SubSectionTitle></SubSectionHeader>
             <TratamentoEmLista lista={paliativaData} path={`${basePath}.paliativa`} setFormData={setFormData} campos={paliativaCampos} title={paliativaListTitle} />
-        </Section>
+        </TreatmentSubSection>
     );
 };
 
@@ -149,7 +149,7 @@ const TratamentoSection = ({ formData, setFormData, onOpenModal, onRemoveCirurgi
     return (
         <>
             {/* ======================= CIRURGIA ======================= */}
-            <Section>
+            <TreatmentSubSection>
                 <SectionTitle>Cirurgia</SectionTitle>
                 <SubSectionHeader>
                     <SubSectionTitle>Procedimentos Cirúrgicos</SubSectionTitle>
@@ -163,7 +163,7 @@ const TratamentoSection = ({ formData, setFormData, onOpenModal, onRemoveCirurgi
                     <FaPlus size={10} />
                     Adicionar Procedimento Cirúrgico
                 </AddSubButton>
-            </Section>
+            </TreatmentSubSection>
 
             {/* ======================= TERAPIAS ======================= */}
             <TerapiaSection sectionTitle="Quimioterapia" formData={formData} setFormData={setFormData} basePath="tratamento.quimioterapia" paliativaListTitle="Adicionar Esquema Paliativo" paliativaCampos={[ { name: 'data_inicio', label: 'Data Início', type: 'date', span: 2 }, { name: 'data_termino', label: 'Data Término', type: 'date', span: 2 }, { name: 'esquema', label: 'Esquema', span: 2 }, { name: 'intercorrencias', label: 'Intercorrências', span: 6 }, ]} />
@@ -172,13 +172,16 @@ const TratamentoSection = ({ formData, setFormData, onOpenModal, onRemoveCirurgi
             <TerapiaSection sectionTitle="Imunoterapia" formData={formData} setFormData={setFormData} basePath="tratamento.imunoterapia" paliativaListTitle="Adicionar Esquema Paliativo" paliativaCampos={[ { name: 'data_inicio', label: 'Data Início', type: 'date', span: 2 }, { name: 'data_termino', label: 'Data Término', type: 'date', span: 2 }, { name: 'esquema', label: 'Esquema', span: 2 }, { name: 'intercorrencias', label: 'Intercorrências', span: 6 }, ]} />
             
             {/* ======================= IMUNOHISTOQUÍMICA ======================= */}
-            <Section>
+            <TreatmentSubSection>
                 <SectionTitle>Imunohistoquímica</SectionTitle>
+                <SubSectionHeader>
+                    <SubSectionTitle>Exames de Imunohistoquímica</SubSectionTitle>
+                </SubSectionHeader>
                 <TratamentoEmLista lista={formData.tratamento.imunohistoquimicas} path="tratamento.imunohistoquimicas" setFormData={setFormData} title="Adicionar Imunohistoquímica" campos={[ { name: 'tipo', label: 'Tipo', type: 'select', span: 2, options: [{ value: '', label: 'Selecione...' }, { value: 'diagnostica', label: 'Diagnóstica' }, { value: 'prognostica', label: 'Prognóstica' }] }, { name: 'especime', label: 'Espécime', span: 2 }, { name: 'data_realizacao', label: 'Data Realização', type: 'date', span: 2 }, { name: 're', label: 'RE', span: 1 }, { name: 'rp', label: 'RP', span: 1 }, { name: 'ki67', label: 'Ki67', span: 1 }, { name: 'her2', label: 'Her2', span: 1 }, { name: 'fish', label: 'FISH', span: 2 }, { name: 'outras_informacoes', label: 'Outras Informações', span: 6 }, ]} />
-            </Section>
+            </TreatmentSubSection>
 
             {/* ======================= CORE BIOPSY ======================= */}
-            <Section>
+            <TreatmentSubSection>
                 <SectionTitle>Core Biopsy</SectionTitle>
                 <FormGrid>
                     <FieldContainer style={{ gridColumn: 'span 6' }}>
@@ -197,10 +200,10 @@ const TratamentoSection = ({ formData, setFormData, onOpenModal, onRemoveCirurgi
                         {formData.tratamento.core_biopsy.anatomopatologico === 'malignidade' && <FieldContainer style={{ gridColumn: 'span 3' }}><InputLabel>Tipo Histológico</InputLabel><StyledInput name="tipo_histologico" value={formData.tratamento.core_biopsy.tipo_histologico || ''} onChange={(e) => handleSimpleChange(e, 'tratamento.core_biopsy')} /></FieldContainer>}
                     </FormGrid>
                 )}
-            </Section>
+            </TreatmentSubSection>
             
             {/* ======================= MAMOTOMIA ======================= */}
-            <Section>
+            <TreatmentSubSection>
                 <SectionTitle>Mamotomia</SectionTitle>
                 <FormGrid>
                     <FieldContainer style={{ gridColumn: 'span 6' }}>
@@ -219,10 +222,10 @@ const TratamentoSection = ({ formData, setFormData, onOpenModal, onRemoveCirurgi
                         {formData.tratamento.mamotomia.anatomopatologico === 'malignidade' && <FieldContainer style={{ gridColumn: 'span 3' }}><InputLabel>Tipo Histológico</InputLabel><StyledInput name="tipo_histologico" value={formData.tratamento.mamotomia.tipo_histologico || ''} onChange={(e) => handleSimpleChange(e, 'tratamento.mamotomia')} /></FieldContainer>}
                     </FormGrid>
                 )}
-            </Section>
+            </TreatmentSubSection>
 
             {/* ======================= PAAF ======================= */}
-            <Section>
+            <TreatmentSubSection>
                 <SectionTitle>PAAF</SectionTitle>
                 <FormGrid>
                     <FieldContainer style={{ gridColumn: 'span 6' }}>
@@ -239,7 +242,7 @@ const TratamentoSection = ({ formData, setFormData, onOpenModal, onRemoveCirurgi
                         <FieldContainer style={{ gridColumn: 'span 3' }}><InputLabel>Citologia Oncótica (Achados)</InputLabel><StyledInput name="achados" value={formData.tratamento.paaf.achados || ''} onChange={(e) => handleSimpleChange(e, 'tratamento.paaf')} /></FieldContainer>
                     </FormGrid>
                 )}
-            </Section>
+            </TreatmentSubSection>
         </>
     );
 };

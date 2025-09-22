@@ -26,7 +26,7 @@ import TemposDiagnosticoSection from '../../components/FormSections/TemposDiagno
 // Estilos da Página
 import {
     Container, FormContainer, Section, SectionTitle, Button,
-    FixedSubmitButton, SuccessMessage, ApiErrorContainer, ErrorText, TabNav, TabButton
+    FixedSubmitButton, SuccessMessage, ApiErrorContainer, ErrorText, TabNav, TabButton, SectionContent
 } from './styles';
 
 const CadastroPacientePage = () => {

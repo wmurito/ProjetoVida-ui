@@ -11,7 +11,7 @@ export const FormContainer = styled.form`
   background: white;
   padding: 25px 35px;
   border-radius: 10px;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   width: 100%;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
@@ -174,7 +174,7 @@ export const TabNav = styled.div`
     display: flex;
     flex-wrap: wrap;
     border-bottom: 2px solid #dee2e6;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 `;
 
 export const TabButton = styled.button`
@@ -268,6 +268,18 @@ export const AddMemberButton = styled.button`
 // --- Estilos específicos para Tratamento ---
 export const TreatmentSection = styled.div`
   background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const TreatmentSubSection = styled.div`
+  background: #fafbfc;
   border: 1px solid #e9ecef;
   border-radius: 6px;
   padding: 15px;
