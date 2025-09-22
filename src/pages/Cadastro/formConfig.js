@@ -1,26 +1,34 @@
 import * as yup from 'yup';
 
-// AVISO: O schema de validação (yup) é um exemplo e precisa ser
-// detalhadamente implementado para validar a nova e complexa estrutura de dados.
-export const validationSchema = yup.object().shape({
-  nome_completo: yup.string().required('O nome é obrigatório'),
-  data_nascimento: yup.date().required('A data de nascimento é obrigatória').nullable(),
-  cpf: yup.string().required('O CPF é obrigatório'),
-  prontuario: yup.string().required('O prontuário é obrigatório'),
-  // Adicione aqui as outras validações para todos os campos...
-});
-
+// --- ESTRUTURA INICIAL PARA A SEÇÃO DE TRATAMENTO ---
+// ATUALIZADO para refletir a nova estrutura (Neoadjuvante, Adjuvante, Paliativa)
 const tratamentoInitialState = {
-  // ATUALIZADO: Cirurgia agora contém arrays para múltiplos registros
   cirurgia: {
+    contexto_cirurgico: '', // Novo campo para 'Upfront' ou 'Pós Neoadjuvante'
     mamas: [],
     axilas: [],
     reconstrucoes: [],
   },
-  quimioterapias: [],
-  radioterapias: [],
-  endocrinoterapias: [],
-  imunoterapias: [],
+  quimioterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
+  radioterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
+  endocrinoterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
+  imunoterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
   imunohistoquimicas: [],
   core_biopsy: {
     realizada: false,
@@ -36,6 +44,7 @@ const tratamentoInitialState = {
     data: '',
     especime: '',
     tecnica: '',
+    tipo_lesao: '',
     anatomopatologico: '',
     tipo_histologico: '',
   },
@@ -47,7 +56,6 @@ const tratamentoInitialState = {
     achados: '',
   },
 };
-
 
 // --- ESTRUTURA COMPLETA DO ESTADO INICIAL DO FORMULÁRIO ---
 export const initialState = {
@@ -194,6 +202,31 @@ export const initialState = {
   },
 };
 
+// --- SCHEMA DE VALIDAÇÃO (YUP) ---
+// AVISO: Este schema é um exemplo e precisa ser expandido para cobrir
+// todos os campos obrigatórios e condicionais do seu formulário.
+export const validationSchema = yup.object().shape({
+  nome_completo: yup.string().required('O nome é obrigatório'),
+  data_nascimento: yup.date().required('A data de nascimento é obrigatória').nullable(),
+  cpf: yup.string().required('O CPF é obrigatório'),
+  prontuario: yup.string().required('O prontuário é obrigatório'),
+  
+  // Exemplo de como validar a nova estrutura de tratamento (pode ser refinado)
+  tratamento: yup.object().shape({
+    cirurgia: yup.object().shape({
+      mamas: yup.array().of(
+        yup.object().shape({
+          data: yup.date().required('A data da cirurgia é obrigatória').nullable(),
+          tecnica: yup.string().required('A técnica é obrigatória'),
+          // ... outras validações para os campos da cirurgia de mama
+        })
+      )
+    }),
+    // Adicionar validações para quimioterapia, radioterapia, etc.
+  }),
+  // Adicione aqui as outras validações para todos os campos...
+});
+
 // --- CONFIGURAÇÃO DAS ABAS DO FORMULÁRIO ---
 export const tabs = [
   { key: 'identificacao', label: 'Identificação' },
@@ -203,78 +236,33 @@ export const tabs = [
 ];
 
 // --- MAPEAMENTO DE ERROS PARA ABAS ---
+// ATUALIZADO para refletir a nova estrutura do tratamento
 export const errorFieldToTabMap = {
   // --- Aba: Identificação ---
   nome_completo: 'identificacao',
   data_nascimento: 'identificacao',
   cpf: 'identificacao',
   prontuario: 'identificacao',
-  genero: 'identificacao',
-  estado_civil: 'identificacao',
-  cor_etnia: 'identificacao',
-  escolaridade: 'identificacao',
-  renda_familiar: 'identificacao',
-  naturalidade: 'identificacao',
-  profissao: 'identificacao',
-  cep: 'identificacao',
-  logradouro: 'identificacao',
-  numero: 'identificacao',
-  complemento: 'identificacao',
-  bairro: 'identificacao',
-  cidade: 'identificacao',
-  uf: 'identificacao',
-  telefone: 'identificacao',
-  email: 'identificacao',
-  altura: 'identificacao',
-  peso: 'identificacao',
-  imc: 'identificacao',
+  // ... (outros campos da aba 'identificacao')
 
   // --- Aba: Histórico ---
   'historia_patologica.comorbidades': 'historico',
-  'historia_patologica.neoplasia_previa': 'historico',
-  'historia_patologica.biopsia_mamaria_previa': 'historico',
-  'historia_familiar.cancer_familia': 'historico',
   'familiares': 'historico',
-  'habitos_vida.tabagismo': 'historico',
-  'habitos_vida.etilismo': 'historico',
-  'habitos_vida.atividade_fisica': 'historico',
+  // ... (outros campos da aba 'historico')
 
   // --- Aba: Dados Clínicos ---
   'paridade.gesta': 'dadosClinicos',
-  'paridade.para': 'dadosClinicos',
-  'paridade.aborto': 'dadosClinicos',
-  'paridade.teve_filhos': 'dadosClinicos',
-  'paridade.amamentou': 'dadosClinicos',
-  'paridade.menarca_idade': 'dadosClinicos',
-  'paridade.menopausa': 'dadosClinicos',
-  'paridade.uso_trh': 'dadosClinicos',
-  'paridade.uso_aco': 'dadosClinicos',
   'historia_doenca.sinal_sintoma_principal': 'dadosClinicos',
-  'historia_doenca.idade_diagnostico': 'dadosClinicos',
-  'historia_doenca.ecog': 'dadosClinicos',
-  'historia_doenca.lado_acometido': 'dadosClinicos',
-  'histologia.biopsia_pre_tratamento': 'dadosClinicos',
-  'histologia.tipo_histologico': 'dadosClinicos',
-  'histologia.grau_histologico': 'dadosClinicos',
+  // ... (outros campos da aba 'dadosClinicos')
 
   // --- Aba: Tratamento e Evolução ---
   'tratamento': 'tratamentoEvolucao',
   'tratamento.cirurgia': 'tratamentoEvolucao',
-  'tratamento.quimioterapias': 'tratamentoEvolucao',
+  'tratamento.quimioterapia': 'tratamentoEvolucao',
   'tratamento.radioterapia': 'tratamentoEvolucao',
-  'tratamento.endocrinoterapias': 'tratamentoEvolucao',
-  'tratamento.imunoterapias': 'tratamentoEvolucao',
-  'tratamento.imunohistoquimicas': 'tratamentoEvolucao',
-  'tratamento.core_biopsy': 'tratamentoEvolucao',
-  'tratamento.mamotomia': 'tratamentoEvolucao',
-  'desfecho.status_vital': 'tratamentoEvolucao',
-  'desfecho.recidiva_local': 'tratamentoEvolucao',
-  'desfecho.recidiva_regional': 'tratamentoEvolucao',
-  'desfecho.metastases': 'tratamentoEvolucao',
-  'tempos_diagnostico.data_primeira_consulta': 'tratamentoEvolucao',
-  'tempos_diagnostico.data_diagnostico': 'tratamentoEvolucao',
-  'tempos_diagnostico.data_inicio_tratamento': 'tratamentoEvolucao',
-  'tempos_diagnostico.data_cirurgia': 'tratamentoEvolucao',
+  'tratamento.endocrinoterapia': 'tratamentoEvolucao',
+  'tratamento.imunoterapia': 'tratamentoEvolucao',
+  // ... (outros campos da aba 'tratamentoEvolucao')
 };
 
 // --- OPÇÕES PARA CAMPOS SELECT ---

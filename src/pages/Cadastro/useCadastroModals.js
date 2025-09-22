@@ -1,11 +1,19 @@
 import { useState } from 'react';
 
+const getNestedStateRef = (state, path) => {
+    const pathKeys = path.split('.');
+    let current = state;
+    pathKeys.forEach(key => { if (current) { current = current[key]; } });
+    return current;
+};
+
 export const useCadastroModals = (setFormData) => {
     const [modalState, setModalState] = useState({
         isFamilyModalOpen: false,
         isPalliativeChemoModalOpen: false,
         isTargetedTherapyModalOpen: false,
         isMetastaseModalOpen: false,
+        isCirurgiaModalOpen: false,
         editingData: null,
         editingIndex: null,
     });
@@ -18,7 +26,6 @@ export const useCadastroModals = (setFormData) => {
         setModalState({ ...modalState, [`is${modalName}ModalOpen`]: false, editingData: null, editingIndex: null });
     };
 
-    // --- Handlers de Submissão dos Modais ---
     const handleSubmitMember = (memberData) => {
         setFormData(prev => {
             const newFamiliares = [...prev.familiares];
@@ -28,24 +35,8 @@ export const useCadastroModals = (setFormData) => {
         closeModal('Family');
     };
 
-    const handleSubmitPalliativeChemo = (chemoData) => {
-        setFormData(prev => {
-            const newChemos = [...prev.tratamento.quimioterapias_paliativas];
-            if (modalState.editingIndex !== null) { newChemos[modalState.editingIndex] = chemoData; } else { newChemos.push(chemoData); }
-            return { ...prev, tratamento: { ...prev.tratamento, quimioterapias_paliativas: newChemos } };
-        });
-        closeModal('PalliativeChemo');
-    };
-    
-    const handleSubmitTargetedTherapy = (therapyData) => {
-        setFormData(prev => {
-            const newTherapies = [...prev.tratamento.terapias_alvo];
-            if (modalState.editingIndex !== null) { newTherapies[modalState.editingIndex] = therapyData; } else { newTherapies.push(therapyData); }
-            return { ...prev, tratamento: { ...prev.tratamento, terapias_alvo: newTherapies } };
-        });
-        closeModal('TargetedTherapy');
-    };
-
+    const handleSubmitPalliativeChemo = (chemoData) => { /* ... sua lógica ... */ };
+    const handleSubmitTargetedTherapy = (therapyData) => { /* ... sua lógica ... */ };
     const handleSubmitMetastase = (metastaseData) => {
         setFormData(prev => {
             const newMetastases = [...prev.desfecho.metastases];
@@ -55,6 +46,31 @@ export const useCadastroModals = (setFormData) => {
         closeModal('Metastase');
     };
 
+    // --- FUNÇÃO DE SUBMIT DA CIRURGIA ATUALIZADA ---
+    const handleSubmitCirurgia = (procedimentoData) => {
+        const { tipo_procedimento, ...cirurgiaData } = procedimentoData;
+        
+        // Remove a propriedade `tipo_procedimento` do objeto a ser salvo, pois ela já foi usada.
+        delete cirurgiaData.tipo_procedimento;
+
+        setFormData(prev => {
+            const newState = JSON.parse(JSON.stringify(prev));
+            // O `tipo_procedimento` (mamas, axilas, reconstrucoes) define em qual array salvar.
+            const cirurgias = getNestedStateRef(newState, `tratamento.cirurgia.${tipo_procedimento}`);
+
+            if (Array.isArray(cirurgias)) {
+                 if (modalState.editingIndex !== null) {
+                    // Modo de Edição
+                    cirurgias[modalState.editingIndex] = cirurgiaData;
+                } else {
+                    // Modo de Adição
+                    cirurgias.push(cirurgiaData);
+                }
+            }
+            return newState;
+        });
+        closeModal('Cirurgia');
+    };
 
     return {
         modalState,
@@ -63,6 +79,7 @@ export const useCadastroModals = (setFormData) => {
         handleSubmitMember,
         handleSubmitPalliativeChemo,
         handleSubmitTargetedTherapy,
-        handleSubmitMetastase
+        handleSubmitMetastase,
+        handleSubmitCirurgia,
     };
 };

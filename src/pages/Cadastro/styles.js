@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { tokens, Button as BaseButton, Input as BaseInput, Select as BaseSelect, Checkbox as BaseCheckbox, Label as BaseLabel, Card, Grid as BaseGrid } from '../../components/UI';
 
 export const Container = styled.div`
   height: 100%; 
@@ -39,21 +40,17 @@ export const SectionTitle = styled.h2`
   display: inline-block;
 `;
 
-export const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 12px 15px;
+export const FormGrid = styled(BaseGrid).attrs({ cols: 6 })`
+  gap: ${tokens.spacing.sm} ${tokens.spacing.md};
   
   @media (max-width: 1200px) {
     grid-template-columns: repeat(4, 1fr);
   }
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
   }
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
-    gap: 8px;
   }
 `;
 
@@ -63,11 +60,9 @@ export const FieldContainer = styled.div`
   width: 100%; 
 `;
 
-export const InputLabel = styled.label`
-  margin-bottom: 6px;
-  font-weight: 500;
-  font-size: 0.85rem;
-  color: #495057;
+export const InputLabel = styled(BaseLabel)`
+  margin-bottom: ${tokens.spacing.xs};
+  font-size: ${tokens.typography.sm};
 `;
 
 const inputStyles = `
@@ -85,8 +80,13 @@ const inputStyles = `
     box-shadow: 0 0 0 2px rgba(176, 25, 80, 0.1);
   }
 `;
-export const StyledInput = styled.input`${inputStyles}`;
-export const StyledSelect = styled.select`${inputStyles}`;
+export const StyledInput = styled(BaseInput)`
+  /* Herda do sistema base */
+`;
+
+export const StyledSelect = styled(BaseSelect)`
+  /* Herda do sistema base */
+`;
 
 export const CheckboxLabel = styled.label`
   display: flex;
@@ -96,33 +96,12 @@ export const CheckboxLabel = styled.label`
   color: #495057;
 `;
 
-export const StyledCheckbox = styled.input.attrs({ type: 'checkbox' })`
-  margin-right: 8px;
-  width: 17px;
-  height: 17px;
-  cursor: pointer;
-  accent-color: #b01950ff;
+export const StyledCheckbox = styled(BaseCheckbox)`
+  /* Herda do sistema base */
 `;
 
-export const Button = styled.button`
-  background-color: #b71550;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-
-  &:hover {
-    background-color: #d81b60;
-  }
-  
-  &:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-  }
+export const Button = styled(BaseButton)`
+  /* Herda do sistema base */
 `;
 
 export const FixedSubmitButton = styled.div`
@@ -223,22 +202,22 @@ export const TabButton = styled.button`
 `;
 
 export const SuccessMessage = styled.div`
-  margin-bottom: 18px;
-  padding: 12px 16px;
+  margin-bottom: ${tokens.spacing.md};
+  padding: ${tokens.spacing.sm} ${tokens.spacing.md};
   background-color: #d1e7dd;
   border: 1px solid #badbcc;
   color: #0f5132;
-  border-radius: 8px;
+  border-radius: ${tokens.radius.lg};
   text-align: center;
 `;
 
 export const ApiErrorContainer = styled.div`
-  margin-bottom: 18px;
-  padding: 12px 16px;
+  margin-bottom: ${tokens.spacing.md};
+  padding: ${tokens.spacing.sm} ${tokens.spacing.md};
   background-color: #f8d7da;
   border: 1px solid #f5c2c7;
   color: #842029;
-  border-radius: 8px;
+  border-radius: ${tokens.radius.lg};
   text-align: left;
 `;
 
@@ -248,12 +227,10 @@ export const ErrorText = styled.div`
   margin-top: 5px;
 `;
 
-export const SectionContent = styled.div`
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 10px;
-  border: 1px solid #e9ecef;
+export const SectionContent = styled(Card)`
+  background: ${tokens.colors.surface};
+  padding: ${tokens.spacing.md};
+  margin-top: ${tokens.spacing.sm};
 `;
 
 export const AddMemberButton = styled.button`
