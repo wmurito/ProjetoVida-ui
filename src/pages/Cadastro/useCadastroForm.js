@@ -31,9 +31,9 @@ export const useCadastroForm = () => {
         addEvento(tratamento.fim_radioterapia, 'Término da Radioterapia');
         addEvento(tratamento.inicio_endocrino, 'Início da Endocrinoterapia', tratamento.qual_endocrinoterapia);
         addEvento(tratamento.fim_endocrino, 'Término da Endocrinoterapia');
-        tratamento.quimioterapias_paliativas.forEach(qt => { addEvento(qt.inicio_quimioterapia_paliativa, `Início da Quimio Paliativa (${qt.linha_tratamento_paliativo})`, qt.qual_quimioterapia_paliativa); addEvento(qt.fim_quimioterapia_paliativa, `Fim da Quimio Paliativa (${qt.linha_tratamento_paliativo})`); });
-        tratamento.terapias_alvo.forEach(ta => { addEvento(ta.inicio_terapia_alvo, `Início da Terapia Alvo`, ta.qual_terapia_alvo); addEvento(ta.fim_terapia_alvo, `Fim da Terapia Alvo`); });
-        desfecho.metastases.forEach(meta => addEvento(meta.data_metastase, 'Diagnóstico de Metástase', meta.local_metastase));
+        (tratamento.quimioterapias_paliativas || []).forEach(qt => { addEvento(qt.inicio_quimioterapia_paliativa, `Início da Quimio Paliativa (${qt.linha_tratamento_paliativo})`, qt.qual_quimioterapia_paliativa); addEvento(qt.fim_quimioterapia_paliativa, `Fim da Quimio Paliativa (${qt.linha_tratamento_paliativo})`); });
+        (tratamento.terapias_alvo || []).forEach(ta => { addEvento(ta.inicio_terapia_alvo, `Início da Terapia Alvo`, ta.qual_terapia_alvo); addEvento(ta.fim_terapia_alvo, `Fim da Terapia Alvo`); });
+        (desfecho.metastases || []).forEach(meta => addEvento(meta.data_metastase, 'Diagnóstico de Metástase', meta.local_metastase));
         addEvento(desfecho.data_recidiva_local, 'Diagnóstico de Recidiva Local', desfecho.cirurgia_recidiva_local);
         addEvento(desfecho.data_recidiva_regional, 'Diagnóstico de Recidiva Regional', desfecho.cirurgia_recidiva_regional);
         addEvento(desfecho.data_morte, 'Data da Morte', desfecho.causa_morte);
