@@ -6,10 +6,11 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Lista de domínios permitidos
+// Lista de domínios permitidos - configurar via variáveis de ambiente
 const ALLOWED_ORIGINS = [
   self.location.origin,
-  'https://your-api-domain.com'
+  // Domínios permitidos devem ser configurados via environment variables
+  ...(self.registration?.scope ? [new URL(self.registration.scope).origin] : [])
 ];
 
 // Função para validar URLs de forma mais rigorosa
@@ -78,6 +79,12 @@ self.addEventListener('fetch', (event) => {
         // Retornar do cache se disponível
         if (response) {
           return response;
+        }
+        
+        // Validação adicional de URL antes do fetch
+        const requestUrl = new URL(event.request.url);
+        if (!ALLOWED_ORIGINS.some(origin => requestUrl.origin === origin)) {
+          return new Response('Forbidden Origin', { status: 403 });
         }
         
         // Criar request seguro com headers limitados

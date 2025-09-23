@@ -144,12 +144,7 @@ export const Button = styled.button`
         default: return tokens.colors.primaryHover;
       }
     }};
-    color: ${props => {
-      switch(props.variant) {
-        case 'outline': return 'white';
-        default: return 'white';
-      }
-    }};
+    color: white;
   }
 `;
 

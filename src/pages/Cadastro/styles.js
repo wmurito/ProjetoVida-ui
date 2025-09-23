@@ -9,11 +9,11 @@ export const Container = styled.div`
 
 export const FormContainer = styled.form`
   background: white;
-  padding: 25px 35px;
+  padding: 10px 10px;
   border-radius: 10px;
-  max-width: 1300px;
-  margin: 0 auto;
-  width: 100%;
+  max-width: 100%;
+  margin: 2px 10px;
+  width: 98%;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
   flex-grow: 1; 
   padding-bottom: 100px; /* Espaço para o botão fixo */
