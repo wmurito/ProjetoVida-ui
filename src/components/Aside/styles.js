@@ -9,15 +9,24 @@ export const Container = styled.aside`
   display: flex;
   flex-direction: column;
   
-  width: ${({ $isClosed }) => ($isClosed ? '44px' : '150px')};
+  width: ${({ $isClosed }) => ($isClosed ? '60px' : '200px')};
   transition: width 0.3s ease-in-out;
   
   border-right: 1px solid var(--border-color-inverted);
   z-index: 1000;
   overflow-x: hidden;
-
-  /* ADICIONADO PARA O MENU TER SEU PRÓPRIO SCROLL SE NECESSÁRIO */
   overflow-y: auto;
+  
+  @media (max-width: 768px) {
+    display: ${({ $menuAberto }) => ($menuAberto ? 'flex' : 'none')};
+    position: fixed;
+    left: 0;
+    top: 60px;
+    width: 70%;
+    height: calc(100vh - 60px);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    z-index: 2000;
+  }
 `;
 
 // O STYLED COMPONENT 'LOGO' FOI REMOVIDO DAQUI

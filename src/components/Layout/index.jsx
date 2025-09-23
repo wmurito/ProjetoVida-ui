@@ -1,25 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from '../Header'; // Importa o novo Header
+import Header from '../Header';
 import Aside from '../Aside';
-import { Grid, Main } from './styles';
+import { Grid, Main, MobileOverlay } from './styles';
 
 const Layout = () => {
   const [isAsideClosed, setIsAsideClosed] = useState(false);
+  const [menuAberto, setMenuAberto] = useState(false);
 
   const toggleAside = () => {
-    setIsAsideClosed(prevState => !prevState);
+    if (window.innerWidth <= 768) {
+      setMenuAberto(prev => !prev);
+    } else {
+      setIsAsideClosed(prev => !prev);
+    }
   };
+
+  const closeMobileMenu = () => {
+    setMenuAberto(false);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setMenuAberto(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <Grid>
-      {/* Renderiza o Header, passando o controle do menu */}
       <Header isAsideClosed={isAsideClosed} toggleAside={toggleAside} />
-      
-      {/* O Aside continua recebendo o estado para controlar sua largura */}
-      <Aside isClosed={isAsideClosed} />
-      
-      {/* O Main ajusta sua margem com base no estado do Aside */}
+      <Aside isClosed={isAsideClosed} $menuAberto={menuAberto} />
+      <MobileOverlay $show={menuAberto} onClick={closeMobileMenu} />
       <Main $isAsideClosed={isAsideClosed}>
         <Outlet />
       </Main>

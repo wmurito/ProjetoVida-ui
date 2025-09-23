@@ -1,8 +1,17 @@
 import styled from 'styled-components';
-import { tokens, Button as BaseButton, Input as BaseInput, Select as BaseSelect, Checkbox as BaseCheckbox, Label as BaseLabel, Card, Grid as BaseGrid } from '../../components/UI';
+import {
+  tokens,
+  Button as BaseButton,
+  Input as BaseInput,
+  Select as BaseSelect,
+  Checkbox as BaseCheckbox,
+  Label as BaseLabel,
+  Card,
+  Grid as BaseGrid,
+} from '../../components/UI';
 
 export const Container = styled.div`
-  height: 100%; 
+  height: 100%;
   display: flex;
   flex-direction: column;
 `;
@@ -14,8 +23,8 @@ export const FormContainer = styled.form`
   max-width: 100%;
   margin: 2px 10px;
   width: 98%;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  flex-grow: 1; 
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  flex-grow: 1;
   padding-bottom: 100px; /* Espaço para o botão fixo */
 `;
 
@@ -42,7 +51,7 @@ export const SectionTitle = styled.h2`
 
 export const FormGrid = styled(BaseGrid).attrs({ cols: 6 })`
   gap: ${tokens.spacing.sm} ${tokens.spacing.md};
-  
+
   @media (max-width: 1200px) {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -57,7 +66,7 @@ export const FormGrid = styled(BaseGrid).attrs({ cols: 6 })`
 export const FieldContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%; 
+  width: 100%;
 `;
 
 export const InputLabel = styled(BaseLabel)`
@@ -65,21 +74,6 @@ export const InputLabel = styled(BaseLabel)`
   font-size: ${tokens.typography.sm};
 `;
 
-const inputStyles = `
-  padding: 8px 10px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  box-sizing: border-box;
-  width: 100%;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-
-  &:focus {
-    outline: none;
-    border-color: #b01950ff;
-    box-shadow: 0 0 0 2px rgba(176, 25, 80, 0.1);
-  }
-`;
 export const StyledInput = styled(BaseInput)`
   /* Herda do sistema base */
 `;
@@ -118,16 +112,16 @@ export const FixedSubmitButton = styled.div`
   z-index: 10;
 `;
 
-// --- Estilos para Listas Repetitivas (Quimio, Radio, etc.) ---
+// --- Estilos para Listas Repetitivas ---
 export const ListContainer = styled.div`
-    width: 100%;
-    margin-top: 0.5rem;
-    position: relative;
-    padding: 15px;
-    border: 1px solid #eef0f2;
-    background-color: #fcfdff;
-    border-radius: 6px;
-    margin-bottom: 10px;
+  width: 100%;
+  margin-top: 0.5rem;
+  position: relative;
+  padding: 15px;
+  border: 1px solid #eef0f2;
+  background-color: #fcfdff;
+  border-radius: 6px;
+  margin-bottom: 10px;
 `;
 
 export const AddMoreButton = styled.button`
@@ -151,54 +145,80 @@ export const AddMoreButton = styled.button`
 `;
 
 export const ActionButtons = styled.div`
-    position: absolute;
-    top: 15px;
-    right: 15px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
 `;
 
 export const RemoveButton = styled.button`
-    background: transparent;
-    color: #adb5bd;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 5px;
-    
-    &:hover {
-        color: #dc3545;
-    }
+  background: transparent;
+  color: #adb5bd;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 5px;
+
+  &:hover {
+    color: #dc3545;
+  }
 `;
 
 // --- Abas e Mensagens ---
 export const TabNav = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    border-bottom: 2px solid #dee2e6;
-    margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #dee2e6;
+  margin-bottom: 10px;
+
+  @media (max-width: 600px) {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #b01950;
+      border-radius: 2px;
+    }
+  }
 `;
 
 export const TabButton = styled.button`
-    padding: 14px 22px;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #6c757d;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s ease-in-out;
-    margin-bottom: -2px;
+  padding: 14px 22px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6c757d;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  flex-shrink: 0;
 
-    ${({ $isActive }) =>
-        $isActive && `
+  ${({ $isActive }) =>
+    $isActive &&
+    `
         color: #b01950ff;
         border-bottom-color: #b01950ff;
         font-weight: 600;
     `}
 
-    &:hover {
-        background-color: #f8f9fa;
-    }
+  &:hover {
+    background-color: #f8f9fa;
+  }
+
+  @media (max-width: 600px) {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    min-width: max-content;
+  }
 `;
 
 export const SuccessMessage = styled.div`
@@ -265,14 +285,14 @@ export const AddMemberButton = styled.button`
   }
 `;
 
-// --- Estilos específicos para Tratamento ---
+// --- Tratamentos ---
 export const TreatmentSection = styled.div`
   background: white;
   border: 1px solid #e9ecef;
   border-radius: 6px;
   padding: 15px;
   margin-bottom: 15px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -284,7 +304,7 @@ export const TreatmentSubSection = styled.div`
   border-radius: 6px;
   padding: 15px;
   margin-bottom: 15px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -307,7 +327,8 @@ export const TreatmentTitle = styled.h3`
 `;
 
 export const CompactButton = styled.button`
-  background-color: ${props => props.variant === 'danger' ? '#dc3545' : '#b71550'};
+  background-color: ${(props) =>
+    props.variant === 'danger' ? '#dc3545' : '#b71550'};
   color: white;
   border: none;
   padding: 4px 8px;
@@ -316,11 +337,12 @@ export const CompactButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background-color: ${props => props.variant === 'danger' ? '#c82333' : '#a01446'};
+    background-color: ${(props) =>
+      props.variant === 'danger' ? '#c82333' : '#a01446'};
   }
-  
+
   &:disabled {
     background-color: #6c757d;
     cursor: not-allowed;
@@ -331,7 +353,7 @@ export const TreatmentGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 10px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -342,7 +364,7 @@ export const CheckboxGroup = styled.div`
   flex-wrap: wrap;
   gap: 15px;
   margin: 10px 0;
-  
+
   @media (max-width: 576px) {
     flex-direction: column;
     gap: 8px;
@@ -354,7 +376,7 @@ export const InlineGroup = styled.div`
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  
+
   @media (max-width: 576px) {
     flex-direction: column;
     align-items: flex-start;
@@ -362,7 +384,6 @@ export const InlineGroup = styled.div`
   }
 `;
 
-// Subtítulo menor para seções dentro de tratamento
 export const SubSectionTitle = styled.h3`
   font-size: 1rem;
   margin-bottom: 10px;
@@ -373,7 +394,6 @@ export const SubSectionTitle = styled.h3`
   display: inline-block;
 `;
 
-// Container para subtítulo + botão
 export const SubSectionHeader = styled.div`
   display: flex;
   flex-direction: column;
@@ -381,7 +401,6 @@ export const SubSectionHeader = styled.div`
   margin-bottom: 15px;
 `;
 
-// Botão de adicionar menor e mais discreto
 export const AddSubButton = styled.button`
   background-color: #e3f2fd;
   color: #1976d2;
@@ -396,14 +415,37 @@ export const AddSubButton = styled.button`
   align-items: center;
   gap: 4px;
   align-self: flex-start;
-  
+
   &:hover {
     background-color: #bbdefb;
   }
-  
+
   &:disabled {
     background-color: #f5f5f5;
     color: #9e9e9e;
     cursor: not-allowed;
+  }
+`;
+
+export const TabelaContainer = styled.div`
+  width: 100%;
+
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    table {
+      min-width: 600px;
+    }
+  }
+`;
+
+export const DashboardGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
   }
 `;
