@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, Button, CircularProgress } from '@mui/material';
 import { format } from 'date-fns';
 import api, { getAuthToken } from '../../services/api';
 import styled from 'styled-components';
+import { Overlay, Button, Spinner } from '../UI';
 
 // --- Styled Components ---
 const DetailGrid = styled.div`
@@ -41,6 +41,37 @@ const SectionTitle = styled.h3`
   border-bottom: 1px solid #e9ecef;
   padding-bottom: 10px;
   font-weight: 600;
+`;
+
+const ModalBox = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 1000px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  padding: 32px;
+  max-height: 90vh;
+  overflow-y: auto;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 24px;
+  text-align: right;
+`;
+
+const ErrorContainer = styled.div`
+  text-align: center;
+  padding: 32px;
 `;
 // --- Fim dos Styled Components ---
 
@@ -116,49 +147,38 @@ const ViewModal = ({ open, onClose, pacienteId }) => {
     );
   };
 
+  if (!open) return null;
+
+  if (!open) return null;
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '90%',
-          maxWidth: 1000,
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-          maxHeight: '90vh',
-          overflowY: 'auto',
-        }}
-      >
+    <Overlay>
+      <ModalBox>
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-            <CircularProgress />
-          </Box>
+          <LoadingContainer>
+            <Spinner size="40px" />
+          </LoadingContainer>
         ) : pacienteData ? (
           <>
             <SectionTitle>Dados do Paciente</SectionTitle>
             {renderDetails(pacienteData)}
 
-            <Box sx={{ mt: 3, textAlign: 'right' }}>
-              <Button onClick={onClose} variant="contained" color="secondary">
+            <ButtonContainer>
+              <Button onClick={onClose} variant="secondary">
                 Fechar
               </Button>
-            </Box>
+            </ButtonContainer>
           </>
         ) : (
-          <Box sx={{ textAlign: 'center', p: 4 }}>
+          <ErrorContainer>
             <p>Dados não encontrados.</p>
-            <Button onClick={onClose} variant="contained" color="secondary">
+            <Button onClick={onClose} variant="secondary">
               Fechar
             </Button>
-          </Box>
+          </ErrorContainer>
         )}
-      </Box>
-    </Modal>
+      </ModalBox>
+    </Overlay>
   );
 };
 
