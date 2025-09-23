@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Hooks e Serviços
 import { useCadastroForm } from './useCadastroForm';
 import { useCadastroModals } from './useCadastroModals';
-import { submitCadastro } from './cadastroService';
 import { errorFieldToTabMap, tabs } from './formConfig';
 
 // Componentes Reutilizáveis e de Seção
@@ -26,45 +27,44 @@ import TemposDiagnosticoSection from '../../components/FormSections/TemposDiagno
 // Estilos da Página
 import {
     Container, FormContainer, Section, SectionTitle, Button,
-    FixedSubmitButton, SuccessMessage, ApiErrorContainer, ErrorText, TabNav, TabButton, SectionContent
+    FixedSubmitButton, SuccessMessage, ApiErrorContainer, ErrorText, TabNav, TabButton
 } from './styles';
 
 const CadastroPacientePage = () => {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [apiErrors, setApiErrors] = useState([]);
     const [activeTab, setActiveTab] = useState(tabs[0].key);
 
-    const { formData, setFormData, errors, setErrors, handleChange, handleNestedChange, handleNestedCheckbox, resetForm } = useCadastroForm();
+    const { 
+        formData, setFormData, errors, isLoading, successMessage,
+        handleChange, handleNestedChange, handleNestedCheckbox, handleSave 
+    } = useCadastroForm(setActiveTab, navigate);
     
     const {
-        modalState,
-        openModal,
-        closeModal,
-        handleSubmitMember,
-        handleSubmitMetastase,
-        handleSubmitCirurgia,
+        modalState, openModal, closeModal,
+        handleSubmitMember, handleSubmitMetastase, handleSubmitCirurgia,
     } = useCadastroModals(setFormData);
     
-    // Lógica do Termo de Aceite (sem alterações)
     const [termoAceito, setTermoAceito] = useState(false);
     const [arquivoTermo, setArquivoTermo] = useState(null);
     const [erroTermo, setErroTermo] = useState('');
     const [acessoLiberado, setAcessoLiberado] = useState(false);
+    
     const handleConfirmarAceite = () => {
-        if (!termoAceito || !arquivoTermo) { setErroTermo('É necessário aceitar os termos e anexar o arquivo.'); return; }
-        setErroTermo(''); setAcessoLiberado(true);
-    };
-    const handleCancelarAceite = () => navigate(-1);
-
-    // Submissão Principal (sem alterações)
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // ... sua lógica de submit aqui ...
+        if (!termoAceito || !arquivoTermo) { 
+            setErroTermo('É necessário aceitar os termos e anexar o arquivo.'); 
+            return; 
+        }
+        setErroTermo(''); 
+        setAcessoLiberado(true);
     };
     
-    // --- Handlers de Remoção ---
+    const handleCancelarAceite = () => navigate(-1);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await handleSave(arquivoTermo);
+    };
+    
     const handleRemoveMember = (indexToRemove) => {
         if (window.confirm('Tem certeza?')) {
             setFormData(prev => ({ ...prev, familiares: prev.familiares.filter((_, index) => index !== indexToRemove) }));
@@ -77,7 +77,6 @@ const CadastroPacientePage = () => {
         }
     };
     
-    // --- FUNÇÃO DE REMOVER CIRURGIA CORRIGIDA ---
     const handleRemoveCirurgia = (type, indexToRemove) => {
         if (window.confirm('Tem certeza que deseja remover este procedimento?')) {
             setFormData(prev => {
@@ -90,14 +89,18 @@ const CadastroPacientePage = () => {
             });
         }
     };
+
+    const getErrorCountForTab = (tabKey) => {
+        return Object.keys(errors).filter(key => errorFieldToTabMap[key] === tabKey).length;
+    };
     
     return (
         <Container>
+            <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
             <TermoAceiteModal isOpen={!acessoLiberado} onConfirm={handleConfirmarAceite} onCancel={handleCancelarAceite} termoAceito={termoAceito} setTermoAceito={setTermoAceito} arquivoTermo={arquivoTermo} setArquivoTermo={setArquivoTermo} erroTermo={erroTermo} />
 
             {acessoLiberado && (
                 <>
-                    {/* --- RENDERIZAÇÃO DOS MODAIS --- */}
                     <FamilyMemberModal isOpen={modalState.isFamilyModalOpen} onClose={() => closeModal('Family')} onSubmit={handleSubmitMember} member={modalState.editingData} />
                     <MetastaseModal isOpen={modalState.isMetastaseModalOpen} onClose={() => closeModal('Metastase')} onSubmit={handleSubmitMetastase} metastaseData={modalState.editingData} />
                     <CirurgiaModal
@@ -109,50 +112,48 @@ const CadastroPacientePage = () => {
 
                     <FormContainer onSubmit={handleSubmit} noValidate>
                         {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
-                        {apiErrors.length > 0 && (<ApiErrorContainer>{apiErrors.map((error, index) => <ErrorText key={index}>{error}</ErrorText>)}</ApiErrorContainer>)}
+                        {Object.keys(errors).length > 0 && !isLoading && (
+                            <ApiErrorContainer>
+                                <ErrorText>Por favor, corrija os erros para continuar.</ErrorText>
+                            </ApiErrorContainer>
+                        )}
 
                         <TabNav>
-                            {tabs.map(tab => (<TabButton key={tab.key} type="button" $isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>{tab.label}</TabButton>))}
+                            {tabs.map(tab => (
+                                <TabButton key={tab.key} type="button" $isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
+                                    {tab.label}
+                                    {getErrorCountForTab(tab.key) > 0 && (
+                                        <span style={{ marginLeft: '8px', backgroundColor: '#dc3545', color: 'white', borderRadius: '50%', padding: '2px 8px', fontSize: '0.75em' }}>
+                                            {getErrorCountForTab(tab.key)}
+                                        </span>
+                                    )}
+                                </TabButton>
+                            ))}
                         </TabNav>
 
-                        {/* --- RENDERIZAÇÃO DAS ABAS --- */}
+                        {/* RENDERIZAÇÃO DAS ABAS (Sua lógica original preservada) */}
                         {activeTab === 'identificacao' && (<Section><SectionTitle>Identificação e Dados Sociais</SectionTitle><DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} /></Section>)}
                         
                         {activeTab === 'historico' && (<><Section><SectionTitle>História Patológica Pregressa</SectionTitle><HistoriaPatologicaSection formData={formData.historia_patologica} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_patologica')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'historia_patologica')} /></Section><Section><SectionTitle>História Familiar</SectionTitle><HistoriaFamiliarSection familiares={formData.familiares} historiaFamiliar={formData.historia_familiar} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_familiar')} onAddMember={() => openModal('Family')} onEditMember={(member, index) => openModal('Family', member, index)} onRemoveMember={handleRemoveMember} /></Section><Section><SectionTitle>Hábitos de Vida</SectionTitle><HabitosDeVidaSection formData={formData.habitos_vida} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'habitos_vida')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'habitos_vida')} /></Section></>)}
                         
                         {activeTab === 'dadosClinicos' && (<><Section><SectionTitle>Paridade</SectionTitle><ParidadeSection formData={formData.paridade} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'paridade')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'paridade')} /></Section><Section><SectionTitle>História da Doença Atual</SectionTitle><HistoriaDoencaSection formData={formData.historia_doenca} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_doenca')} /></Section><Section><SectionTitle>Histologia</SectionTitle><HistologiaSection formData={formData.histologia} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'histologia')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'histologia')} /></Section></>)}
                         
-                        {activeTab === 'tratamentoEvolucao' && (
+                        {activeTab === 'tratamento' && (
+                            <Section>
+                                <SectionTitle>Tratamento</SectionTitle>
+                                <TratamentoSection formData={formData} setFormData={setFormData} errors={errors} onOpenModal={openModal} onRemoveCirurgia={handleRemoveCirurgia} />
+                            </Section>
+                        )}
+                        
+                        {activeTab === 'evolucao' && (
                             <>
                                 <Section>
-                                    <SectionTitle>Tratamento</SectionTitle>
-                                    <TratamentoSection
-                                        formData={formData}
-                                        setFormData={setFormData}
-                                        errors={errors}
-                                        onOpenModal={openModal}
-                                        onRemoveCirurgia={handleRemoveCirurgia} // Corrigido
-                                    />
-                                </Section>
-                                <Section>
                                     <SectionTitle>Desfecho</SectionTitle>
-                                    <DesfechoSection
-                                        formData={formData.desfecho}
-                                        errors={errors}
-                                        handleInputChange={(e) => handleNestedChange(e, 'desfecho')}
-                                        handleCheckboxChange={(e) => handleNestedCheckbox(e, 'desfecho')}
-                                        onAddMetastase={() => openModal('Metastase')}
-                                        onEditMetastase={(meta, index) => openModal('Metastase', meta, index)}
-                                        onRemoveMetastase={handleRemoveMetastase}
-                                    />
+                                    <DesfechoSection formData={formData.desfecho} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'desfecho')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'desfecho')} onAddMetastase={() => openModal('Metastase')} onEditMetastase={(meta, index) => openModal('Metastase', meta, index)} onRemoveMetastase={handleRemoveMetastase} />
                                 </Section>
                                 <Section>
-                                    <SectionTitle>Tempos de Diagnóstico</SectionTitle>
-                                    <TemposDiagnosticoSection
-                                        formData={formData.tempos_diagnostico}
-                                        errors={errors}
-                                        handleInputChange={(e) => handleNestedChange(e, 'tempos_diagnostico')}
-                                    />
+                                    <SectionTitle>Data Diagnóstico</SectionTitle>
+                                    <TemposDiagnosticoSection formData={formData.tempos_diagnostico} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'tempos_diagnostico')} />
                                 </Section>
                             </>
                         )}

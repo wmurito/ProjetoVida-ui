@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 
 // --- ESTRUTURA INICIAL PARA A SEÇÃO DE TRATAMENTO ---
-// ATUALIZADO para refletir a nova estrutura (Neoadjuvante, Adjuvante, Paliativa)
 const tratamentoInitialState = {
   cirurgia: {
     contexto_cirurgico: '', // Novo campo para 'Upfront' ou 'Pós Neoadjuvante'
@@ -182,7 +181,7 @@ export const initialState = {
   // --- TRATAMENTO E EVOLUÇÃO ---
   tratamento: tratamentoInitialState,
   desfecho: {
-    status_vital: 'vivo',
+    status_vital: '',
     data_morte: '',
     causa_morte: '',
     recidiva_local: false,
@@ -203,28 +202,81 @@ export const initialState = {
 };
 
 // --- SCHEMA DE VALIDAÇÃO (YUP) ---
-// AVISO: Este schema é um exemplo e precisa ser expandido para cobrir
-// todos os campos obrigatórios e condicionais do seu formulário.
+// Schema expandido para cobrir os campos mais importantes e condicionais.
 export const validationSchema = yup.object().shape({
-  nome_completo: yup.string().required('O nome é obrigatório'),
-  data_nascimento: yup.date().required('A data de nascimento é obrigatória').nullable(),
+  // --- Aba: Identificação ---
+  nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
+  data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
   cpf: yup.string().required('O CPF é obrigatório'),
   prontuario: yup.string().required('O prontuário é obrigatório'),
-  
-  // Exemplo de como validar a nova estrutura de tratamento (pode ser refinado)
-  tratamento: yup.object().shape({
-    cirurgia: yup.object().shape({
-      mamas: yup.array().of(
-        yup.object().shape({
-          data: yup.date().required('A data da cirurgia é obrigatória').nullable(),
-          tecnica: yup.string().required('A técnica é obrigatória'),
-          // ... outras validações para os campos da cirurgia de mama
-        })
-      )
+  genero: yup.string().required('O gênero é obrigatório'),
+  cep: yup.string().required('O CEP é obrigatório'),
+  logradouro: yup.string().required('O logradouro é obrigatório'),
+  numero: yup.string().required('O número é obrigatório'),
+  bairro: yup.string().required('O bairro é obrigatório'),
+  cidade: yup.string().required('A cidade é obrigatória'),
+  uf: yup.string().required('O UF é obrigatório'),
+  telefone: yup.string().required('O telefone é obrigatório'),
+  email: yup.string().email('Formato de e-mail inválido').required('O e-mail é obrigatório'),
+
+  // --- Aba: Histórico (Exemplos de validações condicionais) ---
+  historia_patologica: yup.object().shape({
+    neoplasia_previa: yup.object().shape({
+        qual: yup.string().when('has', {
+            is: true,
+            then: (schema) => schema.required('Qual neoplasia prévia é obrigatório'),
+            otherwise: (schema) => schema.notRequired(),
+        }),
     }),
-    // Adicionar validações para quimioterapia, radioterapia, etc.
   }),
-  // Adicione aqui as outras validações para todos os campos...
+
+  habitos_vida: yup.object().shape({
+    tabagismo_carga: yup.string().when('tabagismo', {
+        is: (val) => val !== 'nao',
+        then: (schema) => schema.required('A carga tabágica é obrigatória'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    tabagismo_tempo_anos: yup.string().when('tabagismo', {
+        is: (val) => val !== 'nao',
+        then: (schema) => schema.required('O tempo de tabagismo é obrigatório'),
+        otherwise: (schema) => schema.notRequired(),
+    })
+  }),
+
+  // --- Aba: Dados Clínicos ---
+  historia_doenca: yup.object().shape({
+    sinal_sintoma_principal: yup.string().required('O sinal/sintoma principal é obrigatório'),
+    data_sintomas: yup.date().required('A data dos primeiros sintomas é obrigatória').typeError('Forneça uma data válida').nullable(),
+    idade_diagnostico: yup.number().required('A idade ao diagnóstico é obrigatória').typeError('Deve ser um número').positive(),
+    lado_acometido: yup.string().required('O lado acometido é obrigatório'),
+  }),
+
+  histologia: yup.object().shape({
+      tipo_histologico: yup.string().when('biopsia_pre_tratamento', {
+          is: true,
+          then: (schema) => schema.required('O tipo histológico é obrigatório'),
+          otherwise: (schema) => schema.notRequired(),
+      }),
+      grau_histologico: yup.string().when('biopsia_pre_tratamento', {
+          is: true,
+          then: (schema) => schema.required('O grau histológico é obrigatório'),
+          otherwise: (schema) => schema.notRequired(),
+      })
+  }),
+
+  // --- Aba: Tratamento e Evolução ---
+  desfecho: yup.object().shape({
+      data_morte: yup.date().nullable().when('status_vital', {
+          is: 'morto',
+          then: (schema) => schema.required('A data do óbito é obrigatória').typeError('Forneça uma data válida'),
+          otherwise: (schema) => schema.notRequired(),
+      }),
+      causa_morte: yup.string().when('status_vital', {
+          is: 'morto',
+          then: (schema) => schema.required('A causa da morte é obrigatória'),
+          otherwise: (schema) => schema.notRequired(),
+      }),
+  }),
 });
 
 // --- CONFIGURAÇÃO DAS ABAS DO FORMULÁRIO ---
@@ -232,38 +284,51 @@ export const tabs = [
   { key: 'identificacao', label: 'Identificação' },
   { key: 'historico', label: 'Histórico' },
   { key: 'dadosClinicos', label: 'Dados Clínicos' },
-  { key: 'tratamentoEvolucao', label: 'Tratamento e Evolução' },
+  { key: 'tratamento', label: 'Tratamento' },
+  { key: 'evolucao', label: 'Evolução' },
 ];
 
 // --- MAPEAMENTO DE ERROS PARA ABAS ---
-// ATUALIZADO para refletir a nova estrutura do tratamento
+// ATUALIZADO para refletir a nova estrutura e validações
 export const errorFieldToTabMap = {
   // --- Aba: Identificação ---
   nome_completo: 'identificacao',
   data_nascimento: 'identificacao',
   cpf: 'identificacao',
   prontuario: 'identificacao',
-  // ... (outros campos da aba 'identificacao')
+  genero: 'identificacao',
+  cep: 'identificacao',
+  logradouro: 'identificacao',
+  numero: 'identificacao',
+  bairro: 'identificacao',
+  cidade: 'identificacao',
+  uf: 'identificacao',
+  telefone: 'identificacao',
+  email: 'identificacao',
 
   // --- Aba: Histórico ---
-  'historia_patologica.comorbidades': 'historico',
+  'historia_patologica.neoplasia_previa.qual': 'historico',
+  'habitos_vida.tabagismo_carga': 'historico',
+  'habitos_vida.tabagismo_tempo_anos': 'historico',
   'familiares': 'historico',
-  // ... (outros campos da aba 'historico')
 
   // --- Aba: Dados Clínicos ---
-  'paridade.gesta': 'dadosClinicos',
   'historia_doenca.sinal_sintoma_principal': 'dadosClinicos',
-  // ... (outros campos da aba 'dadosClinicos')
+  'historia_doenca.data_sintomas': 'dadosClinicos',
+  'historia_doenca.idade_diagnostico': 'dadosClinicos',
+  'historia_doenca.lado_acometido': 'dadosClinicos',
+  'histologia.tipo_histologico': 'dadosClinicos',
+  'histologia.grau_histologico': 'dadosClinicos',
 
-  // --- Aba: Tratamento e Evolução ---
-  'tratamento': 'tratamentoEvolucao',
-  'tratamento.cirurgia': 'tratamentoEvolucao',
-  'tratamento.quimioterapia': 'tratamentoEvolucao',
-  'tratamento.radioterapia': 'tratamentoEvolucao',
-  'tratamento.endocrinoterapia': 'tratamentoEvolucao',
-  'tratamento.imunoterapia': 'tratamentoEvolucao',
-  // ... (outros campos da aba 'tratamentoEvolucao')
+  // --- Aba: Tratamento ---
+  'tratamento': 'tratamento',
+  
+  // --- Aba: Evolução ---
+  'desfecho.data_morte': 'evolucao',
+  'desfecho.causa_morte': 'evolucao',
+  'tempos_diagnostico': 'evolucao',
 };
+
 
 // --- OPÇÕES PARA CAMPOS SELECT ---
 export const corEtniaOptions = [
