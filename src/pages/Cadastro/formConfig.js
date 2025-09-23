@@ -1,225 +1,365 @@
 import * as yup from 'yup';
 
-export const corEtniaOptions = [
-    { value: '', label: 'Selecione...' },
-    { value: 'BRANCO', label: 'Branco' },
-    { value: 'PARDO', label: 'Pardo' },
-    { value: 'PRETO', label: 'Preto' },
-    { value: 'INDÍGENA', label: 'Indígena' },
-    { value: 'AMARELO', label: 'Amarelo' },
-];
-export const escolaridadeOptions = [
-    { value: '', label: 'Selecione...' },
-    { value: 'SEM_INSTRUCAO', label: 'Sem Instrução' },
-    { value: 'ENSINO_FUNDAMENTAL_INCOMPLETO', label: 'Ensino Fundamental Incompleto' },
-    { value: 'ENSINO_FUNDAMENTAL_COMPLETO', label: 'Ensino Fundamental Completo' },
-    { value: 'ENSINO_MEDIO_INCOMPLETO', label: 'Ensino Médio Incompleto' },
-    { value: 'ENSINO_MEDIO_COMPLETO', label: 'Ensino Médio Completo' },
-    { value: 'ENSINO_SUPERIOR_INCOMPLETO', label: 'Ensino Superior Incompleto' },
-    { value: 'ENSINO_SUPERIOR_COMPLETO', label: 'Ensino Superior Completo' },
-];
-export const rendaFamiliarOptions = [
-    { value: '', label: 'Selecione...' },
-    { value: 'SEM_RENDA', label: 'Sem Renda' },
-    { value: 'ATE_1_SALARIO_MINIMO', label: 'Até 1 Salário Mínimo' },
-    { value: '1_A_2_SALARIOS_MINIMOS', label: '1 a 2 Salários Mínimos' },
-    { value: '2_A_5_SALARIOS_MINIMOS', label: '2 a 5 Salários Mínimos' },
-    { value: 'MAIOR_QUE_5_SALARIOS_MINIMOS', label: 'Maior que 5 Salários Mínimos' },
-];
-
-// Schema recursivo para um membro da família, permitindo aninhamento.
-const familiarSchema = yup.object().shape({
-    parentesco: yup.string().required('O parentesco é obrigatório.'),
-    idade: yup.number().nullable().positive('A idade deve ser positiva.').integer().typeError('Idade inválida'),
-    tem_cancer_mama: yup.boolean().nullable(),
-    idade_inicio_mama: yup.number().nullable().positive().integer().typeError('Idade inválida'),
-    bilateral: yup.boolean().nullable(),
-    idade_segundo_tumor: yup.number().nullable().positive().integer().typeError('Idade inválida'),
-    tem_cancer_ovario: yup.boolean().nullable(),
-    idade_inicio_ovario: yup.number().nullable().positive().integer().typeError('Idade inválida'),
-    gene_brca: yup.string().nullable(),
-    filhos: yup.array().of(yup.lazy(() => familiarSchema)).nullable(), // Permite aninhar sobrinhos/as
-});
-
-
-export const validationSchema = yup.object().shape({
-    nome_completo: yup.string().required('Nome completo é obrigatório.'),
-    idade: yup.number().required('Idade é obrigatória.').positive('Idade deve ser positiva.').integer('Idade deve ser um número inteiro.').typeError('Idade inválida (somente números).').max(150, 'Idade improvável.'),
-    endereco: yup.string().required('Endereço é obrigatório.'),
-    cidade: yup.string().required('Cidade é obrigatória.'),
-    data_nascimento: yup.date().required('Data de nascimento é obrigatória.').max(new Date(), "Data de nascimento não pode ser no futuro.").typeError('Data inválida.'),
-    telefone: yup.string().matches(/^(\d{10,11})?$/, 'Telefone inválido (10 ou 11 dígitos, apenas números).').transform(value => value === '' ? null : value).nullable(),
-    naturalidade: yup.string().required('Naturalidade é obrigatória.'),
-    altura: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).nullable().positive('Altura deve ser positiva.').min(0.3, "Altura mínima de 0.3m").max(3.0, "Altura máxima de 3.0m").typeError('Altura inválida se preenchida incorretamente.'),
-    peso: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).nullable().positive('Peso deve ser positivo.').min(1, "Peso mínimo de 1kg").max(500, "Peso máximo de 500kg").typeError('Peso inválido se preenchido incorretamente.'),
-    imc: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).nullable().typeError('IMC inválido se preenchido incorretamente.'),
-    cor_etnia: yup.string().required('Cor/Etnia é obrigatória.'),
-    escolaridade: yup.string().required('Escolaridade é obrigatória.'),
-    renda_familiar: yup.string().required('Renda familiar é obrigatória.'),
-    historia_patologica: yup.object().shape({
-        hipertensao: yup.boolean().nullable(),
-        hipotireoidismo: yup.boolean().nullable(),
-        ansiedade: yup.boolean().nullable(),
-        depressao: yup.boolean().nullable(),
-        diabetes: yup.boolean().nullable(),
-        outros: yup.string().transform(value => value === '' ? null : value).nullable(),
-    }).nullable().default(undefined),
-    
-    familiares: yup.array().of(familiarSchema).nullable(),
-
-    historia_familiar: yup.object().shape({
-        outros: yup.string().transform(value => value === '' ? null : value).nullable(),
-    }).nullable().default(undefined),
-    habitos_vida: yup.object().shape({
-        tabagismo_carga: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0, "Deve ser positivo ou zero").nullable().typeError('Carga tabágica inválida.'),
-        tabagismo_tempo_anos: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0, "Deve ser positivo ou zero").nullable().typeError('Tempo de tabagismo inválido.'),
-        etilismo_dose_diaria: yup.string().transform(value => value === '' ? null : value).nullable(),
-        etilismo_tempo_anos: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0, "Deve ser positivo ou zero").nullable().typeError('Tempo de etilismo inválido.'),
-        atividade_fisica: yup.boolean().nullable(),
-        modalidade_atividade: yup.string().when('atividade_fisica', { is: true, then: schema => schema.required('A modalidade é obrigatória.'), otherwise: schema => schema.nullable(), }),
-        tempo_atividade_semanal_min: yup.number().when('atividade_fisica', { is: true, then: schema => schema.required('O tempo é obrigatório.').min(0, 'O tempo não pode ser negativo.').typeError('Tempo inválido.'), otherwise: schema => schema.nullable().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)), }),
-    }).nullable().default(undefined),
-    paridade: yup.object().shape({
-        gesta: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Nº de gestações inválido.'),
-        para: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Nº de partos inválido.'),
-        aborto: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Nº de abortos inválido.'),
-        idade_primeiro_filho: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Idade inválida.'),
-        amamentou: yup.boolean().nullable(),
-        tempo_amamentacao_meses: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).when('amamentou', {is: true, then: (schema) => schema.required("Tempo de amamentação obrigatório.").min(0).integer().typeError('Tempo inválido.'), otherwise: (schema) => schema.nullable().default(undefined)}),
-        menarca_idade: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Idade da menarca inválida.'),
-        menopausa: yup.boolean().nullable(),
-        idade_menopausa: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).when('menopausa', {is: true, then: (schema) => schema.required("Idade da menopausa obrigatória.").min(0).integer().typeError('Idade inválida.'), otherwise: (schema) => schema.nullable().default(undefined)}),
-        trh_uso: yup.boolean().nullable(),
-        tempo_uso_trh: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).when('trh_uso', {is: true, then: (schema) => schema.required("Tempo de uso TRH obrigatório.").min(0).typeError('Tempo inválido.'), otherwise: (schema) => schema.nullable().default(undefined)}),
-        tipo_terapia: yup.string().transform(value => value === '' ? null : value).when('trh_uso', {is: true, then: (schema) => schema.required("Tipo de terapia TRH obrigatório."), otherwise: (schema) => schema.nullable()}),
-    }).nullable().default(undefined),
-    historia_doenca: yup.object().shape({
-        idade_diagnostico: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Idade ao diagnóstico inválida.'),
-        score_tyrer_cuzick: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).nullable().typeError('Score inválido.'),
-        score_canrisk: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).nullable().typeError('Score inválido.'),
-        score_gail: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).nullable().typeError('Score inválido.')
-    }).nullable().default(undefined),
-    histologia: yup.object().shape({
-        subtipo_core_re: yup.string().transform(value => value === '' ? null : value).nullable(),
-        subtipo_core_rp: yup.string().transform(value => value === '' ? null : value).nullable(),
-        subtipo_core_her2: yup.string().transform(value => value === '' ? null : value).nullable(),
-        subtipo_core_ki67: yup.string().transform(value => value === '' ? null : value).nullable(),
-        subtipo_cirurgia_re: yup.string().transform(value => value === '' ? null : value).nullable(),
-        subtipo_cirurgia_rp: yup.string().transform(value => value === '' ? null : value).nullable(),
-        subtipo_cirurgia_her2: yup.string().transform(value => value === '' ? null : value).nullable(),
-        subtipo_cirurgia_ki67: yup.string().transform(value => value === '' ? null : value).nullable(),
-        tamanho_tumoral: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).nullable().typeError('Tamanho tumoral inválido.'),
-        grau_tumoral_cirurgia: yup.string().transform(value => value === '' ? null : value).nullable(),
-        margens_comprometidas: yup.boolean().nullable(),
-        margens_local: yup.string().transform(value => value === '' ? null : value).when('margens_comprometidas', {is: true, then: (schema) => schema.required('Local das margens é obrigatório.'), otherwise: (schema) => schema.nullable()}),
-        biopsia_linfonodo_sentinela: yup.boolean().nullable(),
-        bls_numerador: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Valor inválido.'),
-        bls_denominador: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Valor inválido.'),
-        linfadenectomia_axilar: yup.boolean().nullable(),
-        ea_numerador: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Valor inválido.'),
-        ea_denominador: yup.number().transform(value => (isNaN(value) || value === null || value === '' ? undefined : value)).min(0).integer().nullable().typeError('Valor inválido.'),
-    }).nullable().default(undefined),
-    
-    tratamento: yup.object().shape({
-        tratamento_neoadjuvante: yup.boolean().nullable(),
-        inicio_neoadjuvante: yup.string().when('tratamento_neoadjuvante', { is: true, then: schema => schema.required('Data de início é obrigatória.') }),
-        termino_neoadjuvante: yup.string().when('inicio_neoadjuvante', (inicio, schema) => { if (inicio && inicio[0]) { return schema.required('Data de término é obrigatória.').test('is-after', 'Término deve ser após o início', v => !v || new Date(v) >= new Date(inicio[0])); } return schema.nullable(); }),
-        qual_neoadjuvante: yup.string().when('tratamento_neoadjuvante', { is: true, then: schema => schema.required('O tipo é obrigatório.') }),
-        estagio_clinico_pre_qxt: yup.string().when('tratamento_neoadjuvante', { is: true, then: schema => schema.required('O estágio pré-QXT é obrigatório.') }),
-        imunoterapia_neoadjuvante: yup.boolean().nullable(),
-        qual_imunoterapia_neoadjuvante: yup.string().when('imunoterapia_neoadjuvante', { is: true, then: schema => schema.required('O tipo é obrigatório.') }),
-        quimioterapia_neoadjuvante_realizada: yup.boolean().nullable(),
-        qual_quimioterapia_neoadjuvante: yup.string().when('quimioterapia_neoadjuvante_realizada', { is: true, then: schema => schema.required('O tipo é obrigatório.') }),
-        inicio_quimioterapia_neoadjuvante: yup.string().when('quimioterapia_neoadjuvante_realizada', { is: true, then: schema => schema.required('Data de início é obrigatória.') }),
-        fim_quimioterapia_neoadjuvante: yup.string().when('inicio_quimioterapia_neoadjuvante', (inicio, schema) => { if (inicio && inicio[0]) { return schema.required('Data de término é obrigatória.').test('is-after', 'Término deve ser após o início', v => !v || new Date(v) >= new Date(inicio[0])); } return schema.nullable(); }),
-        adjuvancia_realizada: yup.boolean().nullable(),
-        inicio_adjuvante: yup.string().when('adjuvancia_realizada', { is: true, then: schema => schema.required('Data de início é obrigatória.') }),
-        termino_adjuvante: yup.string().when('inicio_adjuvante', (inicio, schema) => { if (inicio && inicio[0]) { return schema.required('Data de término é obrigatória.').test('is-after', 'Término deve ser após o início', v => !v || new Date(v) >= new Date(inicio[0])); } return schema.nullable(); }),
-        qual_adjuvante: yup.string().when('adjuvancia_realizada', { is: true, then: schema => schema.required('O tipo é obrigatório.') }),
-        estagio_clinico_adjuvante: yup.string().when('adjuvancia_realizada', { is: true, then: schema => schema.required('O estágio é obrigatório.') }),
-        imunoterapia_adjuvante: yup.boolean().nullable(),
-        qual_imunoterapia_adjuvante: yup.string().when('imunoterapia_adjuvante', { is: true, then: schema => schema.required('O tipo é obrigatório.') }),
-        quimioterapia_adjuvante_realizada: yup.boolean().nullable(),
-        qual_quimioterapia_adjuvante: yup.string().when('quimioterapia_adjuvante_realizada', { is: true, then: schema => schema.required('O tipo é obrigatório.') }),
-        inicio_quimioterapia_adjuvante: yup.string().when('quimioterapia_adjuvante_realizada', { is: true, then: schema => schema.required('Data de início é obrigatória.') }),
-        fim_quimioterapia_adjuvante: yup.string().when('inicio_quimioterapia_adjuvante', (inicio, schema) => { if (inicio && inicio[0]) { return schema.required('Data de término é obrigatória.').test('is-after', 'Término deve ser após o início', v => !v || new Date(v) >= new Date(inicio[0])); } return schema.nullable(); }),
-        quimioterapias_paliativas: yup.array().of(yup.object().shape({ linha_tratamento_paliativo: yup.string().required('A linha de tratamento é obrigatória.'), qual_quimioterapia_paliativa: yup.string().required('O tipo de quimio é obrigatório.'), inicio_quimioterapia_paliativa: yup.string().required('A data de início é obrigatória.'), fim_quimioterapia_paliativa: yup.string().nullable(), })),
-        radioterapia_tipo: yup.string().nullable(),
-        radioterapia_sessoes: yup.number().nullable().min(0).integer(),
-        inicio_radioterapia: yup.string().nullable(),
-        fim_radioterapia: yup.string().nullable(),
-        endocrinoterapia_realizada: yup.boolean().nullable(),
-        qual_endocrinoterapia: yup.string().when('endocrinoterapia_realizada', { is: true, then: schema => schema.required('O tipo é obrigatório.') }),
-        inicio_endocrino: yup.string().when('endocrinoterapia_realizada', { is: true, then: schema => schema.required('Data de início é obrigatória.') }),
-        fim_endocrino: yup.string().when('inicio_endocrino', (inicio, schema) => { if (inicio && inicio[0]) { return schema.test('is-after', 'Término deve ser após o início', v => !v || new Date(v) >= new Date(inicio[0])); } return schema.nullable(); }),
-        terapia_alvo_realizada: yup.boolean().nullable(),
-        terapias_alvo: yup.array().of(yup.object().shape({ qual_terapia_alvo: yup.string().required('O tipo é obrigatório.'), inicio_terapia_alvo: yup.string().required('A data de início é obrigatória.'), fim_terapia_alvo: yup.string().nullable(), })),
-    }).nullable().default(undefined),
-
-    desfecho: yup.object().shape({
-        morte: yup.boolean().nullable(),
-        data_morte: yup.string().nullable().transform(value => (value === '' ? null : value)).when('morte', { is: true, then: schema => schema.required('Data da morte é obrigatória.').test('is-date', 'Data inválida.', value => !value || !isNaN(new Date(value).getTime())), otherwise: schema => schema.test('is-date', 'Data inválida se preenchida incorretamente', value => !value || !isNaN(new Date(value).getTime())), }),
-        causa_morte: yup.string().transform(value => (value === '' ? null : value)).when('morte', { is: true, then: schema => schema.required('Causa da morte é obrigatória.'), otherwise: schema => schema.nullable(), }),
-        metastase_ocorreu: yup.boolean().nullable(),
-        metastases: yup.array().of(yup.object().shape({ data_metastase: yup.string().required('A data é obrigatória.'), local_metastase: yup.string().required('O local é obrigatório.'), })).when('metastase_ocorreu', { is: true, then: schema => schema.min(1, 'Adicione pelo menos uma metástase.'), otherwise: schema => schema.optional(), }),
-        recidiva_local: yup.boolean().nullable(),
-        data_recidiva_local: yup.string().when('recidiva_local', { is: true, then: schema => schema.required('A data é obrigatória.'), otherwise: schema => schema.nullable(), }),
-        cirurgia_recidiva_local: yup.string().when('recidiva_local', { is: true, then: schema => schema.required('A cirurgia é obrigatória.'), otherwise: schema => schema.nullable(), }),
-        recidiva_regional: yup.boolean().nullable(),
-        data_recidiva_regional: yup.string().when('recidiva_regional', { is: true, then: schema => schema.required('A data é obrigatória.'), otherwise: schema => schema.nullable(), }),
-        cirurgia_recidiva_regional: yup.string().when('recidiva_regional', { is: true, then: schema => schema.required('A cirurgia é obrigatória.'), otherwise: schema => schema.nullable(), }),
-        status_vital: yup.string().transform(value => value === '' ? null : value).nullable(),
-    }).nullable().default(undefined),
-
-    tempos_diagnostico: yup.object().shape({
-        data_primeira_consulta: yup.string().nullable().transform(value => (value === '' ? null : value)).test('is-date', 'Data inválida se preenchida incorretamente.', value => !value || !isNaN(new Date(value).getTime())),
-        data_diagnostico: yup.string().nullable().transform(value => (value === '' ? null : value)).test('is-date', 'Data inválida se preenchida incorretamente.', value => !value || !isNaN(new Date(value).getTime())),
-        data_cirurgia: yup.string().nullable().transform(value => (value === '' ? null : value)).test('is-date', 'Data inválida se preenchida incorretamente.', value => !value || !isNaN(new Date(value).getTime())),
-        data_inicio_tratamento: yup.string().nullable().transform(value => (value === '' ? null : value)).test('is-date', 'Data inválida se preenchida incorretamente.', value => !value || !isNaN(new Date(value).getTime())),
-    }).nullable().default(undefined),
-});
-
-export const initialState = {
-    nome_completo: '',
-    idade: '',
-    endereco: '',
-    cidade: '',
-    data_nascimento: '',
-    telefone: '',
-    naturalidade: '',
-    altura: '',
-    peso: '',
-    imc: '',
-    cor_etnia: '',
-    escolaridade: '',
-    renda_familiar: '',
-    historia_patologica: { hipertensao: false, hipotireoidismo: false, ansiedade: false, depressao: false, diabetes: false, outros: '', },
-    familiares: [],
-    historia_familiar: { outros: '', },
-    habitos_vida: { tabagismo_carga: '', tabagismo_tempo_anos: '', etilismo_dose_diaria: '', etilismo_tempo_anos: '', atividade_fisica: false, modalidade_atividade: '', tempo_atividade_semanal_min: '', },
-    paridade: { gesta: '', para: '', aborto: '', idade_primeiro_filho: '', amamentou: false, tempo_amamentacao_meses: '', menarca_idade: '', menopausa: false, idade_menopausa: '', trh_uso: false, tempo_uso_trh: '', tipo_terapia: '', },
-    historia_doenca: { idade_diagnostico: '', score_tyrer_cuzick: '', score_canrisk: '', score_gail: '', },
-    histologia: { subtipo_core_re: '', subtipo_core_rp: '', subtipo_core_her2: '', subtipo_core_ki67: '', subtipo_cirurgia_re: '', subtipo_cirurgia_rp: '', subtipo_cirurgia_her2: '', subtipo_cirurgia_ki67: '', tamanho_tumoral: '', grau_tumoral_cirurgia: '', margens_comprometidas: false, margens_local: '', biopsia_linfonodo_sentinela: false, bls_numerador: '', bls_denominador: '', linfadenectomia_axilar: false, ea_numerador: '', ea_denominador: '', },
-    
-    tratamento: { 
-        tratamento_neoadjuvante: false, inicio_neoadjuvante: '', termino_neoadjuvante: '', qual_neoadjuvante: '', estagio_clinico_pre_qxt: '',
-        imunoterapia_neoadjuvante: false, qual_imunoterapia_neoadjuvante: '',
-        quimioterapia_neoadjuvante_realizada: false, qual_quimioterapia_neoadjuvante: '', inicio_quimioterapia_neoadjuvante: '', fim_quimioterapia_neoadjuvante: '',
-        adjuvancia_realizada: false, inicio_adjuvante: '', termino_adjuvante: '', qual_adjuvante: '', estagio_clinico_adjuvante: '',
-        imunoterapia_adjuvante: false, qual_imunoterapia_adjuvante: '',
-        quimioterapia_adjuvante_realizada: false, qual_quimioterapia_adjuvante: '', inicio_quimioterapia_adjuvante: '', fim_quimioterapia_adjuvante: '',
-        quimioterapias_paliativas: [],
-        radioterapia_tipo: '', radioterapia_sessoes: '', inicio_radioterapia: '', fim_radioterapia: '', 
-        endocrinoterapia_realizada: false, qual_endocrinoterapia: '', inicio_endocrino: '', fim_endocrino: '', 
-        terapia_alvo_realizada: false, terapias_alvo: [],
-    },
-    
-    desfecho: { 
-        morte: false, data_morte: '', causa_morte: '', 
-        metastase_ocorreu: false, metastases: [],
-        recidiva_local: false, data_recidiva_local: '', cirurgia_recidiva_local: '',
-        recidiva_regional: false, data_recidiva_regional: '', cirurgia_recidiva_regional: '',
-        status_vital: '', 
-    },
-    tempos_diagnostico: { data_primeira_consulta: '', data_diagnostico: '', data_cirurgia: '', data_inicio_tratamento: '', eventos: [] },
+// --- ESTRUTURA INICIAL PARA A SEÇÃO DE TRATAMENTO ---
+const tratamentoInitialState = {
+  cirurgia: {
+    contexto_cirurgico: '', // Novo campo para 'Upfront' ou 'Pós Neoadjuvante'
+    mamas: [],
+    axilas: [],
+    reconstrucoes: [],
+  },
+  quimioterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
+  radioterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
+  endocrinoterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
+  imunoterapia: {
+    neoadjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    adjuvante: { data_inicio: '', data_termino: '', esquema: '', intercorrencias: '' },
+    paliativa: [],
+  },
+  imunohistoquimicas: [],
+  core_biopsy: {
+    realizada: false,
+    data: '',
+    especime: '',
+    tecnica: '',
+    tipo_lesao: '',
+    anatomopatologico: '',
+    tipo_histologico: '',
+  },
+  mamotomia: {
+    realizada: false,
+    data: '',
+    especime: '',
+    tecnica: '',
+    tipo_lesao: '',
+    anatomopatologico: '',
+    tipo_histologico: '',
+  },
+  paaf: {
+    realizada: false,
+    data: '',
+    especime: '',
+    tecnica: '',
+    achados: '',
+  },
 };
+
+// --- ESTRUTURA COMPLETA DO ESTADO INICIAL DO FORMULÁRIO ---
+export const initialState = {
+  // --- IDENTIFICAÇÃO E DADOS SOCIAIS ---
+  nome_completo: '',
+  data_nascimento: '',
+  cpf: '',
+  prontuario: '',
+  genero: '',
+  estado_civil: '',
+  cor_etnia: '',
+  escolaridade: '',
+  renda_familiar: '',
+  naturalidade: '',
+  profissao: '',
+  cep: '',
+  logradouro: '',
+  numero: '',
+  complemento: '',
+  bairro: '',
+  cidade: '',
+  uf: '',
+  telefone: '',
+  email: '',
+  altura: '',
+  peso: '',
+  imc: '',
+  idade: '',
+
+  // --- HISTÓRIA PATOLÓGICA PREGRESSA ---
+  historia_patologica: {
+    comorbidades: {
+      has: false,
+      diabetes: false,
+      hipertensao: false,
+      doenca_cardiaca: false,
+      doenca_renal: false,
+      doenca_pulmonar: false,
+      doenca_figado: false,
+      avc: false,
+      outra: '',
+    },
+    neoplasia_previa: {
+      has: false,
+      qual: '',
+      idade_diagnostico: '',
+    },
+    biopsia_mamaria_previa: {
+      has: false,
+      resultado: '',
+    },
+  },
+  
+  // --- HISTÓRIA FAMILIAR ---
+  familiares: [],
+  historia_familiar: {
+    cancer_familia: false,
+    observacoes: '',
+  },
+
+  // --- HÁBITOS DE VIDA ---
+  habitos_vida: {
+    tabagismo: 'nao',
+    tabagismo_carga: '',
+    tabagismo_tempo_anos: '',
+    etilismo: 'nao',
+    etilismo_tempo_anos: '',
+    atividade_fisica: 'nao',
+    tipo_atividade: '',
+    tempo_atividade_semanal_min: '',
+  },
+  
+  // --- PARIDADE ---
+  paridade: {
+    gesta: '',
+    para: '',
+    aborto: '',
+    teve_filhos: false,
+    idade_primeiro_filho: '',
+    amamentou: false,
+    tempo_amamentacao_meses: '',
+    menarca_idade: '',
+    menopausa: 'nao',
+    idade_menopausa: '',
+    uso_trh: false,
+    tempo_uso_trh: '',
+    uso_aco: false,
+    tempo_uso_aco: '',
+  },
+  
+  // --- HISTÓRIA DA DOENÇA ATUAL ---
+  historia_doenca: {
+    sinal_sintoma_principal: '',
+    outro_sinal_sintoma: '',
+    data_sintomas: '',
+    idade_diagnostico: '',
+    ecog: '',
+    lado_acometido: '',
+    tamanho_tumoral_clinico: '',
+    linfonodos_palpaveis: 'nao',
+    estadiamento_clinico: '',
+    metastase_distancia: false,
+    locais_metastase: '',
+    score_tyrer_cuzick: '',
+    score_canrisk: '',
+    score_gail: '',
+  },
+
+  // --- HISTOLOGIA ---
+  histologia: {
+    biopsia_pre_tratamento: false,
+    tipo_histologico: '',
+    grau_histologico: '',
+    re: '',
+    rp: '',
+    ki67: '',
+    her2: '',
+    fish: '',
+    brca: '',
+    indice_oncotype: '',
+    assinatura_genetica: '',
+  },
+
+  // --- TRATAMENTO E EVOLUÇÃO ---
+  tratamento: tratamentoInitialState,
+  desfecho: {
+    status_vital: '',
+    data_morte: '',
+    causa_morte: '',
+    recidiva_local: false,
+    data_recidiva_local: '',
+    cirurgia_recidiva_local: '',
+    recidiva_regional: false,
+    data_recidiva_regional: '',
+    cirurgia_recidiva_regional: '',
+    metastases: [],
+  },
+  tempos_diagnostico: {
+    data_primeira_consulta: '',
+    data_diagnostico: '',
+    data_inicio_tratamento: '',
+    data_cirurgia: '',
+    eventos: [],
+  },
+};
+
+// --- SCHEMA DE VALIDAÇÃO (YUP) ---
+// Schema expandido para cobrir os campos mais importantes e condicionais.
+export const validationSchema = yup.object().shape({
+  // --- Aba: Identificação ---
+  nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
+  data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
+  cpf: yup.string().required('O CPF é obrigatório'),
+  prontuario: yup.string().required('O prontuário é obrigatório'),
+  genero: yup.string().required('O gênero é obrigatório'),
+  cep: yup.string().required('O CEP é obrigatório'),
+  logradouro: yup.string().required('O logradouro é obrigatório'),
+  numero: yup.string().required('O número é obrigatório'),
+  bairro: yup.string().required('O bairro é obrigatório'),
+  cidade: yup.string().required('A cidade é obrigatória'),
+  uf: yup.string().required('O UF é obrigatório'),
+  telefone: yup.string().required('O telefone é obrigatório'),
+  email: yup.string().email('Formato de e-mail inválido').required('O e-mail é obrigatório'),
+
+  // --- Aba: Histórico (Exemplos de validações condicionais) ---
+  historia_patologica: yup.object().shape({
+    neoplasia_previa: yup.object().shape({
+        qual: yup.string().when('has', {
+            is: true,
+            then: (schema) => schema.required('Qual neoplasia prévia é obrigatório'),
+            otherwise: (schema) => schema.notRequired(),
+        }),
+    }),
+  }),
+
+  habitos_vida: yup.object().shape({
+    tabagismo_carga: yup.string().when('tabagismo', {
+        is: (val) => val !== 'nao',
+        then: (schema) => schema.required('A carga tabágica é obrigatória'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    tabagismo_tempo_anos: yup.string().when('tabagismo', {
+        is: (val) => val !== 'nao',
+        then: (schema) => schema.required('O tempo de tabagismo é obrigatório'),
+        otherwise: (schema) => schema.notRequired(),
+    })
+  }),
+
+  // --- Aba: Dados Clínicos ---
+  historia_doenca: yup.object().shape({
+    sinal_sintoma_principal: yup.string().required('O sinal/sintoma principal é obrigatório'),
+    data_sintomas: yup.date().required('A data dos primeiros sintomas é obrigatória').typeError('Forneça uma data válida').nullable(),
+    idade_diagnostico: yup.number().required('A idade ao diagnóstico é obrigatória').typeError('Deve ser um número').positive(),
+    lado_acometido: yup.string().required('O lado acometido é obrigatório'),
+  }),
+
+  histologia: yup.object().shape({
+      tipo_histologico: yup.string().when('biopsia_pre_tratamento', {
+          is: true,
+          then: (schema) => schema.required('O tipo histológico é obrigatório'),
+          otherwise: (schema) => schema.notRequired(),
+      }),
+      grau_histologico: yup.string().when('biopsia_pre_tratamento', {
+          is: true,
+          then: (schema) => schema.required('O grau histológico é obrigatório'),
+          otherwise: (schema) => schema.notRequired(),
+      })
+  }),
+
+  // --- Aba: Tratamento e Evolução ---
+  desfecho: yup.object().shape({
+      data_morte: yup.date().nullable().when('status_vital', {
+          is: 'morto',
+          then: (schema) => schema.required('A data do óbito é obrigatória').typeError('Forneça uma data válida'),
+          otherwise: (schema) => schema.notRequired(),
+      }),
+      causa_morte: yup.string().when('status_vital', {
+          is: 'morto',
+          then: (schema) => schema.required('A causa da morte é obrigatória'),
+          otherwise: (schema) => schema.notRequired(),
+      }),
+  }),
+});
+
+// --- CONFIGURAÇÃO DAS ABAS DO FORMULÁRIO ---
+export const tabs = [
+  { key: 'identificacao', label: 'Identificação' },
+  { key: 'historico', label: 'Histórico' },
+  { key: 'dadosClinicos', label: 'Dados Clínicos' },
+  { key: 'tratamento', label: 'Tratamento' },
+  { key: 'evolucao', label: 'Evolução' },
+];
+
+// --- MAPEAMENTO DE ERROS PARA ABAS ---
+// ATUALIZADO para refletir a nova estrutura e validações
+export const errorFieldToTabMap = {
+  // --- Aba: Identificação ---
+  nome_completo: 'identificacao',
+  data_nascimento: 'identificacao',
+  cpf: 'identificacao',
+  prontuario: 'identificacao',
+  genero: 'identificacao',
+  cep: 'identificacao',
+  logradouro: 'identificacao',
+  numero: 'identificacao',
+  bairro: 'identificacao',
+  cidade: 'identificacao',
+  uf: 'identificacao',
+  telefone: 'identificacao',
+  email: 'identificacao',
+
+  // --- Aba: Histórico ---
+  'historia_patologica.neoplasia_previa.qual': 'historico',
+  'habitos_vida.tabagismo_carga': 'historico',
+  'habitos_vida.tabagismo_tempo_anos': 'historico',
+  'familiares': 'historico',
+
+  // --- Aba: Dados Clínicos ---
+  'historia_doenca.sinal_sintoma_principal': 'dadosClinicos',
+  'historia_doenca.data_sintomas': 'dadosClinicos',
+  'historia_doenca.idade_diagnostico': 'dadosClinicos',
+  'historia_doenca.lado_acometido': 'dadosClinicos',
+  'histologia.tipo_histologico': 'dadosClinicos',
+  'histologia.grau_histologico': 'dadosClinicos',
+
+  // --- Aba: Tratamento ---
+  'tratamento': 'tratamento',
+  
+  // --- Aba: Evolução ---
+  'desfecho.data_morte': 'evolucao',
+  'desfecho.causa_morte': 'evolucao',
+  'tempos_diagnostico': 'evolucao',
+};
+
+
+// --- OPÇÕES PARA CAMPOS SELECT ---
+export const corEtniaOptions = [
+  { value: '', label: 'Selecione...' },
+  { value: 'branca', label: 'Branca' },
+  { value: 'preta', label: 'Preta' },
+  { value: 'parda', label: 'Parda' },
+  { value: 'amarela', label: 'Amarela' },
+  { value: 'indigena', label: 'Indígena' },
+  { value: 'nao_informado', label: 'Não informado' }
+];
+
+export const escolaridadeOptions = [
+  { value: '', label: 'Selecione...' },
+  { value: 'analfabeto', label: 'Analfabeto' },
+  { value: 'fundamental_incompleto', label: 'Fundamental Incompleto' },
+  { value: 'fundamental_completo', label: 'Fundamental Completo' },
+  { value: 'medio_incompleto', label: 'Médio Incompleto' },
+  { value: 'medio_completo', label: 'Médio Completo' },
+  { value: 'superior_incompleto', label: 'Superior Incompleto' },
+  { value: 'superior_completo', label: 'Superior Completo' },
+  { value: 'pos_graduacao', label: 'Pós-graduação' }
+];
+
+export const rendaFamiliarOptions = [
+  { value: '', label: 'Selecione...' },
+  { value: 'ate_1_salario', label: 'Até 1 salário mínimo' },
+  { value: '1_a_2_salarios', label: '1 a 2 salários mínimos' },
+  { value: '2_a_3_salarios', label: '2 a 3 salários mínimos' },
+  { value: '3_a_5_salarios', label: '3 a 5 salários mínimos' },
+  { value: '5_a_10_salarios', label: '5 a 10 salários mínimos' },
+  { value: 'acima_10_salarios', label: 'Acima de 10 salários mínimos' },
+  { value: 'nao_informado', label: 'Não informado' }
+];

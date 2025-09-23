@@ -189,3 +189,70 @@ export const CancelButton = styled(Button)`
   color: white;
   &:hover { background-color: #8e8e8e; }
 `;
+
+export const AddButton = styled(Button)`
+  background-color: ${successGreen};
+  color: white;
+  &:hover { background-color: #45a049; }
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+`;
+
+// Form components
+export const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const FieldContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const InputLabel = styled.label`
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: ${textDark};
+  font-size: 0.9rem;
+`;
+
+export const StyledInput = styled.input`
+  padding: 8px 12px;
+  border: 1px solid ${borderColor};
+  border-radius: 4px;
+  font-size: 0.9rem;
+  &:focus {
+    border-color: ${primaryPink};
+    outline: none;
+    box-shadow: 0 0 0 2px ${lightPink};
+  }
+`;
+
+export const StyledSelect = styled.select`
+  padding: 8px 12px;
+  border: 1px solid ${borderColor};
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: white;
+  &:focus {
+    border-color: ${primaryPink};
+    outline: none;
+    box-shadow: 0 0 0 2px ${lightPink};
+  }
+  &:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+`;

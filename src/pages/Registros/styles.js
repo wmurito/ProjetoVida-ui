@@ -1,10 +1,12 @@
-// src/pages/ListaPacientes/StyledListaPacientes.js
 import styled from 'styled-components';
+import { tokens, Button as BaseButton, Input as BaseInput, Card } from '../../components/UI';
 
 export const Container = styled.div`
-  padding: 2rem;
-  background-color: #f5f7fa;
-  min-height: 100vh;
+  padding: ${tokens.spacing.xl};
+  background-color: ${tokens.colors.surface};
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
 `;
 
 export const Header = styled.div`
@@ -15,9 +17,10 @@ export const Header = styled.div`
 `;
 
 export const Title = styled.h1`
-  font-size: 1.75rem;
-  color: #2c3e50;
+  font-size: ${tokens.typography.xxl};
+  color: ${tokens.colors.dark};
   font-weight: 600;
+  margin: 0;
 `;
 
 export const SearchContainer = styled.div`
@@ -25,77 +28,63 @@ export const SearchContainer = styled.div`
   align-items: center;
 `;
 
-export const SearchInput = styled.input`
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
+export const SearchInput = styled(BaseInput)`
   width: 300px;
-
-  &:focus {
-    border-color: #d94c77;
-    outline: none;
+  
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;
 
 export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  font-size: 0.95rem;
+  background: ${tokens.colors.background};
+  font-size: ${tokens.typography.sm};
+  border-radius: ${tokens.radius.lg};
+  overflow: hidden;
+  box-shadow: ${tokens.shadows.sm};
 `;
 
 export const TableHeader = styled.thead`
-  background-color: #f8f9fa;
+  background-color: ${tokens.colors.light};
 `;
 
 export const TableRow = styled.tr``;
 
 export const TableCell = styled.td`
-  padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  padding: ${tokens.spacing.md};
+  border-bottom: 1px solid ${tokens.colors.border};
   vertical-align: middle;
 `;
 
-export const ActionButton = styled.button`
-  background-color: #d94c77;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  margin-right: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #c73a65;
-  }
+export const ActionButton = styled(BaseButton).attrs({ size: 'sm' })`
+  margin-right: ${tokens.spacing.sm};
 `;
 
 export const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  font-size: 1.2rem;
-  color: #6c757d;
+  height: 50vh;
+  font-size: ${tokens.typography.lg};
+  color: ${tokens.colors.muted};
 `;
 
 export const ErrorContainer = styled.div`
   text-align: center;
-  margin-top: 3rem;
-  color: #dc3545;
-  font-size: 1.1rem;
+  margin-top: ${tokens.spacing.xxl};
+  color: ${tokens.colors.danger};
+  font-size: ${tokens.typography.lg};
 
   button {
-    margin-top: 1rem;
+    margin-top: ${tokens.spacing.md};
   }
 `;
 
 export const NoDataContainer = styled.div`
   text-align: center;
-  margin-top: 2rem;
-  font-size: 1.1rem;
-  color: #6c757d;
+  margin-top: ${tokens.spacing.xl};
+  font-size: ${tokens.typography.lg};
+  color: ${tokens.colors.muted};
 `;

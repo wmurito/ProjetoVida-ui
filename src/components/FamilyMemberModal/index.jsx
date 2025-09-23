@@ -1,158 +1,224 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    ModalOverlay, ModalContent, ModalHeader, CloseButton, ModalBody,
-    RelativeGrid, RelativeCard, RelativeName,
-    FormSection, InputGroup, Label, Input, RadioGroup, RadioButtonLabel,
-    ModalFooter, SaveButton, CancelButton, ErrorText
+import { FaSave, FaTimes } from 'react-icons/fa';
+import {
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    FormGrid,
+    FieldContainer,
+    InputLabel,
+    StyledInput,
+    StyledSelect,
+    AddButton,
+    CancelButton
 } from './styles';
 
-// --- Estrutura de Dados dos Parentes ---
-const RELATIVES = {
-  '1º Grau': ['Mãe', 'Pai', 'Irmã', 'Irmão', 'Filha', 'Filho'],
-  'Paterno': ['Avó Paterna', 'Tia Paterna', 'Meia-Irmã Paterna', 'Filha do Tio Paterna'],
-  'Materno': ['Avó Materna', 'Tia Materna', 'Meia-Irmã Materna', 'Filha do Tio Materna'],
-};
+// As opções de parentesco permanecem as mesmas
+const parentescoMasculinoOptions = [
+    { value: '', label: 'Selecione...' },
+    { value: 'pai', label: 'Pai' },
+    { value: 'avo_paterno', label: 'Avô Paterno' },
+    { value: 'avo_materno', label: 'Avô Materno' },
+    { value: 'irmao', label: 'Irmão' },
+    { value: 'tio_paterno', label: 'Tio Paterno' },
+    { value: 'tio_materno', label: 'Tio Materno' },
+    { value: 'primo_paterno', label: 'Primo Paterno' },
+    { value: 'primo_materno', label: 'Primo Materno' },
+    { value: 'sobrinho', label: 'Sobrinho' },
+    { value: 'filho', label: 'Filho' },
+];
 
-const MALE_RELATIVES = new Set([
-    'Pai', 'Irmão', 'Filho', 'Filho do Tio Paterna', 'Filho do Tio Materna'
-]);
+const parentescoFemininoOptions = [
+    { value: '', label: 'Selecione...' },
+    { value: 'mae', label: 'Mãe' },
+    { value: 'avo_paterna', label: 'Avó Paterna' },
+    { value: 'avo_materna', label: 'Avó Materna' },
+    { value: 'irma', label: 'Irmã' },
+    { value: 'tia_paterna', label: 'Tia Paterna' },
+    { value: 'tia_materna', label: 'Tia Materna' },
+    { value: 'prima_paterna', label: 'Prima Paterna' },
+    { value: 'prima_materna', label: 'Prima Materna' },
+    { value: 'sobrinha', label: 'Sobrinha' },
+    { value: 'filha', label: 'Filha' },
+];
 
 const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
-    const initialState = {
-        parentesco: '',
-        idade: '',
-        tem_cancer_mama: false,
-        tem_cancer_ovario: false,
-        gene_brca: 'Desconhecido',
-    };
+    const [familiarData, setFamiliarData] = useState({});
+    const [genero, setGenero] = useState('');
 
-    const [formData, setFormData] = useState(initialState);
-    const [selectedRelative, setSelectedRelative] = useState(null);
-    const [errors, setErrors] = useState({});
-
-    // Popula o formulário se estiver em modo de edição
     useEffect(() => {
-        if (isOpen && member) {
-            setFormData(member);
-            setSelectedRelative(member.parentesco);
-        } else {
-            setFormData(initialState);
-            setSelectedRelative(null);
+        if (isOpen) {
+            if (member) {
+                // Converte os dados do membro (formato da lista) para o formato do modal
+                const internalState = {
+                    ...member,
+                    cancer_mama: member.tem_cancer_mama ? 'sim' : 'nao',
+                    cancer_ovario: member.tem_cancer_ovario ? 'sim' : 'nao',
+                    bilateral: member.bilateral ? 'sim' : 'nao',
+                };
+                setFamiliarData(internalState);
+                setGenero(member.genero || '');
+            } else {
+                // Define valores padrão para um novo membro
+                setFamiliarData({
+                    cancer_mama: 'nao',
+                    cancer_ovario: 'nao',
+                    bilateral: 'nao',
+                    gene_brca: 'desconhecido',
+                    parentesco: '',
+                });
+                setGenero('');
+            }
         }
-        setErrors({});
     }, [member, isOpen]);
 
-    if (!isOpen) return null;
-
-    const isMale = (relative) => MALE_RELATIVES.has(relative);
-
-    // Função para selecionar/desselecionar um parente
-    const handleSelectRelative = (relative) => {
-        if (selectedRelative === relative) {
-            setSelectedRelative(null); // Desseleciona se clicar no mesmo
-            setFormData(initialState);
-        } else {
-            setSelectedRelative(relative);
-            const newFormData = { ...initialState, parentesco: relative };
-            if (isMale(relative)) {
-                newFormData.tem_cancer_ovario = false;
-            }
-            setFormData(newFormData);
-        }
-    };
-    
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+        setFamiliarData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleRadioChange = (fieldName, value) => {
-        setFormData(prev => ({ ...prev, [fieldName]: value }));
+    const handleGeneroChange = (e) => {
+        const newGenero = e.target.value;
+        setGenero(newGenero);
+        setFamiliarData(prev => ({ ...prev, genero: newGenero, parentesco: '' }));
     };
 
-    const validate = () => {
-        if (!selectedRelative) return false; // Não pode salvar sem selecionar
-        const newErrors = {};
-        if (formData.idade && (isNaN(formData.idade) || formData.idade < 0 || formData.idade > 150)) {
-            newErrors.idade = 'Idade inválida.';
-        }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+    const handleRadioChange = (name, value) => {
+        setFamiliarData(prev => ({ ...prev, [name]: value }));
     };
-    
-    const handleSubmit = () => {
-        if (!validate()) return;
-        onSubmit(formData);
+
+    const handleSave = () => {
+        // Converte os dados do modal para o formato da lista antes de submeter
+        const dataToSubmit = {
+            ...familiarData,
+            genero: genero,
+            tem_cancer_mama: familiarData.cancer_mama === 'sim',
+            tem_cancer_ovario: familiarData.cancer_ovario === 'sim',
+            bilateral: familiarData.bilateral === 'sim',
+        };
+
+        // Remove as propriedades internas do modal para não sujar o objeto final
+        delete dataToSubmit.cancer_mama;
+        delete dataToSubmit.cancer_ovario;
+
+        onSubmit(dataToSubmit);
         onClose();
     };
 
+    if (!isOpen) return null;
+
+    const parentescoOptions = genero === 'masculino'
+        ? parentescoMasculinoOptions
+        : genero === 'feminino'
+            ? parentescoFemininoOptions
+            : [{ value: '', label: 'Selecione o gênero primeiro...' }];
+
     return (
-        <ModalOverlay onClick={onClose}>
-            <ModalContent onClick={(e) => e.stopPropagation()}>
+        <ModalOverlay>
+            <ModalContent>
                 <ModalHeader>
-                    <h2>Adicionar Histórico Familiar</h2>
-                    <CloseButton onClick={onClose}>&times;</CloseButton>
+                    {member ? 'Editar Membro Familiar' : 'Adicionar Membro Familiar'}
+                    <button onClick={onClose}><FaTimes /></button>
                 </ModalHeader>
                 <ModalBody>
-                    <RelativeGrid>
-                        {Object.entries(RELATIVES).map(([degree, relatives]) => (
-                            <div key={degree}>
-                                {relatives.map(relative => (
-                                    <RelativeCard 
-                                        key={relative} 
-                                        $isSelected={selectedRelative === relative}
-                                        onClick={() => handleSelectRelative(relative)}
-                                    >
-                                        <RelativeName>{relative.replace(' Paterna', '').replace(' Materna', '')}</RelativeName>
-                                        {selectedRelative === relative && (
-                                            <FormSection onClick={(e) => e.stopPropagation()}>
-                                                <InputGroup>
-                                                    <Label>Idade atual ou da morte?</Label>
-                                                    <Input type="number" name="idade" value={formData.idade} onChange={handleChange} placeholder="Ex: 55" $hasError={!!errors.idade}/>
-                                                    {errors.idade && <ErrorText>{errors.idade}</ErrorText>}
-                                                </InputGroup>
-                                                
-                                                <InputGroup>
-                                                    <Label $pinkTheme={true}>Câncer de Mama?</Label>
-                                                    <RadioGroup>
-                                                        <RadioButtonLabel><input type="radio" name="tem_cancer_mama" value={false} checked={!formData.tem_cancer_mama} onChange={() => handleRadioChange('tem_cancer_mama', false)} /> Não</RadioButtonLabel>
-                                                        <RadioButtonLabel><input type="radio" name="tem_cancer_mama" value={true} checked={!!formData.tem_cancer_mama} onChange={() => handleRadioChange('tem_cancer_mama', true)} /> Sim</RadioButtonLabel>
-                                                    </RadioGroup>
-                                                </InputGroup>
+                    <FormGrid>
+                        {/* Gênero */}
+                        <FieldContainer style={{ gridColumn: 'span 3' }}>
+                            <InputLabel>Gênero do Familiar</InputLabel>
+                            <StyledSelect name="genero" value={genero} onChange={handleGeneroChange}>
+                                <option value="">Selecione...</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="feminino">Feminino</option>
+                            </StyledSelect>
+                        </FieldContainer>
 
-                                                {!isMale(relative) && (
-                                                    <InputGroup>
-                                                        <Label>Câncer de Ovário?</Label>
-                                                        <RadioGroup>
-                                                            <RadioButtonLabel><input type="radio" name="tem_cancer_ovario" value={false} checked={!formData.tem_cancer_ovario} onChange={() => handleRadioChange('tem_cancer_ovario', false)} /> Não</RadioButtonLabel>
-                                                            <RadioButtonLabel><input type="radio" name="tem_cancer_ovario" value={true} checked={!!formData.tem_cancer_ovario} onChange={() => handleRadioChange('tem_cancer_ovario', true)} /> Sim</RadioButtonLabel>
-                                                        </RadioGroup>
-                                                    </InputGroup>
-                                                )}
-
-                                                <InputGroup>
-                                                    <Label>Gene BRCA:</Label>
-                                                    <RadioGroup>
-                                                        {['Desconhecido', 'Testado, Normal', 'BRCA1+', 'BRCA2+'].map(option => (
-                                                          <RadioButtonLabel key={option}>
-                                                            <input type="radio" name="gene_brca" value={option} checked={formData.gene_brca === option} onChange={handleChange} />
-                                                            {option}
-                                                          </RadioButtonLabel>  
-                                                        ))}
-                                                    </RadioGroup>
-                                                </InputGroup>
-                                            </FormSection>
-                                        )}
-                                    </RelativeCard>
+                        {/* Parentesco */}
+                        <FieldContainer style={{ gridColumn: 'span 3' }}>
+                            <InputLabel>Parentesco</InputLabel>
+                            <StyledSelect
+                                name="parentesco"
+                                value={familiarData.parentesco || ''}
+                                onChange={handleChange}
+                                disabled={!genero}
+                            >
+                                {parentescoOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                                 ))}
-                            </div>
-                        ))}
-                    </RelativeGrid>
+                            </StyledSelect>
+                        </FieldContainer>
+
+                        {/* Campos Femininos */}
+                        {genero === 'feminino' && (
+                            <>
+                                {/* Câncer de mama */}
+                                <FieldContainer style={{ gridColumn: 'span 3' }}>
+                                    <InputLabel>Câncer de mama?</InputLabel>
+                                    <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} /> Não</label>
+                                    <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} /> Sim</label>
+                                    {familiarData.cancer_mama === 'sim' && (
+                                        <StyledInput type="number" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} />
+                                    )}
+                                </FieldContainer>
+
+                                {/* Bilateral */}
+                                <FieldContainer style={{ gridColumn: 'span 3' }}>
+                                    <InputLabel>Bilateral?</InputLabel>
+                                    <label><input type="radio" name="bilateral" checked={familiarData.bilateral === 'nao'} onChange={() => handleRadioChange('bilateral', 'nao')} /> Não</label>
+                                    <label><input type="radio" name="bilateral" checked={familiarData.bilateral === 'sim'} onChange={() => handleRadioChange('bilateral', 'sim')} /> Sim</label>
+                                    {familiarData.bilateral === 'sim' && (
+                                        <StyledInput type="number" name="idade_segunda_mama" placeholder="Idade 2ª mama" value={familiarData.idade_segunda_mama || ''} onChange={handleChange} />
+                                    )}
+                                </FieldContainer>
+
+                                {/* Câncer de ovário */}
+                                <FieldContainer style={{ gridColumn: 'span 3' }}>
+                                    <InputLabel>Câncer de ovário?</InputLabel>
+                                    <label><input type="radio" name="cancer_ovario" checked={familiarData.cancer_ovario === 'nao'} onChange={() => handleRadioChange('cancer_ovario', 'nao')} /> Não</label>
+                                    <label><input type="radio" name="cancer_ovario" checked={familiarData.cancer_ovario === 'sim'} onChange={() => handleRadioChange('cancer_ovario', 'sim')} /> Sim</label>
+                                    {familiarData.cancer_ovario === 'sim' && (
+                                        <StyledInput type="number" name="idade_cancer_ovario" placeholder="Idade no início" value={familiarData.idade_cancer_ovario || ''} onChange={handleChange} />
+                                    )}
+                                </FieldContainer>
+                                
+                                {/* Gene BRCA */}
+                                <FieldContainer style={{ gridColumn: 'span 3' }}>
+                                    <InputLabel>Gene BRCA</InputLabel>
+                                    {['desconhecido', 'normal', 'brca1', 'brca2'].map(opt => (
+                                        <label key={opt}><input type="radio" name="gene_brca" checked={familiarData.gene_brca === opt} onChange={() => handleRadioChange('gene_brca', opt)} />{opt}</label>
+                                    ))}
+                                </FieldContainer>
+                            </>
+                        )}
+
+                        {/* Campos Masculinos */}
+                        {genero === 'masculino' && (
+                            <>
+                                {/* Câncer de mama */}
+                                <FieldContainer style={{ gridColumn: 'span 3' }}>
+                                    <InputLabel>Câncer de mama?</InputLabel>
+                                    <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} /> Não</label>
+                                    <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} /> Sim</label>
+                                    {familiarData.cancer_mama === 'sim' && (
+                                        <StyledInput type="number" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} />
+                                    )}
+                                </FieldContainer>
+
+                                {/* Gene BRCA */}
+                                <FieldContainer style={{ gridColumn: 'span 3' }}>
+                                    <InputLabel>Gene BRCA</InputLabel>
+                                    {['desconhecido', 'normal', 'brca1', 'brca2'].map(opt => (
+                                        <label key={opt}><input type="radio" name="gene_brca" checked={familiarData.gene_brca === opt} onChange={() => handleRadioChange('gene_brca', opt)} /> {opt} </label>
+                                    ))}
+                                </FieldContainer>
+                            </>
+                        )}
+                    </FormGrid>
                 </ModalBody>
                 <ModalFooter>
-                    <CancelButton onClick={onClose}>Cancelar</CancelButton>
-                    <SaveButton onClick={handleSubmit} disabled={!selectedRelative}>Salvar</SaveButton>
+                    <CancelButton type="button" onClick={onClose}><FaTimes /> Cancelar</CancelButton>
+                    <AddButton type="button" onClick={handleSave}><FaSave /> Salvar</AddButton>
                 </ModalFooter>
             </ModalContent>
         </ModalOverlay>

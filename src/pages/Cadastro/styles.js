@@ -1,57 +1,56 @@
 import styled from 'styled-components';
+import { tokens, Button as BaseButton, Input as BaseInput, Select as BaseSelect, Checkbox as BaseCheckbox, Label as BaseLabel, Card, Grid as BaseGrid } from '../../components/UI';
 
 export const Container = styled.div`
-  padding: 20px;
-  background-color: #f8f9fa; // Lighter, cleaner background
-  min-height: 100vh;
-  box-sizing: border-box;
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
 `;
 
 export const FormContainer = styled.form`
   background: white;
-  padding: 25px 35px; // Slightly adjusted padding
+  padding: 25px 35px;
   border-radius: 10px;
-  max-width: 1200px; // Max width for large forms
-  margin: 20px auto;
+  max-width: 1300px;
+  margin: 0 auto;
+  width: 100%;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  flex-grow: 1; 
+  padding-bottom: 100px; /* Espaço para o botão fixo */
 `;
 
 export const Section = styled.div`
-  margin-bottom: 35px;
+  margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid #e9ecef;
 
   &:last-of-type {
     border-bottom: none;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
 `;
 
 export const SectionTitle = styled.h2`
-  font-size: 1.45rem; // Slightly smaller
-  margin-bottom: 20px;
-  color: #343a40; // Dark gray
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #343a40;
   font-weight: 600;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
   border-bottom: 2px solid #b01950ff;
   display: inline-block;
 `;
 
-export const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(6, 1fr); // 6 columns for fine control
-  gap: 18px 20px; // Row gap, Column gap
-
-  @media (max-width: 1200px) { // Larger tablets / Small desktops
+export const FormGrid = styled(BaseGrid).attrs({ cols: 6 })`
+  gap: ${tokens.spacing.sm} ${tokens.spacing.md};
+  
+  @media (max-width: 1200px) {
     grid-template-columns: repeat(4, 1fr);
   }
-  @media (max-width: 768px) { // Tablets
+  @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
   }
-  @media (max-width: 576px) { // Mobile
+  @media (max-width: 576px) {
     grid-template-columns: 1fr;
-    gap: 14px;
   }
 `;
 
@@ -59,106 +58,34 @@ export const FieldContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%; 
-  justify-content: center; // Better for checkbox alignment when it's the only child
 `;
 
-export const InputLabel = styled.label`
-  margin-bottom: 6px; // Reduced margin
-  font-weight: 500;
-  font-size: 0.85rem; // Smaller label
-  color: #495057;
+export const InputLabel = styled(BaseLabel)`
+  margin-bottom: ${tokens.spacing.xs};
+  font-size: ${tokens.typography.sm};
 `;
 
 const inputStyles = `
-  padding: 9px 12px; // Adjusted padding
+  padding: 8px 10px;
   border: 1px solid #ced4da;
-  border-radius: 5px;
-  font-size: 0.95rem; // Slightly smaller input text
+  border-radius: 4px;
+  font-size: 0.9rem;
   box-sizing: border-box;
   width: 100%;
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:focus {
     outline: none;
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
-  }
-
-  &::placeholder {
-    color: #adb5bd;
-  }
-
-  &:disabled {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-    color: #6c757d;
+    border-color: #b01950ff;
+    box-shadow: 0 0 0 2px rgba(176, 25, 80, 0.1);
   }
 `;
-const inputStyles2 = `
-  padding: 9px 12px; // Adjusted padding
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  font-size: 0.95rem; // Slightly smaller input text
-  box-sizing: border-box;
-  width: 40%;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-
-  &:focus {
-    outline: none;
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
-  }
-
-  &::placeholder {
-    color: #adb5bd;
-  }
-
-  &:disabled {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-    color: #6c757d;
-  }
+export const StyledInput = styled(BaseInput)`
+  /* Herda do sistema base */
 `;
 
-export const StyledInput = styled.input`
-  ${inputStyles}
-`;
-
-export const StyledInput2 = styled.input`
-  ${inputStyles2}
-`;
-
-export const StyledSelect = styled.select`
-  ${inputStyles}
-  appearance: none;
-  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23495057%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
-  background-repeat: no-repeat;
-  background-position: right 10px top 50%;
-  background-size: .6em auto;
-  padding-right: 28px;
-`;
-
-export const StyledCheckbox = styled.input.attrs({ type: 'checkbox' })`
-  margin-right: 8px;
-  width: 17px;
-  height: 17px;
-  cursor: pointer;
-  accent-color: #4f46e5;
-  vertical-align: middle; // Better alignment with text
-
-  &:focus {
-    outline: 2px solid rgba(79, 70, 229, 0.25);
-    outline-offset: 1px;
-  }
-`;
-
-export const CheckboxContainer = styled.div`
-  /* This container might be less used if checkboxes are direct grid items */
-  /* Kept for flexibility if needed for a specific group */
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  margin-bottom: 12px;
+export const StyledSelect = styled(BaseSelect)`
+  /* Herda do sistema base */
 `;
 
 export const CheckboxLabel = styled.label`
@@ -167,374 +94,91 @@ export const CheckboxLabel = styled.label`
   cursor: pointer;
   font-size: 0.9rem;
   color: #495057;
-  user-select: none;
-  height: 100%; // Fill FieldContainer height
 `;
 
-export const Button = styled.button`
-  background-color: #b71550;
-  color: white;
-  padding: 11px 26px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+export const StyledCheckbox = styled(BaseCheckbox)`
+  /* Herda do sistema base */
+`;
 
-  &:hover {
-    background-color: #d81b60;
-  }
-  &:active {
-    transform: translateY(1px);
-  }
+export const Button = styled(BaseButton)`
+  /* Herda do sistema base */
 `;
 
 export const FixedSubmitButton = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 25px;
-  padding-bottom: 15px;
-`;
-
-export const SuccessMessage = styled.div`
-  margin-top: 18px;
-  padding: 10px 14px;
-  background-color: #d1e7dd; // Bootstrap success background
-  border: 1px solid #badbcc; // Bootstrap success border
-  color: #0a3622; // Bootstrap success text
-  border-radius: 5px;
-  text-align: center;
-`;
-
-export const ErrorText = styled.div`
-  color: #dc3545; // Bootstrap danger color
-  font-size: 0.8em;
-  margin-top: 5px;
-  width: 100%;
-`;
-
-export const ApiErrorContainer = styled.div`
-  grid-column: 1 / -1;
-  margin-top: 18px;
-  padding: 10px 14px;
-  background-color: #f8d7da; // Bootstrap danger background
-  border: 1px solid #f5c2c7; // Bootstrap danger border
-  color: #58151c; // Bootstrap danger text
-  border-radius: 5px;
-  text-align: left;
-`;
-
-export const SectionContent = styled.div`
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 25px;
-  margin-top: 20px; /* Adicionado para separar do título */
-  border: 1px solid #e9ecef;
-`;
-
-export const AddMemberButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin: 20px 0;
-  min-height: 50px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 18px 20px;
-    font-size: 1.1rem;
-  }
-`;
-
-// Estilos para campos de textarea
-export const TextAreaInput = styled.textarea`
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid ${props => props.$hasError ? '#e74c3c' : '#e1e5e9'};
-  border-radius: 8px;
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-  min-height: 100px;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.$hasError ? '#e74c3c' : '#667eea'};
-    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(231, 76, 60, 0.1)' : 'rgba(102, 126, 234, 0.1)'};
-  }
-
-  &::placeholder {
-    color: #a0a0a0;
-  }
-`;
-
-// Atualização do StyledInput para suportar textarea
-export const StyledInputUpdated = styled.input`
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid ${props => props.$hasError ? '#e74c3c' : '#e1e5e9'};
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.$hasError ? '#e74c3c' : '#667eea'};
-    box-shadow: 0 0 0 3px ${props => props.$hasError ? 'rgba(231, 76, 60, 0.1)' : 'rgba(102, 126, 234, 0.1)'};
-  }
-
-  &::placeholder {
-    color: #a0a0a0;
-  }
-
-  /* Suporte para textarea */
-  ${props => props.as === 'textarea' && `
-    resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
-  `}
-`;
-
-// Estilos para indicadores de status
-export const StatusIndicator = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  ${props => {
-    switch (props.status) {
-      case 'success':
-        return `
-          background-color: #d4edda;
-          color: #155724;
-          border: 1px solid #c3e6cb;
-        `;
-      case 'warning':
-        return `
-          background-color: #fff3cd;
-          color: #856404;
-          border: 1px solid #ffeaa7;
-        `;
-      case 'danger':
-        return `
-          background-color: #f8d7da;
-          color: #721c24;
-          border: 1px solid #f5c6cb;
-        `;
-      default:
-        return `
-          background-color: #e2e3e5;
-          color: #383d41;
-          border: 1px solid #d6d8db;
-        `;
-    }
-  }}
-`;
-
-// Estilos para loading states
-export const LoadingSpinner = styled.div`
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
-// Estilos responsivos adicionais
-export const ResponsiveContainer = styled.div`
-  @media (max-width: 768px) {
-    padding: 15px;
-    
-    ${FormGrid} {
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-    
-    ${FieldContainer} {
-      grid-column: span 1 !important;
-    }
-  }
-`;
-
-// Estilos para animações
-export const FadeIn = styled.div`
-  animation: fadeIn 0.3s ease-in;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-`;
-
-// Estilos para tooltips (se necessário)
-export const Tooltip = styled.div`
   position: relative;
-  display: inline-block;
-
-  &:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    z-index: 1000;
-    opacity: 1;
-    transition: opacity 0.3s;
-  }
-
-  &:hover::before {
-    content: '';
-    position: absolute;
-    bottom: 115%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: #333;
-    z-index: 1000;
-  }
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 15px 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
 `;
 
-
-
+// --- Estilos para Listas Repetitivas (Quimio, Radio, etc.) ---
+export const ListContainer = styled.div`
+    width: 100%;
+    margin-top: 0.5rem;
+    position: relative;
+    padding: 15px;
+    border: 1px solid #eef0f2;
+    background-color: #fcfdff;
+    border-radius: 6px;
+    margin-bottom: 10px;
+`;
 
 export const AddMoreButton = styled.button`
-  background-color: #fce4ec; /* Rosa bem claro */
-  color: #d81b60; /* Rosa principal */
-  border: 1px solid #f8bbd0; /* Borda rosa clara */
-  padding: 8px 16px; /* Menor que o botão principal */
-  border-radius: 20px; /* Mais arredondado */
-  font-size: 0.9rem; /* Fonte menor */
-  font-weight: 600;
+  background-color: #fce4ec;
+  color: #b71550;
+  border: 1px solid #f8bbd0;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 15px;
+  gap: 6px;
+  margin-top: 10px;
 
   &:hover {
     background-color: #f8bbd0;
-    color: #b71550;
-    box-shadow: 0 2px 8px rgba(216, 27, 96, 0.15);
   }
-
-  &:active {
-    transform: translateY(1px);
-  }
-`;
-
-export const ListContainer = styled.div`
-    width: 100%;
-    margin-top: 15px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 10px;
-`;
-
-export const ListItem = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #e9ecef;
-
-    &:last-child {
-        border-bottom: none;
-    }
-`;
-
-export const ListItemText = styled.div`
-    font-size: 0.9rem;
-    color: #495057;
 `;
 
 export const ActionButtons = styled.div`
-    display: flex;
-    gap: 10px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
 `;
 
-export const EditButton = styled(Button)`
-    background-color: #ffc107;
-    color: #212529;
-
+export const RemoveButton = styled.button`
+    background: transparent;
+    color: #adb5bd;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 5px;
+    
     &:hover {
-        background-color: #e0a800;
+        color: #dc3545;
     }
 `;
 
-export const RemoveButton = styled(Button)`
-    background-color: #dc3545;
-    color: white;
-
-    &:hover {
-        background-color: #c82333;
-    }
-`;
-
+// --- Abas e Mensagens ---
 export const TabNav = styled.div`
     display: flex;
-    flex-wrap: wrap; // Permite que as abas quebrem a linha em telas menores
+    flex-wrap: wrap;
     border-bottom: 2px solid #dee2e6;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
 `;
 
 export const TabButton = styled.button`
-    padding: 12px 20px;
+    padding: 14px 22px;
     border: none;
     background-color: transparent;
     cursor: pointer;
@@ -543,18 +187,223 @@ export const TabButton = styled.button`
     color: #6c757d;
     border-bottom: 3px solid transparent;
     transition: all 0.2s ease-in-out;
+    margin-bottom: -2px;
 
-    /* Estilo da aba ativa */
     ${({ $isActive }) =>
-        $isActive &&
-        `
-        color: #e91e63; /* Cor rosa do tema */
-        border-bottom-color: #e91e63;
+        $isActive && `
+        color: #b01950ff;
+        border-bottom-color: #b01950ff;
         font-weight: 600;
     `}
 
     &:hover {
         background-color: #f8f9fa;
-        color: #343a40;
     }
+`;
+
+export const SuccessMessage = styled.div`
+  margin-bottom: ${tokens.spacing.md};
+  padding: ${tokens.spacing.sm} ${tokens.spacing.md};
+  background-color: #d1e7dd;
+  border: 1px solid #badbcc;
+  color: #0f5132;
+  border-radius: ${tokens.radius.lg};
+  text-align: center;
+`;
+
+export const ApiErrorContainer = styled.div`
+  margin-bottom: ${tokens.spacing.md};
+  padding: ${tokens.spacing.sm} ${tokens.spacing.md};
+  background-color: #f8d7da;
+  border: 1px solid #f5c2c7;
+  color: #842029;
+  border-radius: ${tokens.radius.lg};
+  text-align: left;
+`;
+
+export const ErrorText = styled.div`
+  color: #dc3545;
+  font-size: 0.8em;
+  margin-top: 5px;
+`;
+
+export const SectionContent = styled(Card)`
+  background: ${tokens.colors.surface};
+  padding: ${tokens.spacing.md};
+  margin-top: ${tokens.spacing.sm};
+`;
+
+export const AddMemberButton = styled.button`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+  }
+`;
+
+// --- Estilos específicos para Tratamento ---
+export const TreatmentSection = styled.div`
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const TreatmentSubSection = styled.div`
+  background: #fafbfc;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const TreatmentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f3f4;
+`;
+
+export const TreatmentTitle = styled.h3`
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+  margin: 0;
+`;
+
+export const CompactButton = styled.button`
+  background-color: ${props => props.variant === 'danger' ? '#dc3545' : '#b71550'};
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: ${props => props.variant === 'danger' ? '#c82333' : '#a01446'};
+  }
+  
+  &:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+`;
+
+export const TreatmentGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const CheckboxGroup = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin: 10px 0;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 8px;
+  }
+`;
+
+export const InlineGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+`;
+
+// Subtítulo menor para seções dentro de tratamento
+export const SubSectionTitle = styled.h3`
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #495057;
+  font-weight: 600;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #dee2e6;
+  display: inline-block;
+`;
+
+// Container para subtítulo + botão
+export const SubSectionHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+`;
+
+// Botão de adicionar menor e mais discreto
+export const AddSubButton = styled.button`
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  
+  &:hover {
+    background-color: #bbdefb;
+  }
+  
+  &:disabled {
+    background-color: #f5f5f5;
+    color: #9e9e9e;
+    cursor: not-allowed;
+  }
 `;
