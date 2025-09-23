@@ -47,25 +47,22 @@ const FamilyMembersList = ({ members, onEdit, onRemove }) => {
                         </div>
                     </div>
                     <div>
-                        {member.idade && (
+                        <p style={{ margin: '5px 0' }}>
+                            <strong>Câncer de mama:</strong> {member.tem_cancer_mama ? `Sim (idade: ${member.idade_cancer_mama || 'N/I'})` : 'Não'}
+                        </p>
+                        {member.bilateral && (
                             <p style={{ margin: '5px 0' }}>
-                                <strong>Idade:</strong> {member.idade} anos
+                                <strong>Bilateral:</strong> Sim (2ª mama aos {member.idade_segunda_mama || 'N/I'} anos)
                             </p>
                         )}
-                        <p style={{ margin: '5px 0' }}>
-                            <strong>Câncer de mama:</strong> {member.tem_cancer_mama ? 'Sim' : 'Não'}
-                        </p>
-                        <p style={{ margin: '5px 0' }}>
-                            <strong>Câncer de ovário:</strong> {member.tem_cancer_ovario ? 'Sim' : 'Não'}
-                        </p>
+                        {member.genero === 'feminino' && (
+                            <p style={{ margin: '5px 0' }}>
+                                <strong>Câncer de ovário:</strong> {member.tem_cancer_ovario ? `Sim (idade: ${member.idade_cancer_ovario || 'N/I'})` : 'Não'}
+                            </p>
+                        )}
                         <p style={{ margin: '5px 0' }}>
                             <strong>Gene BRCA:</strong> {member.gene_brca || 'Desconhecido'}
                         </p>
-                        {member.tem_filha_com_historico !== null && (
-                            <p style={{ margin: '5px 0' }}>
-                                <strong>Filha com histórico:</strong> {member.tem_filha_com_historico ? 'Sim' : 'Não'}
-                            </p>
-                        )}
                     </div>
                 </div>
             ))}
