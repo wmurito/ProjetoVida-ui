@@ -9,8 +9,7 @@ import Input from "../../components/Input";
 import Button from "../../components/Button";
 import logoImg from "../../assets/logo.png";
 
-import Checkbox from "@mui/material/Checkbox";
-import { FormControlLabel } from "@mui/material";
+import { Checkbox, CheckboxLabel } from "../../components/UI";
 
 import {
   FaGithub,
@@ -225,16 +224,13 @@ const Login = () => {
           )}
 
           <CheckContainer>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  color="primary"
-                />
-              }
-              label="Lembrar-me"
-            />
+            <CheckboxLabel>
+              <Checkbox
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+              />
+              Lembrar-me
+            </CheckboxLabel>
           </CheckContainer>
 
           <Button type="submit" disabled={loading}>
