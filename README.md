@@ -1,38 +1,26 @@
-# Projeto Vida - Dashboard de Dados Oncológicos
+# Projeto Vida
 
-API e dashboard para gerenciamento de dados de pacientes oncológicos.
+Dashboard para gerenciamento de dados oncológicos.
 
-## Estrutura do Projeto
+## Instalação
 
-- `main.py`: API FastAPI principal
-- `lambda_dashboard.py`: Gerador de dashboard para AWS Lambda
-- `models.py`: Modelos SQLAlchemy
-- `schemas.py`: Schemas Pydantic
-- `crud.py`: Operações CRUD
-- `auth.py`: Autenticação e autorização
-- `database.py`: Configuração do banco de dados
+```bash
+npm install
+```
 
 ## Configuração
 
-1. Crie um arquivo `.env` baseado no `.env.example`
-2. Instale as dependências: `pip install -r requirements.txt`
-3. Execute localmente: `uvicorn main:app --reload`
+1. Copie `.env` e configure suas variáveis de ambiente
+2. Configure AWS Cognito credentials
 
-## Implantação no AWS Lambda
+## Desenvolvimento
 
 ```bash
-# Instalar o Serverless Framework
-npm install -g serverless
-
-# Configurar credenciais AWS
-aws configure
-
-# Implantar
-serverless deploy
+npm run dev
 ```
 
-## Segurança
+## Build para Produção
 
-- As credenciais AWS são gerenciadas por IAM roles
-- O banco de dados é acessado através de uma VPC
-- Autenticação via tokens JWT
+```bash
+npm run build
+```
