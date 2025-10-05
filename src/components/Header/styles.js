@@ -24,13 +24,15 @@ export const Logo = styled.img`
 export const ToggleButton = styled.button`
   background: none;
   border: none;
-  color: var(--side-text-color);
+  color: #ff7bac;
   font-size: 1.5rem;
   cursor: pointer;
   margin-left: 0.5rem;
   margin-right: 1rem;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: var(--primary-color);
+    color: black;
+    transform: scale(1.1);
   }
 `;

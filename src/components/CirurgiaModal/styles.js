@@ -18,7 +18,7 @@ export const ModalContent = styled.div`
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   width: 90%;
-  max-width: 800px;
+  max-width: min(90vw, 800px);
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -77,11 +77,11 @@ const BaseButton = styled.button`
 `;
 
 export const AddButton = styled(BaseButton)`
-    background-color: #28a745;
+    background-color: #ff7bac;
     color: white;
 
     &:hover {
-        background-color: #218838;
+        background-color: #ff6ba0;
     }
 `;
 

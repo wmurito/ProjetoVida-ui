@@ -9,15 +9,26 @@ export const Container = styled.aside`
   display: flex;
   flex-direction: column;
   
-  width: ${({ $isClosed }) => ($isClosed ? '44px' : '150px')};
+  width: ${({ $isClosed }) => ($isClosed ? '60px' : '200px')};
   transition: width 0.3s ease-in-out;
   
   border-right: 1px solid var(--border-color-inverted);
   z-index: 1000;
   overflow-x: hidden;
-
-  /* ADICIONADO PARA O MENU TER SEU PRÓPRIO SCROLL SE NECESSÁRIO */
   overflow-y: auto;
+  
+  @media (max-width: 768px) {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    width: 70%;
+    height: calc(100vh - 60px);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    z-index: 2000;
+    transform: translateX(${({ $menuAberto }) => ($menuAberto ? '0' : '-100%')});
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+  }
 `;
 
 // O STYLED COMPONENT 'LOGO' FOI REMOVIDO DAQUI
@@ -39,13 +50,14 @@ export const NavLink = styled(RouterNavLink)`
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  color: var(--side-text-color);
+  color: #ff7bac;
   text-decoration: none;
   border-radius: 6px;
   white-space: nowrap;
+  transition: all 0.2s ease;
 
   svg {
-    font-size: 1.5rem; /* Ícones um pouco maiores para destaque */
+    font-size: 1.5rem;
     min-width: 24px;
     margin-right: ${({ 'data-is-closed': isClosed }) => (isClosed ? 0 : '0.5rem')};
     transition: margin-right 0.3s ease-in-out;
@@ -56,9 +68,13 @@ export const NavLink = styled(RouterNavLink)`
     transition: opacity 0.2s ease-in-out;
   }
 
-  &.active,
+  &.active {
+    background-color: #ff7bac;
+    color: black;
+  }
+  
   &:hover {
-    background-color: var(--primary-color);
+    background-color: #ff7bac;
     color: black;
   }
 `;
@@ -68,12 +84,13 @@ export const LogoutButton = styled.button`
   align-items: center;
   padding: 0.75rem 1rem;
   width: 100%;
-  color: var(--side-text-color);
+  color: #ff7bac;
   background: none;
   border: none;
   cursor: pointer;
   border-radius: 6px;
   white-space: nowrap;
+  transition: all 0.2s ease;
   
   svg {
     font-size: 1.5rem;
@@ -89,6 +106,6 @@ export const LogoutButton = styled.button`
 
   &:hover {
     background-color: rgba(255, 0, 0, 0.1);
-    color: var(--red-color);
+    color: #dc3545;
   }
 `;

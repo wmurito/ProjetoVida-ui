@@ -18,7 +18,7 @@ import {
 import { FaSignOutAlt } from 'react-icons/fa';
 
 // Recebe apenas 'isClosed'. A função de toggle não é mais necessária aqui.
-const Aside = ({ isClosed }) => {
+const Aside = ({ isClosed, $menuAberto }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -39,7 +39,7 @@ const Aside = ({ isClosed }) => {
   ];
 
   return (
-    <Container $isClosed={isClosed}>
+    <Container $isClosed={isClosed} $menuAberto={$menuAberto}>
       {/* A LOGO E O TOGGLE BUTTON FORAM REMOVIDOS DAQUI */}
       <NavMenu>
         {navLinks.map((link, index) => (

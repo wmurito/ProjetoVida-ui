@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components';
 // === TOKENS DE DESIGN ===
 export const tokens = {
   colors: {
-    primary: '#b01950',
-    primaryHover: '#d81b60',
+    primary: '#ff7bac',
+    primaryHover: '#ff6ba0',
     secondary: '#667eea',
     success: '#28a745',
     warning: '#ffc107',
@@ -144,12 +144,7 @@ export const Button = styled.button`
         default: return tokens.colors.primaryHover;
       }
     }};
-    color: ${props => {
-      switch(props.variant) {
-        case 'outline': return 'white';
-        default: return 'white';
-      }
-    }};
+    color: white;
   }
 `;
 

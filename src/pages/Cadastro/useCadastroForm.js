@@ -47,8 +47,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name]) setErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors[name];
+            const { [name]: removed, ...newErrors } = prev;
             return newErrors;
         });
     }, [errors]);
@@ -58,8 +57,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         setFormData(prev => ({ ...prev, [section]: { ...prev[section], [name]: value } }));
         const errorKey = `${section}.${name}`;
         if (errors[errorKey]) setErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors[errorKey];
+            const { [errorKey]: removed, ...newErrors } = prev;
             return newErrors;
         });
     }, [errors]);
@@ -69,8 +67,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         setFormData(prev => ({ ...prev, [section]: { ...prev[section], [name]: checked } }));
         const errorKey = `${section}.${name}`;
         if (errors[errorKey]) setErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors[errorKey];
+            const { [errorKey]: removed, ...newErrors } = prev;
             return newErrors;
         });
     }, [errors]);
