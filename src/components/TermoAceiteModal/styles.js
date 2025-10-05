@@ -18,7 +18,7 @@ export const ModalContent = styled.div`
     padding: 30px;
     border-radius: 10px;
     width: 90%;
-    max-width: 600px;
+    max-width: min(90vw, 600px);
     text-align: center;
 `;
 

@@ -18,7 +18,6 @@ export const Container = styled.aside`
   overflow-y: auto;
   
   @media (max-width: 768px) {
-    display: ${({ $menuAberto }) => ($menuAberto ? 'flex' : 'none')};
     position: fixed;
     left: 0;
     top: 60px;
@@ -26,6 +25,9 @@ export const Container = styled.aside`
     height: calc(100vh - 60px);
     box-shadow: 2px 0 5px rgba(0,0,0,0.2);
     z-index: 2000;
+    transform: translateX(${({ $menuAberto }) => ($menuAberto ? '0' : '-100%')});
+    transition: transform 0.3s ease-in-out;
+    display: flex;
   }
 `;
 

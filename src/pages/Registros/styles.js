@@ -29,7 +29,7 @@ export const SearchContainer = styled.div`
 `;
 
 export const SearchInput = styled(BaseInput)`
-  width: 300px;
+  width: min(100%, 300px);
   
   @media (max-width: 768px) {
     width: 100%;

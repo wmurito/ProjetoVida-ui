@@ -158,25 +158,15 @@ export const initialState = {
     estadiamento_clinico: '',
     metastase_distancia: false,
     locais_metastase: '',
+  },
+
+  // --- MODELOS PREDITORES DE RISCO ---
+  modelos_preditores: {
     score_tyrer_cuzick: '',
     score_canrisk: '',
     score_gail: '',
   },
 
-  // --- HISTOLOGIA ---
-  histologia: {
-    biopsia_pre_tratamento: false,
-    tipo_histologico: '',
-    grau_histologico: '',
-    re: '',
-    rp: '',
-    ki67: '',
-    her2: '',
-    fish: '',
-    brca: '',
-    indice_oncotype: '',
-    assinatura_genetica: '',
-  },
 
   // --- TRATAMENTO E EVOLUÇÃO ---
   tratamento: tratamentoInitialState,
@@ -251,18 +241,6 @@ export const validationSchema = yup.object().shape({
     lado_acometido: yup.string().required('O lado acometido é obrigatório'),
   }),
 
-  histologia: yup.object().shape({
-      tipo_histologico: yup.string().when('biopsia_pre_tratamento', {
-          is: true,
-          then: (schema) => schema.required('O tipo histológico é obrigatório'),
-          otherwise: (schema) => schema.notRequired(),
-      }),
-      grau_histologico: yup.string().when('biopsia_pre_tratamento', {
-          is: true,
-          then: (schema) => schema.required('O grau histológico é obrigatório'),
-          otherwise: (schema) => schema.notRequired(),
-      })
-  }),
 
   // --- Aba: Tratamento e Evolução ---
   desfecho: yup.object().shape({

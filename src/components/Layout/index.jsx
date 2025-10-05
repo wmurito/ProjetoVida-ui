@@ -9,7 +9,9 @@ const Layout = () => {
   const [menuAberto, setMenuAberto] = useState(false);
 
   const toggleAside = () => {
-    if (window.innerWidth <= 768) {
+    const isMobile = window.innerWidth <= 768;
+    console.log('Toggle clicked, isMobile:', isMobile, 'menuAberto:', menuAberto);
+    if (isMobile) {
       setMenuAberto(prev => !prev);
     } else {
       setIsAsideClosed(prev => !prev);
@@ -17,7 +19,9 @@ const Layout = () => {
   };
 
   const closeMobileMenu = () => {
-    setMenuAberto(false);
+    if (window.innerWidth <= 768) {
+      setMenuAberto(false);
+    }
   };
 
   useEffect(() => {

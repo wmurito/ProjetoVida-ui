@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 // --- Cores ---
-const primaryPink = '#e91e63';
+const primaryPink = '#ff7bac';
 const lightPink = '#fce4ec';
 const textDark = '#333';
 const textLight = '#666';
@@ -23,7 +23,7 @@ export const ModalContent = styled.div`
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   width: 90%;
-  max-width: 800px;
+  max-width: min(90vw, 800px);
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -173,9 +173,9 @@ const Button = styled.button`
 `;
 
 export const SaveButton = styled(Button)`
-  background-color: ${successGreen};
+  background-color: #ff7bac;
   color: white;
-  &:hover { background-color: #45a049; }
+  &:hover { background-color: #ff6ba0; }
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;
@@ -191,9 +191,9 @@ export const CancelButton = styled(Button)`
 `;
 
 export const AddButton = styled(Button)`
-  background-color: ${successGreen};
+  background-color: #ff7bac;
   color: white;
-  &:hover { background-color: #45a049; }
+  &:hover { background-color: #ff6ba0; }
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;

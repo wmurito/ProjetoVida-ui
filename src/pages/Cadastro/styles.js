@@ -126,7 +126,7 @@ export const ListContainer = styled.div`
 
 export const AddMoreButton = styled.button`
   background-color: #fce4ec;
-  color: #b71550;
+  color: #ff7bac;
   border: 1px solid #f8bbd0;
   padding: 6px 12px;
   border-radius: 4px;
@@ -254,7 +254,7 @@ export const SectionContent = styled(Card)`
 `;
 
 export const AddMemberButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff7bac 0%, #ff6ba0 100%);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -268,11 +268,11 @@ export const AddMemberButton = styled.button`
   justify-content: center;
   gap: 6px;
   margin: 10px 0;
-  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 4px rgba(255, 123, 172, 0.2);
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 8px rgba(255, 123, 172, 0.3);
   }
 
   &:active {
@@ -281,7 +281,7 @@ export const AddMemberButton = styled.button`
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 0 0 2px rgba(255, 123, 172, 0.3);
   }
 `;
 
@@ -328,7 +328,7 @@ export const TreatmentTitle = styled.h3`
 
 export const CompactButton = styled.button`
   background-color: ${(props) =>
-    props.variant === 'danger' ? '#dc3545' : '#b71550'};
+    props.variant === 'danger' ? '#dc3545' : '#ff7bac'};
   color: white;
   border: none;
   padding: 4px 8px;
@@ -340,7 +340,7 @@ export const CompactButton = styled.button`
 
   &:hover {
     background-color: ${(props) =>
-      props.variant === 'danger' ? '#c82333' : '#a01446'};
+      props.variant === 'danger' ? '#c82333' : '#ff6ba0'};
   }
 
   &:disabled {
@@ -402,9 +402,9 @@ export const SubSectionHeader = styled.div`
 `;
 
 export const AddSubButton = styled.button`
-  background-color: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid #bbdefb;
+  background-color: #fce4ec;
+  color: #ff7bac;
+  border: 1px solid #f8bbd0;
   padding: 4px 8px;
   border-radius: 3px;
   font-size: 0.8rem;
@@ -417,7 +417,18 @@ export const AddSubButton = styled.button`
   align-self: flex-start;
 
   &:hover {
-    background-color: #bbdefb;
+    background-color: #f8bbd0;
+    color: #ff6ba0;
+  }
+
+  &:active {
+    background-color: #ff7bac;
+    color: white;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 123, 172, 0.3);
   }
 
   &:disabled {
