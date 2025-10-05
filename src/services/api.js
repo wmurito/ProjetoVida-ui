@@ -4,6 +4,11 @@ import { validateJwtFormat, sanitizeInput } from './securityConfig';
 import { addCSRFToken, initCSRFProtection } from './csrf';
 import { toast } from 'react-toastify';
 
+// Controle de toast para evitar spam
+let lastErrorToast = null;
+let lastErrorTime = 0;
+const ERROR_TOAST_COOLDOWN = 5000; // 5 segundos
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // Inicializar proteção CSRF
@@ -112,6 +117,20 @@ api.interceptors.request.use(
   }
 );
 
+// Função auxiliar para mostrar toast com cooldown
+const showErrorToast = (message, type = 'error') => {
+  const now = Date.now();
+  
+  // Se já existe um toast ativo com a mesma mensagem, não mostrar outro
+  if (lastErrorToast === message && (now - lastErrorTime) < ERROR_TOAST_COOLDOWN) {
+    return;
+  }
+  
+  lastErrorToast = message;
+  lastErrorTime = now;
+  toast[type](message);
+};
+
 // Interceptor de resposta
 api.interceptors.response.use(
   (response) => response,
@@ -119,14 +138,14 @@ api.interceptors.response.use(
     if (error.response) {
       // Redirecionar para login em caso de erro de autenticação
       if (error.response.status === 401) {
-        toast.error('Sessão expirada. Redirecionando para login...');
+        showErrorToast('Sessão expirada. Redirecionando para login...');
         setTimeout(() => {
           window.location.href = '/login';
         }, 2000);
       } else if (error.response.status === 403) {
-        toast.error('Acesso negado. Você não tem permissão para esta operação.');
+        showErrorToast('Acesso negado. Você não tem permissão para esta operação.');
       } else {
-        toast.error('Erro na operação. Tente novamente.');
+        showErrorToast('Erro na operação. Tente novamente.');
       }
       
       // Log seguro do erro
@@ -136,7 +155,7 @@ api.interceptors.response.use(
         method: error.config?.method?.toUpperCase()
       });
     } else {
-      toast.error('Erro de conexão. Verifique sua internet.');
+      showErrorToast('Erro de conexão. Verifique sua internet.');
     }
     return Promise.reject(error);
   }

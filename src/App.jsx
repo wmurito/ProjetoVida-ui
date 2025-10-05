@@ -15,6 +15,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Registro = lazy(() => import('./pages/Registros'));
 const Cadastro = lazy(() => import('./pages/Cadastro'));
 const Relatorio = lazy(() => import('./pages/Relatorios'));
+const UploadMobile = lazy(() => import('./pages/UploadMobile'));
 
 // Componente simples para o estado de carregamento do Suspense
 const LoadingFallback = () => (
@@ -69,6 +70,7 @@ const App = () => {
           path="/login"
           element={!logged ? <Login /> : <Navigate to="/dashboard" replace />}
         />
+        <Route path="/upload-mobile/:sessionId" element={<UploadMobile />} />
         <Route
           path="/"
           element={logged ? <Layout /> : <Navigate to="/login" replace />}

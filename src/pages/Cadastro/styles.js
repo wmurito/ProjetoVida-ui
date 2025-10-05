@@ -45,7 +45,7 @@ export const SectionTitle = styled.h2`
   color: #343a40;
   font-weight: 600;
   padding-bottom: 4px;
-  border-bottom: 2px solid #b01950ff;
+  border-bottom: 2px solid #ff7bac;
   display: inline-block;
 `;
 
@@ -140,7 +140,9 @@ export const AddMoreButton = styled.button`
   margin-top: 10px;
 
   &:hover {
-    background-color: #f8bbd0;
+    background-color: #ff7bac;
+    color: white;
+    border-color: #ff7bac;
   }
 `;
 
@@ -182,7 +184,7 @@ export const TabNav = styled.div`
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #b01950;
+      background: #ff7bac;
       border-radius: 2px;
     }
   }
@@ -205,13 +207,14 @@ export const TabButton = styled.button`
   ${({ $isActive }) =>
     $isActive &&
     `
-        color: #b01950ff;
-        border-bottom-color: #b01950ff;
+        color: #ff7bac;
+        border-bottom-color: #ff7bac;
         font-weight: 600;
     `}
 
   &:hover {
-    background-color: #f8f9fa;
+    background-color: #fce4ec;
+    color: #ff7bac;
   }
 
   @media (max-width: 600px) {

@@ -105,7 +105,7 @@ export const CancelButton = styled.button`
 
 // AJUSTE: ContinueButton agora ocupa a outra metade
 export const ContinueButton = styled.button`
-    flex: 1; /* Ocupa a outra metade do espaço */
+    flex: 1;
     padding: 15px;
     font-size: 1.1rem;
     font-weight: bold;
@@ -123,5 +123,50 @@ export const ContinueButton = styled.button`
     &:disabled {
         background-color: #bdbdbd;
         cursor: not-allowed;
+    }
+`;
+
+export const QRCodeContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 2px solid #e0e0e0;
+`;
+
+export const QRCodeTitle = styled.h3`
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1rem;
+`;
+
+export const UploadOption = styled.div`
+    margin: 10px 0;
+`;
+
+export const OrDivider = styled.div`
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: #999;
+    font-weight: 600;
+    
+    &::before,
+    &::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    &::before {
+        margin-right: 15px;
+    }
+    
+    &::after {
+        margin-left: 15px;
     }
 `;
