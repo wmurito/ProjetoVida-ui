@@ -118,17 +118,16 @@ const UploadMobile = () => {
     setUploading(true);
 
     try {
-      // Converter arquivo para base64
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         const fileData = {
           fileName: file.name,
           fileType: file.type,
           fileData: reader.result
         };
         
-        // Salvar no localStorage
-        localStorage.setItem(`upload-${sessionId}`, JSON.stringify(fileData));
+        // Enviar para o backend
+        await api.post(`/upload-mobile/${sessionId}`, fileData);
         
         toast.success('Arquivo enviado com sucesso!');
         setTimeout(() => {
