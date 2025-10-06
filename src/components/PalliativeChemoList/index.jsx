@@ -13,7 +13,7 @@ const PalliativeChemoList = ({ chemos, onEdit, onRemove }) => {
                         <strong style={{ color: '#495057' }}>{chemo.linha_tratamento_paliativo}</strong>
                         <div>
                             <Button type="button" onClick={() => onEdit(chemo, index)} style={{ padding: '5px 10px', fontSize: '0.8rem', marginRight: '10px' }}>Editar</Button>
-                            <Button type="button" onClick={() => onRemove(index)} style={{ padding: '5px 10px', fontSize: '0.8rem', background: '#dc3545', hover: {background: '#c82333'} }}>Remover</Button>
+                            <Button type="button" onClick={() => onRemove(index)} style={{ padding: '5px 10px', fontSize: '0.8rem', background: '#ff7bac', hover: {background: '#ff6ba0'} }}>Remover</Button>
                         </div>
                     </div>
                     <div>

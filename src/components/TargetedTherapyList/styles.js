@@ -61,6 +61,6 @@ export const EditButton = styled(Button)`
 `;
 
 export const RemoveButton = styled(Button)`
-    background-color: #dc3545; // Vermelho
+    background-color: #ff7bac; // Rosa
     color: white;
 `;

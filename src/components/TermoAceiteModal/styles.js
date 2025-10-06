@@ -67,7 +67,7 @@ export const FileInputLabel = styled.label`
     margin-bottom: 15px;
 
     &:hover {
-        border-color: #e91e63;
+        border-color: #ff7bac;
         background-color: #fce4ec;
     }
 `;
