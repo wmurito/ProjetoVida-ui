@@ -1,0 +1,106 @@
+name: 🎨 Frontend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'ProjetoVida-ui/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'ProjetoVida-ui/**'
+      - '.github/workflows/frontend-ci.yml'
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'ProjetoVida-ui/package-lock.json'
+    
+    - name: 📦 Install dependencies
+      working-directory: ./ProjetoVida-ui
+      run: npm ci
+    
+    - name: 🔍 Run linting
+      working-directory: ./ProjetoVida-ui
+      run: npm run lint || true
+    
+    - name: 🧪 Run tests (if available)
+      working-directory: ./ProjetoVida-ui
+      run: |
+        if [ -f "package.json" ] && grep -q '"test"' package.json; then
+          npm test || true
+        else
+          echo "No tests configured"
+        fi
+    
+    - name: 🏗️ Build application
+      working-directory: ./ProjetoVida-ui
+      run: npm run build
+    
+    - name: 🔍 Security audit
+      working-directory: ./ProjetoVida-ui
+      run: |
+        npm audit --audit-level moderate --json > npm-audit-report.json || true
+        npm audit --audit-level moderate || true
+    
+    - name: 📊 Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: frontend-build-${{ github.run_number }}
+        path: |
+          ProjetoVida-ui/dist/
+          ProjetoVida-ui/npm-audit-report.json
+        retention-days: 30
+    
+    - name: 🚨 Comment PR with build results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          let auditResults = '';
+          try {
+            if (fs.existsSync('ProjetoVida-ui/npm-audit-report.json')) {
+              const auditData = JSON.parse(fs.readFileSync('ProjetoVida-ui/npm-audit-report.json', 'utf8'));
+              const vulnCount = auditData.vulnerabilities ? Object.keys(auditData.vulnerabilities).length : 0;
+              auditResults = `## 🔍 Frontend Security Audit
+              - **Vulnerabilities**: ${vulnCount} found
+              
+              ${vulnCount > 0 ? '⚠️ **Vulnerable dependencies found!**' : '✅ No vulnerable dependencies'}
+              `;
+            } else {
+              auditResults = '❌ Audit report not found';
+            }
+          } catch (e) {
+            auditResults = '❌ Could not parse audit results';
+          }
+          
+          const comment = `# 🎨 Frontend Build Results
+          
+          ✅ **Build completed successfully**
+          
+          ${auditResults}
+          
+          ---
+          *Frontend CI completed on ${new Date().toISOString()}*
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

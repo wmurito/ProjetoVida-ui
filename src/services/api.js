@@ -11,6 +11,9 @@ const ERROR_TOAST_COOLDOWN = 5000; // 5 segundos
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+// Debug: verificar a URL da API
+console.log('API URL configurada:', API_URL);
+
 // Inicializar proteção CSRF
 initCSRFProtection();
 

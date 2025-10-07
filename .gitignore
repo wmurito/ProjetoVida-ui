@@ -1,38 +1,254 @@
-# Dependencies
-node_modules
+# =============================================================================
+# 🔒 GITIGNORE FRONTEND - PROJETO VIDA - SEGURANÇA MÁXIMA
+# =============================================================================
+# Este arquivo protege contra vazamento de dados sensíveis no frontend
+# NUNCA remova ou modifique sem autorização de segurança!
 
-# Environment variables
+# =============================================================================
+# 🚨 CRÍTICO - DADOS SENSÍVEIS (NUNCA COMMITAR!)
+# =============================================================================
+
+# Variáveis de ambiente
 .env
+.env.*
+!.env.example
 .env.local
 .env.development
+.env.staging
 .env.production
+.env.test
 
-# Build output
-dist
-build
+# Configurações sensíveis
+config.local.js
+settings.local.js
+aws-exports.js
+aws-config.js
 
-# Logs
-logs
-*.log
+# Chaves e tokens
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+auth_token*
+api_key*
+apikey*
+*.token
+*.tokens
+secrets.json
+.secrets
+*.secret
+*.secrets
+
+# =============================================================================
+# 📦 DEPENDÊNCIAS
+# =============================================================================
+
+# Node modules
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
+yarn.lock
 
-# Editor directories and files
-.vscode
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# =============================================================================
+# 🏗️ BUILD E DISTRIBUIÇÃO
+# =============================================================================
 
-# OS files
+# Build output
+dist/
+build/
+out/
+
+# Build analysis
+bundle-analyzer-report.html
+stats.html
+webpack-bundle-analyzer-report.html
+
+# =============================================================================
+# 🧪 TESTES E COBERTURA
+# =============================================================================
+
+# Test files
+test_*.js
+*_test.js
+test_*.ts
+*_test.ts
+test_*.jsx
+*_test.jsx
+test_*.tsx
+*_test.tsx
+test_*.json
+*_test.json
+
+# Coverage reports
+coverage/
+.nyc_output/
+*.lcov
+
+# Jest
+.jest/
+
+# =============================================================================
+# 🔍 SEGURANÇA E AUDITORIA
+# =============================================================================
+
+# Security scan results
+security_scan_*.json
+npm-audit-*.json
+yarn-audit-*.json
+vulnerability_*.json
+snyk-*.json
+
+# Debug files
+debug_*.js
+debug_*.ts
+debug_*.json
+check_*.js
+check_*.ts
+
+# =============================================================================
+# 💻 IDE E EDITORES
+# =============================================================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# WebStorm/IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+
+# =============================================================================
+# 🖥️ SISTEMA OPERACIONAL
+# =============================================================================
+
+# macOS
 .DS_Store
-Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
 
-# Documentation (não necessário em produção)
-DESIGN_SYSTEM.md
-SECURITY_FIXES.md
-SECURITY.md
-README.md
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# 📚 DOCUMENTAÇÃO TEMPORÁRIA
+# =============================================================================
+
+# Documentação que não deve ir para produção
+*.md
+!README.md
+!CHANGELOG.md
+!LICENSE
+!LICENSE.txt
+
+# =============================================================================
+# 🔧 FERRAMENTAS DE DESENVOLVIMENTO
+# =============================================================================
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettierignore
+
+# Stylelint
+.stylelintcache
+
+# =============================================================================
+# 📊 LOGS E TEMPORÁRIOS
+# =============================================================================
+
+# Logs
+logs/
+*.log
+*.log.*
+log_*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# 🎯 ESPECÍFICO DO FRONTEND
+# =============================================================================
+
+# Cache do Vite
+.vite/
+
+# Cache do Parcel
+.cache/
+.parcel-cache/
+
+# Cache do Next.js
+.next/
+out/
+
+# Cache do Nuxt.js
+.nuxt/
+dist/
+
+# Cache do Gatsby
+.cache/
+public/
+
+# =============================================================================
+# 🚨 REGRAS DE SEGURANÇA ADICIONAIS
+# =============================================================================
+
+# Qualquer arquivo que contenha dados pessoais
+*_personal*
+*_private*
+*_confidential*
+*_sensitive*
+
+# Arquivos de configuração de produção
+prod_*
+production_*
+staging_*
+
+# Arquivos de deploy específicos
+deploy_*
+deployment_*
+
+# =============================================================================
+# ⚠️ IMPORTANTE: NUNCA REMOVER ESTAS REGRAS!
+# =============================================================================
+# Este arquivo foi criado para proteger dados sensíveis do frontend
+# Se você precisar adicionar algo, consulte a equipe de segurança
+# NUNCA commite arquivos que contenham:
+# - Chaves de API do frontend
+# - Tokens de autenticação
+# - Configurações de produção
+# - Dados pessoais de usuários
+# - Credenciais de serviços externos

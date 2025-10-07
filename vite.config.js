@@ -16,6 +16,8 @@ export default defineConfig({
     sourcemap: false
   },
   server: {
+    host: '0.0.0.0',  // Aceitar conexões de qualquer IP
+    port: 5173,
     headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-XSS-Protection': '1; mode=block'
