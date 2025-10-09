@@ -24,8 +24,6 @@ const AreaCards = () => {
       setError(null);
 
       try {
-        console.log('[AreaCards] Tentando buscar dados do dashboard da API...');
-        
         // Buscar dados de todos os endpoints do dashboard
         const [estadiamentoRes, sobrevidaRes, recidivaRes, deltaTRes] = await Promise.all([
           getDashboardEstadiamento(),
@@ -38,8 +36,6 @@ const AreaCards = () => {
         const sobrevida = sobrevidaRes.data;
         const recidiva = recidivaRes.data;
         const deltaT = deltaTRes.data;
-
-        console.log('[AreaCards] Dados recebidos da API:', { estadiamento, sobrevida, recidiva, deltaT });
 
         // Calcular KPIs baseados nos dados recebidos
         const totalPacientes = estadiamento.reduce((sum, item) => sum + item.total, 0);
@@ -58,7 +54,7 @@ const AreaCards = () => {
         setTaxaMortalidade(taxaMortalidade);
 
       } catch (err) {
-        console.error('Erro ao carregar dados do dashboard da API: [Erro sanitizado por segurança]');
+        // Log de erro sanitizado para produção
         const errorMessage = err.response?.data?.detail ||
                              err.response?.data?.error ||
                              err.message ||

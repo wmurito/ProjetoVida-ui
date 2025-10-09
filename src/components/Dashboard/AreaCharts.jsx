@@ -42,8 +42,7 @@ const AreaCharts = () => {
         setChartData(chartData);
         setError(null);
       } catch (err) {
-        // Log seguro sem expor dados sensíveis
-        console.error('Erro ao carregar gráficos do dashboard');
+        // Log de erro sanitizado para produção
         
         // Sanitizar mensagem de erro antes de exibir
         const sanitizedMessage = sanitizeInput(err.message || 'Erro desconhecido');

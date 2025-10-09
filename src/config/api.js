@@ -31,7 +31,7 @@ export const createApiRequest = async (endpoint, options = {}) => {
     
     return await response.json();
   } catch (error) {
-    console.error('Erro na requisição:', error);
+    // Log de erro sanitizado para produção
     throw error;
   }
 };
