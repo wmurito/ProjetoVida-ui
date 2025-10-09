@@ -9,10 +9,9 @@ let lastErrorToast = null;
 let lastErrorTime = 0;
 const ERROR_TOAST_COOLDOWN = 5000; // 5 segundos
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://84i83ihklg.execute-api.us-east-1.amazonaws.com';
 
-// Debug: verificar a URL da API
-console.log('API URL configurada:', API_URL);
+// API URL configurada para produção
 
 // Inicializar proteção CSRF
 initCSRFProtection();
@@ -46,7 +45,7 @@ const checkAuthorization = async () => {
     
     return true;
   } catch (error) {
-    console.error('Erro de autorização:', sanitizeInput(error.message));
+    // Log de erro de autorização sanitizado
     return false;
   }
 };
@@ -65,9 +64,7 @@ export const getAuthToken = async () => {
     
     return null;
   } catch (error) {
-    if (!import.meta.env.PROD && error.name !== 'UserNotAuthenticatedException') {
-      console.error('[Auth] Erro de autenticação');
-    }
+    // Log de erro de autenticação sanitizado
     return null;
   }
 };
@@ -119,12 +116,7 @@ api.interceptors.response.use(
         showErrorToast('Erro na operação. Tente novamente.');
       }
       
-      // Log seguro do erro
-      console.error('[API Error]', {
-        status: error.response.status,
-        url: sanitizeInput(error.config?.url || ''),
-        method: error.config?.method?.toUpperCase()
-      });
+      // Log de erro sanitizado para produção
     } else {
       showErrorToast('Erro de conexão. Verifique sua internet.');
     }
@@ -138,12 +130,20 @@ export const getPacientes = async (skip = 0, limit = 100) => {
 };
 
 // Endpoints do Dashboard
-export const getDashboardGraficos = async () => {
-  return api.get(`/dashboard/graficos`);
+export const getDashboardEstadiamento = async () => {
+  return api.get(`/dashboard/estadiamento`);
 };
 
-export const getDashboardKpis = async () => {
-  return api.get(`/dashboard/kpis`);
+export const getDashboardSobrevida = async () => {
+  return api.get(`/dashboard/sobrevida`);
+};
+
+export const getDashboardRecidiva = async () => {
+  return api.get(`/dashboard/recidiva`);
+};
+
+export const getDashboardDeltaT = async () => {
+  return api.get(`/dashboard/delta_t`);
 };
 
 export default api;

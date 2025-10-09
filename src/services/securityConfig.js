@@ -2,28 +2,43 @@
 
 // Configuração de Content Security Policy (CSP)
 export const setupCSP = () => {
-  // Implementar CSP mais restritiva
-  const meta = document.createElement('meta');
-  meta.httpEquiv = 'Content-Security-Policy';
-  meta.content = `
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.amplify.aws;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: https://*.amazonaws.com;
-    connect-src 'self' http://localhost:8000 https://*.amazonaws.com wss://*.amazonaws.com;
-    frame-ancestors 'none';
-    form-action 'self';
-    upgrade-insecure-requests;
-    block-all-mixed-content;
-  `;
-  document.head.appendChild(meta);
-  
-  // Adicionar cabeçalhos de segurança adicionais
-  addSecurityHeaders();
-  
-  // Configurar detecção de inatividade
-  setupInactivityTimeout();
+  // Importar utilitários CSP
+  import('../utils/cspUtils.js').then(({ setupCSPWithNonces, applyNonceToInlineScripts }) => {
+    // Configurar CSP com nonces seguros
+    setupCSPWithNonces();
+    
+    // Aplicar nonces a elementos inline existentes
+    applyNonceToInlineScripts();
+    
+    // Adicionar cabeçalhos de segurança adicionais
+    addSecurityHeaders();
+    
+    // Configurar detecção de inatividade
+    setupInactivityTimeout();
+  }).catch(() => {
+    // Fallback para CSP sem nonces se houver erro
+    const meta = document.createElement('meta');
+    meta.httpEquiv = 'Content-Security-Policy';
+    meta.content = `
+      default-src 'self';
+      script-src 'self' https://cdn.amplify.aws;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https://*.amazonaws.com;
+      connect-src 'self' https://84i83ihklg.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
+      frame-ancestors 'none';
+      form-action 'self';
+      upgrade-insecure-requests;
+      block-all-mixed-content;
+    `;
+    document.head.appendChild(meta);
+    
+    // Adicionar cabeçalhos de segurança adicionais
+    addSecurityHeaders();
+    
+    // Configurar detecção de inatividade
+    setupInactivityTimeout();
+  });
 };
 
 // Adicionar cabeçalhos de segurança via meta tags

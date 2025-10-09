@@ -1,6 +1,6 @@
 // Configuração da API
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  BASE_URL: import.meta.env.VITE_API_URL || 'https://84i83ihklg.execute-api.us-east-1.amazonaws.com',
   TIMEOUT: 30000,
   HEADERS: {
     'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export const createApiRequest = async (endpoint, options = {}) => {
     
     return await response.json();
   } catch (error) {
-    console.error('Erro na requisição:', error);
+    // Log de erro sanitizado para produção
     throw error;
   }
 };
