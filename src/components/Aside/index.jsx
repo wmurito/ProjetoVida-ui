@@ -23,11 +23,16 @@ const Aside = ({ isClosed, $menuAberto }) => {
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      await signOut({ global: true });
+      localStorage.clear();
+      sessionStorage.clear();
       toast.success('Logout realizado com sucesso!');
       navigate('/login');
     } catch (error) {
+      localStorage.clear();
+      sessionStorage.clear();
       toast.error('Erro ao fazer logout. Tente novamente.');
+      navigate('/login');
     }
   };
 
