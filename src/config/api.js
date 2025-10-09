@@ -1,9 +1,7 @@
-// Configuração da API para desenvolvimento
+// Configuração da API
 export const API_CONFIG = {
-  BASE_URL: window.location.hostname === 'localhost' 
-    ? 'http://localhost:8000'
-    : 'http://192.168.2.101:8000',
-  TIMEOUT: 10000,
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  TIMEOUT: 30000,
   HEADERS: {
     'Content-Type': 'application/json',
   }
