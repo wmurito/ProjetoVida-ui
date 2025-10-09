@@ -9,7 +9,7 @@ let lastErrorToast = null;
 let lastErrorTime = 0;
 const ERROR_TOAST_COOLDOWN = 5000; // 5 segundos
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://84i83ihklg.execute-api.us-east-1.amazonaws.com';
 
 // Debug: verificar a URL da API
 console.log('API URL configurada:', API_URL);
@@ -138,12 +138,20 @@ export const getPacientes = async (skip = 0, limit = 100) => {
 };
 
 // Endpoints do Dashboard
-export const getDashboardGraficos = async () => {
-  return api.get(`/dashboard/graficos`);
+export const getDashboardEstadiamento = async () => {
+  return api.get(`/dashboard/estadiamento`);
 };
 
-export const getDashboardKpis = async () => {
-  return api.get(`/dashboard/kpis`);
+export const getDashboardSobrevida = async () => {
+  return api.get(`/dashboard/sobrevida`);
+};
+
+export const getDashboardRecidiva = async () => {
+  return api.get(`/dashboard/recidiva`);
+};
+
+export const getDashboardDeltaT = async () => {
+  return api.get(`/dashboard/delta_t`);
 };
 
 export default api;

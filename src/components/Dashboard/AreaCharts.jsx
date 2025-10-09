@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { getDashboardGraficos } from '../../services/api';
+import { getDashboardEstadiamento, getDashboardSobrevida, getDashboardRecidiva, getDashboardDeltaT } from '../../services/api';
 import { sanitizeInput } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
 
@@ -13,8 +13,33 @@ const AreaCharts = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getDashboardGraficos();
-        setChartData(response.data);
+        
+        // Buscar dados de todos os endpoints do dashboard
+        const [estadiamentoRes, sobrevidaRes, recidivaRes, deltaTRes] = await Promise.all([
+          getDashboardEstadiamento(),
+          getDashboardSobrevida(),
+          getDashboardRecidiva(),
+          getDashboardDeltaT()
+        ]);
+
+        const estadiamento = estadiamentoRes.data;
+        const sobrevida = sobrevidaRes.data;
+        const recidiva = recidivaRes.data;
+        const deltaT = deltaTRes.data;
+
+        // Preparar dados para os gráficos
+        const chartData = {
+          estadiamento: estadiamento,
+          sobrevida: sobrevida,
+          recidiva: recidiva,
+          deltaT: deltaT,
+          // Dados para gráficos de linha (exemplo)
+          months: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+          newPatients: [10, 15, 12, 18, 20, 16],
+          consultations: [25, 30, 28, 35, 40, 32]
+        };
+
+        setChartData(chartData);
         setError(null);
       } catch (err) {
         // Log seguro sem expor dados sensíveis

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './AreaCards.scss';
-import { getDashboardKpis } from '../../services/api'; // ❗ Importe a função do seu api.js
+import { getDashboardEstadiamento, getDashboardSobrevida, getDashboardRecidiva, getDashboardDeltaT } from '../../services/api';
 
 const AreaCards = () => {
   // Estados para cada KPI
@@ -24,31 +24,47 @@ const AreaCards = () => {
       setError(null);
 
       try {
-        console.log('[AreaCards] Tentando buscar KPIs da API...');
-        const response = await getDashboardKpis(); // Chama a função de api.js
-        const kpiData = response.data; // response.data já é o objeto DashboardKpiResponse
+        console.log('[AreaCards] Tentando buscar dados do dashboard da API...');
         
-        console.log('[AreaCards] KPIs recebidos da API:', kpiData);
+        // Buscar dados de todos os endpoints do dashboard
+        const [estadiamentoRes, sobrevidaRes, recidivaRes, deltaTRes] = await Promise.all([
+          getDashboardEstadiamento(),
+          getDashboardSobrevida(),
+          getDashboardRecidiva(),
+          getDashboardDeltaT()
+        ]);
 
-        // Atualiza os estados com os dados recebidos da API
-        // A verificação 'kpiData.nome_do_kpi !== undefined' é uma boa prática
-        // para evitar que um NaN ou undefined quebre o .toFixed() depois.
-        setTotalPacientes(kpiData.total_pacientes !== undefined ? kpiData.total_pacientes : 0);
-        setTotalObitos(kpiData.total_obitos !== undefined ? kpiData.total_obitos : 0);
-        setTaxaMortalidade(kpiData.taxa_mortalidade !== undefined ? kpiData.taxa_mortalidade : 0);
-        setIdadeMediaDiagnostico(kpiData.idade_media_diagnostico !== undefined ? kpiData.idade_media_diagnostico : 0);
-        setTamanhoMedioTumor(kpiData.tamanho_medio_tumor !== undefined ? kpiData.tamanho_medio_tumor : 0); // Confirmado
-        setMediaRiscoGail(kpiData.media_risco_gail !== undefined ? kpiData.media_risco_gail : 0);
-        setMediaRiscoTyrer(kpiData.media_risco_tyrer_cuzick !== undefined ? kpiData.media_risco_tyrer_cuzick : 0);
+        const estadiamento = estadiamentoRes.data;
+        const sobrevida = sobrevidaRes.data;
+        const recidiva = recidivaRes.data;
+        const deltaT = deltaTRes.data;
+
+        console.log('[AreaCards] Dados recebidos da API:', { estadiamento, sobrevida, recidiva, deltaT });
+
+        // Calcular KPIs baseados nos dados recebidos
+        const totalPacientes = estadiamento.reduce((sum, item) => sum + item.total, 0);
+        const totalObitos = sobrevida.find(item => item.status === 'Óbito')?.total || 0;
+        const taxaMortalidade = totalPacientes > 0 ? (totalObitos / totalPacientes) * 100 : 0;
+        
+        // Para idade média e tamanho médio, usar valores padrão por enquanto
+        // (esses dados precisariam vir de endpoints específicos)
+        setIdadeMediaDiagnostico(0);
+        setTamanhoMedioTumor(0);
+        setMediaRiscoGail(0);
+        setMediaRiscoTyrer(0);
+
+        setTotalPacientes(totalPacientes);
+        setTotalObitos(totalObitos);
+        setTaxaMortalidade(taxaMortalidade);
 
       } catch (err) {
-        console.error('Erro ao carregar KPIs da API: [Erro sanitizado por segurança]');
+        console.error('Erro ao carregar dados do dashboard da API: [Erro sanitizado por segurança]');
         const errorMessage = err.response?.data?.detail ||
                              err.response?.data?.error ||
                              err.message ||
-                             'Erro desconhecido ao buscar KPIs.';
+                             'Erro desconhecido ao buscar dados do dashboard.';
         setError(errorMessage);
-        // Opcional: resetar todos os KPIs para 0 ou valores padrão
+        // Resetar todos os KPIs para 0
         setTotalPacientes(0);
         setTotalObitos(0);
         setTaxaMortalidade(0);

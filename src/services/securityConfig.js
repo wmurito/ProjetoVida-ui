@@ -11,7 +11,7 @@ export const setupCSP = () => {
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: https://*.amazonaws.com;
-    connect-src 'self' http://localhost:8000 https://*.amazonaws.com wss://*.amazonaws.com;
+    connect-src 'self' https://84i83ihklg.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
     frame-ancestors 'none';
     form-action 'self';
     upgrade-insecure-requests;
