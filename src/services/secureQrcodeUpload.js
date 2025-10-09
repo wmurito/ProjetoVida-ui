@@ -1,8 +1,10 @@
-// src/services/qrcodeUpload.js
-// Serviço seguro para gerenciar upload via QR Code
-import { createApiRequest } from '../config/api';
+// 🔒 Serviço Seguro de Upload via QR Code
+// Implementa melhorias de segurança baseadas na análise
 
-class QRCodeUploadService {
+import api from './api';
+import { v4 as uuidv4 } from 'uuid';
+
+class SecureQRCodeUploadService {
   constructor() {
     this.sessionId = null;
     this.checkInterval = null;
@@ -11,11 +13,10 @@ class QRCodeUploadService {
   }
 
   /**
-   * Gera um sessionId seguro usando timestamp + random
-   * Em produção, usar UUID
+   * Gera um sessionId seguro usando UUID
    */
   generateSessionId() {
-    return `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `upload-${uuidv4()}`;
   }
 
   /**
@@ -69,36 +70,73 @@ class QRCodeUploadService {
   }
 
   /**
+   * Converte arquivo para base64 de forma segura
+   */
+  async fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+        try {
+          const result = reader.result;
+          
+          // Validar se é um data URL válido
+          if (!result.startsWith('data:')) {
+            reject(new Error('Formato de arquivo inválido'));
+            return;
+          }
+
+          // Verificar se tem dados
+          const parts = result.split(',');
+          if (parts.length !== 2) {
+            reject(new Error('Formato de dados inválido'));
+            return;
+          }
+
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Erro ao processar arquivo'));
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /**
    * Verifica status do upload no servidor
    */
   async checkUploadStatus() {
     try {
-      return await createApiRequest(`/upload-status/${this.sessionId}`, {
-        method: 'GET',
-      });
+      const response = await api.get(`/upload-status/${this.sessionId}`);
+      return response.data;
     } catch (error) {
-      if (error.message === '404') {
+      // Se for 404, arquivo ainda não chegou
+      if (error.response?.status === 404) {
         return null;
       }
+      
+      // Outros erros
       console.error('Erro ao verificar status do upload:', error);
       throw error;
     }
   }
 
   /**
-   * Cria uma nova sessão de upload no servidor
+   * Cria uma nova sessão de upload
    */
   async createUploadSession() {
     try {
-      const data = await createApiRequest('/create-upload-session', {
-        method: 'POST',
-      });
-      
-      this.sessionId = data.session_id;
+      const response = await api.post('/create-upload-session');
+      this.sessionId = response.data.session_id;
       return this.sessionId;
     } catch (error) {
-      console.error('Erro ao criar sessão:', error);
-      throw error;
+      console.error('Erro ao criar sessão de upload:', error);
+      throw new Error('Falha ao criar sessão de upload');
     }
   }
 
@@ -198,11 +236,7 @@ class QRCodeUploadService {
       throw new Error('Sessão não iniciada');
     }
     
-    // Para desenvolvimento local com celular, usar IP da máquina
-    const baseUrl = window.location.origin.includes('localhost') 
-      ? 'http://192.168.2.101:5173'  // IP local para acesso via celular
-      : window.location.origin;
-    
+    const baseUrl = window.location.origin;
     return `${baseUrl}/upload-mobile/${this.sessionId}`;
   }
 
@@ -227,4 +261,6 @@ class QRCodeUploadService {
   }
 }
 
-export default new QRCodeUploadService();
+// Exportar instância singleton
+export default new SecureQRCodeUploadService();
+

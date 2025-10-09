@@ -6,7 +6,7 @@ const lightPink = '#fce4ec';
 const textDark = '#333';
 const textLight = '#666';
 const borderColor = '#ddd';
-const dangerRed = '#f44336';
+const dangerRed = '#ff7bac';
 const successGreen = '#4CAF50';
 const greyButton = '#9e9e9e';
 

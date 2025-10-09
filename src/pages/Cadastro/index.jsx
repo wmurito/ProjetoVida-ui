@@ -123,7 +123,7 @@ const CadastroPacientePage = () => {
                                 <TabButton key={tab.key} type="button" $isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
                                     {tab.label}
                                     {getErrorCountForTab(tab.key) > 0 && (
-                                        <span style={{ marginLeft: '8px', backgroundColor: '#dc3545', color: 'white', borderRadius: '50%', padding: '2px 8px', fontSize: '0.75em' }}>
+                                        <span style={{ marginLeft: '8px', backgroundColor: '#ff7bac', color: 'white', borderRadius: '50%', padding: '2px 8px', fontSize: '0.75em' }}>
                                             {getErrorCountForTab(tab.key)}
                                         </span>
                                     )}

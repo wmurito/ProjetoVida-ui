@@ -64,7 +64,7 @@ export const EditButton = styled(ActionButton)`
 `;
 
 export const RemoveButton = styled(ActionButton)`
-    color: #dc3545;
+    color: #ff7bac;
 `;
 
 export const MemberInfo = styled.div`

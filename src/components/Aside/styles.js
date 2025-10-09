@@ -105,7 +105,7 @@ export const LogoutButton = styled.button`
   }
 
   &:hover {
-    background-color: rgba(255, 0, 0, 0.1);
-    color: #dc3545;
+    background-color: rgba(255, 123, 172, 0.1);
+    color: #ff7bac;
   }
 `;

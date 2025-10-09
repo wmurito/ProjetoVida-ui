@@ -161,7 +161,7 @@ export const RemoveButton = styled.button`
   padding: 5px;
 
   &:hover {
-    color: #dc3545;
+    color: #ff7bac;
   }
 `;
 
@@ -245,7 +245,7 @@ export const ApiErrorContainer = styled.div`
 `;
 
 export const ErrorText = styled.div`
-  color: #dc3545;
+  color: #ff7bac;
   font-size: 0.8em;
   margin-top: 5px;
 `;

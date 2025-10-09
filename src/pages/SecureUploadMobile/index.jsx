@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
@@ -12,7 +12,6 @@ const Container = styled.div`
   justify-content: center;
   padding: 20px;
   background: linear-gradient(135deg, #ff7bac 0%, #ff6ba0 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const Card = styled.div`
@@ -88,11 +87,67 @@ const FileName = styled.p`
   text-align: center;
 `;
 
-const UploadMobile = () => {
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-top: 15px;
+  overflow: hidden;
+`;
+
+const ProgressFill = styled.div`
+  height: 100%;
+  background: #ff7bac;
+  width: ${props => props.progress}%;
+  transition: width 0.3s ease;
+`;
+
+const ErrorMessage = styled.div`
+  color: #dc3545;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 15px;
+  font-size: 0.9rem;
+`;
+
+const SuccessMessage = styled.div`
+  color: #155724;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 15px;
+  font-size: 0.9rem;
+`;
+
+const FileInfo = styled.div`
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #666;
+`;
+
+const SecureUploadMobile = () => {
   const { sessionId } = useParams();
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  // Validar sessionId
+  useEffect(() => {
+    if (!sessionId || !sessionId.startsWith('upload-')) {
+      toast.error('Sessão inválida');
+      navigate('/');
+    }
+  }, [sessionId, navigate]);
 
   const validateFile = (selectedFile) => {
     const errors = [];
@@ -138,59 +193,96 @@ const UploadMobile = () => {
       const errors = validateFile(selectedFile);
       
       if (errors.length > 0) {
-        toast.error(errors.join('. '));
+        setError(errors.join('. '));
         setFile(null);
         return;
       }
 
+      setError(null);
       setFile(selectedFile);
     }
   };
 
   const handleUpload = async () => {
     if (!file) {
-      toast.error('Selecione um arquivo primeiro');
+      setError('Selecione um arquivo primeiro');
       return;
     }
 
     setUploading(true);
+    setProgress(0);
+    setError(null);
 
     try {
+      // Simular progresso
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
       const reader = new FileReader();
       reader.onload = async () => {
-        const fileData = {
-          fileName: file.name,
-          fileType: file.type,
-          fileData: reader.result
-        };
-        
-        // Enviar para o backend
-        await api.post(`/upload-mobile/${sessionId}`, fileData);
-        
-        toast.success('Arquivo enviado com sucesso!');
-        setTimeout(() => {
-          window.close();
-        }, 1500);
+        try {
+          const fileData = {
+            fileName: file.name,
+            fileType: file.type,
+            fileData: reader.result
+          };
+          
+          // Enviar para o backend
+          await api.post(`/upload-mobile/${sessionId}`, fileData);
+          
+          setProgress(100);
+          setSuccess(true);
+          toast.success('Arquivo enviado com sucesso!');
+          
+          setTimeout(() => {
+            window.close();
+          }, 2000);
+        } catch (error) {
+          clearInterval(progressInterval);
+          setProgress(0);
+          
+          if (error.response?.status === 404) {
+            setError('Sessão expirada. Tente novamente.');
+          } else if (error.response?.status === 413) {
+            setError('Arquivo muito grande.');
+          } else if (error.response?.status === 415) {
+            setError('Tipo de arquivo não suportado.');
+          } else {
+            setError('Erro ao enviar arquivo. Tente novamente.');
+          }
+          
+          setUploading(false);
+        }
       };
       
       reader.onerror = () => {
-        toast.error('Erro ao processar arquivo');
+        clearInterval(progressInterval);
+        setProgress(0);
+        setError('Erro ao processar arquivo');
         setUploading(false);
       };
       
       reader.readAsDataURL(file);
     } catch (error) {
-      if (error.response?.status === 404) {
-        toast.error('Sessão expirada. Tente novamente.');
-      } else if (error.response?.status === 413) {
-        toast.error('Arquivo muito grande.');
-      } else if (error.response?.status === 415) {
-        toast.error('Tipo de arquivo não suportado.');
-      } else {
-        toast.error('Erro ao enviar arquivo. Tente novamente.');
-      }
+      setProgress(0);
+      setError('Erro inesperado. Tente novamente.');
       setUploading(false);
     }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
@@ -198,17 +290,6 @@ const UploadMobile = () => {
       <Card>
         <Title>📄 Enviar Termo de Consentimento</Title>
         <Subtitle>Selecione o arquivo assinado do seu dispositivo</Subtitle>
-        <div style={{ 
-          marginBottom: '20px', 
-          padding: '10px', 
-          backgroundColor: '#e3f2fd', 
-          borderRadius: '8px',
-          fontSize: '0.9rem',
-          color: '#1976d2',
-          textAlign: 'center'
-        }}>
-          ⚠️ Formatos aceitos: PDF, JPG, PNG (máximo 5MB)
-        </div>
         
         <FileLabel htmlFor="file-upload">
           {file ? '✓ Arquivo selecionado' : '📎 Toque para selecionar arquivo'}
@@ -218,19 +299,36 @@ const UploadMobile = () => {
           type="file" 
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleFileChange}
+          disabled={uploading}
         />
         
-        {file && <FileName>{file.name}</FileName>}
+        {file && (
+          <FileInfo>
+            <div><strong>Nome:</strong> {file.name}</div>
+            <div><strong>Tamanho:</strong> {formatFileSize(file.size)}</div>
+            <div><strong>Tipo:</strong> {file.type}</div>
+          </FileInfo>
+        )}
+        
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        {success && <SuccessMessage>Arquivo enviado com sucesso!</SuccessMessage>}
+        
+        {uploading && (
+          <ProgressBar>
+            <ProgressFill progress={progress} />
+          </ProgressBar>
+        )}
         
         <UploadButton 
           onClick={handleUpload} 
-          disabled={!file || uploading}
+          disabled={!file || uploading || success}
         >
-          {uploading ? 'Enviando...' : 'Enviar Arquivo'}
+          {uploading ? 'Enviando...' : success ? 'Enviado!' : 'Enviar Arquivo'}
         </UploadButton>
       </Card>
     </Container>
   );
 };
 
-export default UploadMobile;
+export default SecureUploadMobile;
+

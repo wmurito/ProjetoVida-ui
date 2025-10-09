@@ -67,7 +67,7 @@ export const FileInputLabel = styled.label`
     margin-bottom: 15px;
 
     &:hover {
-        border-color: #e91e63;
+        border-color: #ff7bac;
         background-color: #fce4ec;
     }
 `;
@@ -130,17 +130,26 @@ export const QRCodeContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
+    padding: 25px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
     margin: 20px 0;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #ff7bac;
+    box-shadow: 0 4px 12px rgba(255, 123, 172, 0.1);
+    animation: fadeIn 0.3s ease-in;
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 `;
 
 export const QRCodeTitle = styled.h3`
     margin: 0 0 15px 0;
-    color: #333;
-    font-size: 1rem;
+    color: #ff7bac;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
 `;
 
 export const UploadOption = styled.div`

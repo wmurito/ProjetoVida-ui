@@ -11,6 +11,9 @@ const ERROR_TOAST_COOLDOWN = 5000; // 5 segundos
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+// Debug: verificar a URL da API
+console.log('API URL configurada:', API_URL);
+
 // Inicializar proteção CSRF
 initCSRFProtection();
 
@@ -69,50 +72,18 @@ export const getAuthToken = async () => {
   }
 };
 
-// Interceptor para adicionar token de autenticação e CSRF
+// Interceptor para adicionar token de autenticação
 api.interceptors.request.use(
   async (config) => {
-    // Verificar autorização antes de fazer a requisição
-    const isAuthorized = await checkAuthorization();
-    if (!isAuthorized) {
-      throw new Error('Não autorizado');
-    }
-
     // Adicionar token de autenticação
     const token = await getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Adicionar token CSRF para métodos não seguros
-    if (['post', 'put', 'delete', 'patch'].includes(config.method?.toLowerCase())) {
-      config.headers = addCSRFToken(config.headers);
-    }
-    
-    // Sanitizar parâmetros de consulta
-    if (config.params) {
-      Object.keys(config.params).forEach(key => {
-        if (typeof config.params[key] === 'string') {
-          config.params[key] = sanitizeInput(config.params[key]);
-        }
-      });
-    }
-    
-    // Sanitizar dados de requisição
-    if (config.data && typeof config.data === 'object') {
-      Object.keys(config.data).forEach(key => {
-        if (typeof config.data[key] === 'string') {
-          config.data[key] = sanitizeInput(config.data[key]);
-        }
-      });
-    }
-    
     return config;
   },
   (error) => {
-    if (!import.meta.env.PROD) {
-      console.error('[API] Erro na requisição:', sanitizeInput(error.message));
-    }
     return Promise.reject(error);
   }
 );
@@ -161,45 +132,18 @@ api.interceptors.response.use(
   }
 );
 
-// Endpoints de Pacientes com verificação de autorização
+// Endpoints de Pacientes
 export const getPacientes = async (skip = 0, limit = 100) => {
-  try {
-    const isAuthorized = await checkAuthorization();
-    if (!isAuthorized) {
-      throw new Error('Não autorizado para acessar dados de pacientes');
-    }
-    return api.get(`/pacientes/?skip=${skip}&limit=${limit}`);
-  } catch (error) {
-    console.error('Erro ao buscar pacientes:', sanitizeInput(error.message));
-    throw error;
-  }
+  return api.get(`/pacientes/?skip=${skip}&limit=${limit}`);
 };
 
-// Endpoints do Dashboard com verificação de autorização
+// Endpoints do Dashboard
 export const getDashboardGraficos = async () => {
-  try {
-    const isAuthorized = await checkAuthorization();
-    if (!isAuthorized) {
-      throw new Error('Não autorizado para acessar dashboard');
-    }
-    return api.get(`/dashboard/graficos`);
-  } catch (error) {
-    console.error('Erro ao buscar gráficos:', sanitizeInput(error.message));
-    throw error;
-  }
+  return api.get(`/dashboard/graficos`);
 };
 
 export const getDashboardKpis = async () => {
-  try {
-    const isAuthorized = await checkAuthorization();
-    if (!isAuthorized) {
-      throw new Error('Não autorizado para acessar KPIs');
-    }
-    return api.get(`/dashboard/kpis`);
-  } catch (error) {
-    console.error('Erro ao buscar KPIs:', sanitizeInput(error.message));
-    throw error;
-  }
+  return api.get(`/dashboard/kpis`);
 };
 
 export default api;

@@ -41,7 +41,7 @@ const FamilyMembersList = ({ members, onEdit, onRemove }) => {
                             <Button type="button" onClick={() => onEdit(member, index)} style={{ padding: '5px 10px', fontSize: '0.8rem', marginRight: '10px' }}>
                                 Editar
                             </Button>
-                            <Button type="button" onClick={() => onRemove(index)} style={{ padding: '5px 10px', fontSize: '0.8rem', background: '#dc3545', borderColor: '#dc3545' }}>
+                            <Button type="button" onClick={() => onRemove(index)} style={{ padding: '5px 10px', fontSize: '0.8rem', background: '#ff7bac', borderColor: '#ff7bac' }}>
                                 Remover
                             </Button>
                         </div>
