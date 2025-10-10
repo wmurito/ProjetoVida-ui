@@ -61,15 +61,13 @@ export const initialState = {
   // --- IDENTIFICAÇÃO E DADOS SOCIAIS ---
   nome_completo: '',
   data_nascimento: '',
-  cpf: '',
-  prontuario: '',
   genero: '',
   estado_civil: '',
   cor_etnia: '',
   escolaridade: '',
   renda_familiar: '',
   naturalidade: '',
-  profissao: '',
+  endereco: '',
   cep: '',
   logradouro: '',
   numero: '',
@@ -78,7 +76,6 @@ export const initialState = {
   cidade: '',
   uf: '',
   telefone: '',
-  email: '',
   altura: '',
   peso: '',
   imc: '',
@@ -86,26 +83,23 @@ export const initialState = {
 
   // --- HISTÓRIA PATOLÓGICA PREGRESSA ---
   historia_patologica: {
-    comorbidades: {
-      has: false,
-      diabetes: false,
-      hipertensao: false,
-      doenca_cardiaca: false,
-      doenca_renal: false,
-      doenca_pulmonar: false,
-      doenca_figado: false,
-      avc: false,
-      outra: '',
-    },
-    neoplasia_previa: {
-      has: false,
-      qual: '',
-      idade_diagnostico: '',
-    },
-    biopsia_mamaria_previa: {
-      has: false,
-      resultado: '',
-    },
+    has: false,
+    diabetes: false,
+    hipertensao: false,
+    hipotireoidismo: false,
+    ansiedade: false,
+    depressao: false,
+    doenca_cardiaca: false,
+    doenca_renal: false,
+    doenca_pulmonar: false,
+    doenca_figado: false,
+    avc: false,
+    outra: '',
+    neoplasia_previa: false,
+    qual_neoplasia: '',
+    idade_diagnostico_neoplasia: '',
+    biopsia_mamaria_previa: false,
+    resultado_biopsia: '',
   },
   
   // --- HISTÓRIA FAMILIAR ---
@@ -121,6 +115,7 @@ export const initialState = {
     tabagismo_carga: '',
     tabagismo_tempo_anos: '',
     etilismo: 'nao',
+    etilismo_dose_diaria: '',
     etilismo_tempo_anos: '',
     atividade_fisica: 'nao',
     tipo_atividade: '',
@@ -141,6 +136,7 @@ export const initialState = {
     idade_menopausa: '',
     uso_trh: false,
     tempo_uso_trh: '',
+    tipo_terapia: '',
     uso_aco: false,
     tempo_uso_aco: '',
   },
@@ -172,8 +168,10 @@ export const initialState = {
   tratamento: tratamentoInitialState,
   desfecho: {
     status_vital: '',
+    morte: false,
     data_morte: '',
     causa_morte: '',
+    metastase_ocorreu: false,
     recidiva_local: false,
     data_recidiva_local: '',
     cirurgia_recidiva_local: '',
@@ -197,8 +195,6 @@ export const validationSchema = yup.object().shape({
   // --- Aba: Identificação ---
   nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
   data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
-  cpf: yup.string().required('O CPF é obrigatório'),
-  prontuario: yup.string().required('O prontuário é obrigatório'),
   genero: yup.string().required('O gênero é obrigatório'),
   cep: yup.string().required('O CEP é obrigatório'),
   logradouro: yup.string().required('O logradouro é obrigatório'),
@@ -207,7 +203,6 @@ export const validationSchema = yup.object().shape({
   cidade: yup.string().required('A cidade é obrigatória'),
   uf: yup.string().required('O UF é obrigatório'),
   telefone: yup.string().required('O telefone é obrigatório'),
-  email: yup.string().email('Formato de e-mail inválido').required('O e-mail é obrigatório'),
 
   // --- Aba: Histórico (Exemplos de validações condicionais) ---
   historia_patologica: yup.object().shape({
@@ -272,8 +267,6 @@ export const errorFieldToTabMap = {
   // --- Aba: Identificação ---
   nome_completo: 'identificacao',
   data_nascimento: 'identificacao',
-  cpf: 'identificacao',
-  prontuario: 'identificacao',
   genero: 'identificacao',
   cep: 'identificacao',
   logradouro: 'identificacao',
