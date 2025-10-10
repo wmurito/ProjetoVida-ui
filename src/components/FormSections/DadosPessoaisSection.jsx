@@ -23,16 +23,6 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                     {errors.data_nascimento && <ErrorText>{errors.data_nascimento}</ErrorText>}
                 </FieldContainer>
                 <FieldContainer style={{ gridColumn: 'span 2' }}>
-                    <InputLabel htmlFor="cpf">CPF</InputLabel>
-                    <StyledInput id="cpf" name="cpf" value={formData.cpf} onChange={handleChange} placeholder="000.000.000-00" />
-                    {errors.cpf && <ErrorText>{errors.cpf}</ErrorText>}
-                </FieldContainer>
-                <FieldContainer style={{ gridColumn: 'span 2' }}>
-                    <InputLabel htmlFor="prontuario">Prontuário</InputLabel>
-                    <StyledInput id="prontuario" name="prontuario" value={formData.prontuario} onChange={handleChange} />
-                    {errors.prontuario && <ErrorText>{errors.prontuario}</ErrorText>}
-                </FieldContainer>
-                <FieldContainer style={{ gridColumn: 'span 2' }}>
                     <InputLabel htmlFor="telefone">Telefone</InputLabel>
                     <StyledInput id="telefone" name="telefone" type="tel" value={formData.telefone} onChange={handleChange} placeholder="11999998888" />
                     {errors.telefone && <ErrorText>{errors.telefone}</ErrorText>}
@@ -81,11 +71,6 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                     <StyledInput id="cidade" name="cidade" value={formData.cidade} onChange={handleChange} />
                     {errors.cidade && <ErrorText>{errors.cidade}</ErrorText>}
                 </FieldContainer>
-                <FieldContainer style={{ gridColumn: 'span 3' }}>
-                    <InputLabel htmlFor="email">E-mail</InputLabel>
-                    <StyledInput id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="exemplo@email.com" />
-                    {errors.email && <ErrorText>{errors.email}</ErrorText>}
-                </FieldContainer>
 
                 <FieldContainer style={{ gridColumn: 'span 1' }}>
                     <InputLabel htmlFor="genero">Gênero</InputLabel>
@@ -110,11 +95,6 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                         <option value="nao_informado">Não informado</option>
                     </StyledSelect>
                     {errors.estado_civil && <ErrorText>{errors.estado_civil}</ErrorText>}
-                </FieldContainer>
-                <FieldContainer style={{ gridColumn: 'span 2' }}>
-                    <InputLabel htmlFor="profissao">Profissão</InputLabel>
-                    <StyledInput id="profissao" name="profissao" value={formData.profissao} onChange={handleChange} />
-                    {errors.profissao && <ErrorText>{errors.profissao}</ErrorText>}
                 </FieldContainer>
                 <FieldContainer style={{ gridColumn: 'span 2' }}>
                     <InputLabel htmlFor="naturalidade">Naturalidade</InputLabel>

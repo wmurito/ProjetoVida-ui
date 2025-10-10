@@ -61,15 +61,12 @@ export const initialState = {
   // --- IDENTIFICAÇÃO E DADOS SOCIAIS ---
   nome_completo: '',
   data_nascimento: '',
-  cpf: '',
-  prontuario: '',
   genero: '',
   estado_civil: '',
   cor_etnia: '',
   escolaridade: '',
   renda_familiar: '',
   naturalidade: '',
-  profissao: '',
   endereco: '',
   cep: '',
   logradouro: '',
@@ -79,7 +76,6 @@ export const initialState = {
   cidade: '',
   uf: '',
   telefone: '',
-  email: '',
   altura: '',
   peso: '',
   imc: '',
@@ -199,8 +195,6 @@ export const validationSchema = yup.object().shape({
   // --- Aba: Identificação ---
   nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
   data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
-  cpf: yup.string().required('O CPF é obrigatório'),
-  prontuario: yup.string().required('O prontuário é obrigatório'),
   genero: yup.string().required('O gênero é obrigatório'),
   cep: yup.string().required('O CEP é obrigatório'),
   logradouro: yup.string().required('O logradouro é obrigatório'),
@@ -209,7 +203,6 @@ export const validationSchema = yup.object().shape({
   cidade: yup.string().required('A cidade é obrigatória'),
   uf: yup.string().required('O UF é obrigatório'),
   telefone: yup.string().required('O telefone é obrigatório'),
-  email: yup.string().email('Formato de e-mail inválido').required('O e-mail é obrigatório'),
 
   // --- Aba: Histórico (Exemplos de validações condicionais) ---
   historia_patologica: yup.object().shape({
@@ -274,8 +267,6 @@ export const errorFieldToTabMap = {
   // --- Aba: Identificação ---
   nome_completo: 'identificacao',
   data_nascimento: 'identificacao',
-  cpf: 'identificacao',
-  prontuario: 'identificacao',
   genero: 'identificacao',
   cep: 'identificacao',
   logradouro: 'identificacao',
