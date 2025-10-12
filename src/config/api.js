@@ -9,6 +9,10 @@ export const API_CONFIG = {
 
 // Função para criar uma instância de fetch sem interceptors
 export const createApiRequest = async (endpoint, options = {}) => {
+  // Validar endpoint para prevenir SSRF
+  if (!endpoint.startsWith('/')) {
+    throw new Error('Endpoint inválido');
+  }
   const url = `${API_CONFIG.BASE_URL}${endpoint}`;
   const config = {
     ...options,

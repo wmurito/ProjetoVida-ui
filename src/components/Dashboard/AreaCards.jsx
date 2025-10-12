@@ -54,12 +54,8 @@ const AreaCards = () => {
         setTaxaMortalidade(taxaMortalidade);
 
       } catch (err) {
-        // Log de erro sanitizado para produção
-        const errorMessage = err.response?.data?.detail ||
-                             err.response?.data?.error ||
-                             err.message ||
-                             'Erro desconhecido ao buscar dados do dashboard.';
-        setError(errorMessage);
+        console.error('Erro ao carregar KPIs:', err);
+        setError('Erro ao carregar dados. Tente novamente.');
         // Resetar todos os KPIs para 0
         setTotalPacientes(0);
         setTotalObitos(0);
