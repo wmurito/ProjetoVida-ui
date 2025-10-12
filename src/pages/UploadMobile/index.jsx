@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import api from '../../services/api';
+import { validateFile, fileToBase64 } from '../../services/uploadService';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -89,106 +88,46 @@ const FileName = styled.p`
 `;
 
 const UploadMobile = () => {
-  const { sessionId } = useParams();
-  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  const validateFile = (selectedFile) => {
-    const errors = [];
-
-    // Validar tipo MIME
-    const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-    if (!validTypes.includes(selectedFile.type)) {
-      errors.push('Formato inválido. Use PDF, JPG ou PNG');
-    }
-
-    // Validar tamanho (5MB)
-    if (selectedFile.size > 5 * 1024 * 1024) {
-      errors.push('Arquivo muito grande. Máximo 5MB');
-    }
-
-    // Validar nome do arquivo
-    if (!selectedFile.name || selectedFile.name.length > 255) {
-      errors.push('Nome do arquivo inválido');
-    }
-
-    // Verificar caracteres perigosos
-    const dangerousChars = ['..', '/', '\\', '<', '>', ':', '"', '|', '?', '*'];
-    if (dangerousChars.some(char => selectedFile.name.includes(char))) {
-      errors.push('Nome do arquivo contém caracteres inválidos');
-    }
-
-    // Verificar extensão
-    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png'];
-    const hasValidExtension = allowedExtensions.some(ext => 
-      selectedFile.name.toLowerCase().endsWith(ext)
-    );
-    
-    if (!hasValidExtension) {
-      errors.push('Extensão de arquivo não permitida');
-    }
-
-    return errors;
-  };
-
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      const errors = validateFile(selectedFile);
-      
-      if (errors.length > 0) {
-        toast.error(errors.join('. '));
-        setFile(null);
-        return;
-      }
-
-      setFile(selectedFile);
+    if (!selectedFile) return;
+    
+    const validation = validateFile(selectedFile);
+    if (!validation.isValid) {
+      toast.error(validation.errors.join('. '));
+      setFile(null);
+      return;
     }
+    
+    setFile(selectedFile);
   };
 
   const handleUpload = async () => {
     if (!file) {
-      toast.error('Selecione um arquivo primeiro');
+      toast.error('Selecione um arquivo');
       return;
     }
-
+    
     setUploading(true);
-
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const fileData = {
-          fileName: file.name,
-          fileType: file.type,
-          fileData: reader.result
-        };
-        
-        // Enviar para o backend
-        await api.post(`/upload-mobile/${sessionId}`, fileData);
-        
-        toast.success('Arquivo enviado com sucesso!');
-        setTimeout(() => {
-          window.close();
-        }, 1500);
-      };
+      const base64 = await fileToBase64(file);
       
-      reader.onerror = () => {
-        toast.error('Erro ao processar arquivo');
-        setUploading(false);
-      };
+      // Salvar no localStorage para o desktop recuperar
+      localStorage.setItem('termo_upload', JSON.stringify({
+        fileName: file.name,
+        fileType: file.type,
+        fileData: base64,
+        timestamp: Date.now()
+      }));
       
-      reader.readAsDataURL(file);
+      toast.success('Termo enviado! Pode fechar esta janela.');
+      setTimeout(() => window.close(), 2000);
     } catch (error) {
-      if (error.response?.status === 404) {
-        toast.error('Sessão expirada. Tente novamente.');
-      } else if (error.response?.status === 413) {
-        toast.error('Arquivo muito grande.');
-      } else if (error.response?.status === 415) {
-        toast.error('Tipo de arquivo não suportado.');
-      } else {
-        toast.error('Erro ao enviar arquivo. Tente novamente.');
-      }
+      toast.error('Erro ao processar arquivo');
+    } finally {
       setUploading(false);
     }
   };
@@ -198,6 +137,8 @@ const UploadMobile = () => {
       <Card>
         <Title>📄 Enviar Termo de Consentimento</Title>
         <Subtitle>Selecione o arquivo assinado do seu dispositivo</Subtitle>
+        
+        
         <div style={{ 
           marginBottom: '20px', 
           padding: '10px', 

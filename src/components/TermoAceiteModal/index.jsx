@@ -6,7 +6,7 @@ import {
     ContinueButton, ErrorMessage, ButtonGroup, CancelButton,
     QRCodeContainer, QRCodeTitle, UploadOption, OrDivider
 } from './styles';
-import qrcodeUploadService from '../../services/qrcodeUpload';
+import { validateFile } from '../../services/uploadService';
 
 const TermoAceiteModal = ({ isOpen, onConfirm, onCancel, termoAceito, setTermoAceito, arquivoTermo, setArquivoTermo, erroTermo }) => {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -15,32 +15,31 @@ const TermoAceiteModal = ({ isOpen, onConfirm, onCancel, termoAceito, setTermoAc
 
     useEffect(() => {
         if (isOpen && showQRCode) {
-            console.log('Iniciando sessão de upload via QR Code...');
+            const uploadUrl = `${window.location.origin}/upload-termo-mobile`;
+            setQrCodeUrl(uploadUrl);
             
-            qrcodeUploadService.startSession(
-                (file) => {
-                    console.log('✅ Arquivo recebido via QR Code:', file.name);
-                    setArquivoTermo(file);
-                    setShowQRCode(false);
-                },
-                (errors) => {
-                    console.error('❌ Erro no upload via QR Code:', errors);
+            // Verificar localStorage a cada 2 segundos
+            const interval = setInterval(() => {
+                const stored = localStorage.getItem('termo_upload');
+                if (stored) {
+                    try {
+                        const data = JSON.parse(stored);
+                        // Converter base64 para File
+                        fetch(data.fileData)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                const file = new File([blob], data.fileName, { type: data.fileType });
+                                setArquivoTermo(file);
+                                setShowQRCode(false);
+                                localStorage.removeItem('termo_upload');
+                            });
+                    } catch (e) {
+                        console.error('Erro ao processar arquivo:', e);
+                    }
                 }
-            ).then((sessionId) => {
-                const url = qrcodeUploadService.getUploadUrl();
-                console.log('✅ Sessão criada:', sessionId);
-                console.log('📱 URL do QR Code:', url);
-                setQrCodeUrl(url);
-            }).catch((error) => {
-                console.error('❌ Erro ao iniciar sessão:', error);
-                alert('Erro ao gerar QR Code. Verifique se o backend está rodando.');
-                setShowQRCode(false);
-            });
-
-            return () => {
-                console.log('Finalizando sessão de upload');
-                qrcodeUploadService.endSession();
-            };
+            }, 2000);
+            
+            return () => clearInterval(interval);
         }
     }, [isOpen, showQRCode, setArquivoTermo]);
 
@@ -48,21 +47,19 @@ const TermoAceiteModal = ({ isOpen, onConfirm, onCancel, termoAceito, setTermoAc
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setArquivoTermo(file);
+        if (!file) return;
+        
+        const validation = validateFile(file);
+        if (!validation.isValid) {
+            alert(validation.errors.join('. '));
+            return;
         }
+        
+        setArquivoTermo(file);
     };
 
-    const toggleQRCode = async () => {
-        if (showQRCode) {
-            setShowQRCode(false);
-            setQrCodeUrl('');
-        } else {
-            setLoading(true);
-            setShowQRCode(true);
-            // O useEffect cuidará da criação da sessão
-            setTimeout(() => setLoading(false), 1000);
-        }
+    const toggleQRCode = () => {
+        setShowQRCode(!showQRCode);
     };
 
     return (
