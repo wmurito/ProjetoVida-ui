@@ -146,4 +146,8 @@ export const getDashboardDeltaT = async () => {
   return api.get(`/dashboard/delta_t`);
 };
 
+export const getDashboardEstatisticasTemporais = async () => {
+  return api.get(`/dashboard/estatisticas_temporais`);
+};
+
 export default api;

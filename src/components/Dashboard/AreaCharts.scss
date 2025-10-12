@@ -1,3 +1,33 @@
+.area-charts {
+  width: 100%;
+  margin: 10px 0;
+
+  .metric-card.chart-card {
+    &.chart-full-width {
+      width: 100%;
+      margin-bottom: 20px;
+      min-height: 400px;
+    }
+
+    .card-content {
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: calc(100% - 40px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .metric-card.chart-card {
+      &.chart-full-width {
+        width: 100%;
+        min-width: 100%;
+      }
+    }
+  }
+}
+
 .dashboard-container {
   padding: 10px;
   background-color: #f5f7fa;
