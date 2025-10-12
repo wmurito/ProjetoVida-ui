@@ -2,7 +2,7 @@ import api, { getAuthToken } from '../../services/api';
 import { validationSchema } from './formConfig';
 
 const toDateOrNull = (dateString) => {
-    if (!dateString) return null;
+    if (!dateString || dateString === '' || dateString === 'Invalid Date') return null;
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? null : date.toISOString().split('T')[0];
 };

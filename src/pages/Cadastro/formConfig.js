@@ -169,14 +169,14 @@ export const initialState = {
   desfecho: {
     status_vital: '',
     morte: false,
-    data_morte: '',
+    data_morte: null,
     causa_morte: '',
     metastase_ocorreu: false,
     recidiva_local: false,
-    data_recidiva_local: '',
+    data_recidiva_local: null,
     cirurgia_recidiva_local: '',
     recidiva_regional: false,
-    data_recidiva_regional: '',
+    data_recidiva_regional: null,
     cirurgia_recidiva_regional: '',
     metastases: [],
   },
@@ -232,20 +232,40 @@ export const validationSchema = yup.object().shape({
   historia_doenca: yup.object().shape({
     sinal_sintoma_principal: yup.string().required('O sinal/sintoma principal é obrigatório'),
     data_sintomas: yup.date().required('A data dos primeiros sintomas é obrigatória').typeError('Forneça uma data válida').nullable(),
-    idade_diagnostico: yup.number().required('A idade ao diagnóstico é obrigatória').typeError('Deve ser um número').positive(),
+    idade_diagnostico: yup.number()
+      .transform((value, originalValue) => originalValue === '' ? undefined : value)
+      .required('A idade ao diagnóstico é obrigatória')
+      .typeError('Deve ser um número')
+      .positive('Deve ser um número positivo'),
     lado_acometido: yup.string().required('O lado acometido é obrigatório'),
   }),
 
 
+  // --- Aba: Modelos Preditores de Risco ---
+  modelos_preditores: yup.object().shape({
+    score_tyrer_cuzick: yup.number()
+      .transform((value, originalValue) => originalValue === '' ? null : value)
+      .nullable()
+      .typeError('Deve ser um número válido'),
+    score_canrisk: yup.number()
+      .transform((value, originalValue) => originalValue === '' ? null : value)
+      .nullable()
+      .typeError('Deve ser um número válido'),
+    score_gail: yup.number()
+      .transform((value, originalValue) => originalValue === '' ? null : value)
+      .nullable()
+      .typeError('Deve ser um número válido'),
+  }),
+
   // --- Aba: Tratamento e Evolução ---
   desfecho: yup.object().shape({
-      data_morte: yup.date().nullable().when('status_vital', {
-          is: 'morto',
+      data_morte: yup.date().nullable().when('morte', {
+          is: true,
           then: (schema) => schema.required('A data do óbito é obrigatória').typeError('Forneça uma data válida'),
           otherwise: (schema) => schema.notRequired(),
       }),
-      causa_morte: yup.string().when('status_vital', {
-          is: 'morto',
+      causa_morte: yup.string().when('morte', {
+          is: true,
           then: (schema) => schema.required('A causa da morte é obrigatória'),
           otherwise: (schema) => schema.notRequired(),
       }),
@@ -290,6 +310,9 @@ export const errorFieldToTabMap = {
   'historia_doenca.lado_acometido': 'dadosClinicos',
   'histologia.tipo_histologico': 'dadosClinicos',
   'histologia.grau_histologico': 'dadosClinicos',
+  'modelos_preditores.score_tyrer_cuzick': 'dadosClinicos',
+  'modelos_preditores.score_canrisk': 'dadosClinicos',
+  'modelos_preditores.score_gail': 'dadosClinicos',
 
   // --- Aba: Tratamento ---
   'tratamento': 'tratamento',

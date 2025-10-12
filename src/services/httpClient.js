@@ -90,7 +90,10 @@ const isValidApiUrl = (url) => {
     }
     
     // Verificar se é um endpoint válido (lista restritiva)
-    const validPaths = ['/api/patients', '/api/auth', '/api/dashboard'];
+    const validPaths = [
+      '/api/patients', '/api/auth', '/api/dashboard',
+      '/dashboard/', '/pacientes/', '/auth/', '/upload-'
+    ];
     const isValidPath = validPaths.some(path => {
       const pathRegex = new RegExp(`^${path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/.*)?$`);
       return pathRegex.test(urlObj.pathname);
