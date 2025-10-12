@@ -15,26 +15,37 @@ export const ModalOverlay = styled.div`
 
 export const ModalContent = styled.div`
     background: white;
-    padding: 30px;
     border-radius: 10px;
     width: 90%;
-    max-width: min(90vw, 600px);
+    max-width: 600px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
     text-align: center;
 `;
 
 export const ModalHeader = styled.div`
-    margin-bottom: 20px;
+    padding: 20px 30px;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
     h2 {
         margin: 0;
         color: #333;
+        font-size: 1.3rem;
     }
 `;
 
 export const ModalBody = styled.div`
+    padding: 20px 30px;
+    overflow-y: auto;
+    flex: 1;
+    
     p {
         text-align: justify;
         color: #555;
-        line-height: 1.6;
+        line-height: 1.5;
+        font-size: 0.9rem;
+        margin: 10px 0;
     }
 `;
 
@@ -42,13 +53,13 @@ export const CheckboxLabel = styled.label`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 25px 0;
-    font-size: 1.1rem;
+    margin: 15px 0;
+    font-size: 1rem;
     cursor: pointer;
     
     input {
         margin-right: 10px;
-        transform: scale(1.3);
+        transform: scale(1.2);
     }
 `;
 
@@ -58,13 +69,13 @@ export const FileInput = styled.input`
 
 export const FileInputLabel = styled.label`
     display: block;
-    padding: 12px 20px;
+    padding: 10px 15px;
     border: 2px dashed #ccc;
     border-radius: 8px;
     background-color: #f9f9f9;
     cursor: pointer;
     transition: all 0.2s;
-    margin-bottom: 15px;
+    font-size: 0.9rem;
 
     &:hover {
         border-color: #ff7bac;
@@ -78,18 +89,19 @@ export const ErrorMessage = styled.p`
     margin: 10px 0;
 `;
 
-// NOVO: Container para os botões
 export const ButtonGroup = styled.div`
     display: flex;
     gap: 15px;
-    margin-top: 25px;
+    padding: 20px 30px;
+    border-top: 1px solid #eee;
+    background: white;
+    flex-shrink: 0;
 `;
 
-// NOVO: Estilo para o botão de cancelar/voltar
 export const CancelButton = styled.button`
-    flex: 1; /* Ocupa metade do espaço */
-    padding: 15px;
-    font-size: 1.1rem;
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
     font-weight: bold;
     color: #333;
     background-color: #f0f0f0;
@@ -103,11 +115,10 @@ export const CancelButton = styled.button`
     }
 `;
 
-// AJUSTE: ContinueButton agora ocupa a outra metade
 export const ContinueButton = styled.button`
     flex: 1;
-    padding: 15px;
-    font-size: 1.1rem;
+    padding: 12px;
+    font-size: 1rem;
     font-weight: bold;
     color: white;
     background-color: #4CAF50;
@@ -130,10 +141,10 @@ export const QRCodeContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 25px;
+    padding: 15px;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 12px;
-    margin: 20px 0;
+    margin: 15px 0;
     border: 2px solid #ff7bac;
     box-shadow: 0 4px 12px rgba(255, 123, 172, 0.1);
     animation: fadeIn 0.3s ease-in;
@@ -145,9 +156,9 @@ export const QRCodeContainer = styled.div`
 `;
 
 export const QRCodeTitle = styled.h3`
-    margin: 0 0 15px 0;
+    margin: 0 0 10px 0;
     color: #ff7bac;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     text-align: center;
 `;
@@ -160,9 +171,10 @@ export const OrDivider = styled.div`
     display: flex;
     align-items: center;
     text-align: center;
-    margin: 20px 0;
+    margin: 15px 0;
     color: #999;
     font-weight: 600;
+    font-size: 0.9rem;
     
     &::before,
     &::after {

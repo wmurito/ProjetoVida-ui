@@ -70,7 +70,7 @@ const App = () => {
           path="/login"
           element={!logged ? <Login /> : <Navigate to="/dashboard" replace />}
         />
-        <Route path="/upload-mobile/:sessionId" element={<UploadMobile />} />
+        <Route path="/upload-termo-mobile" element={<UploadMobile />} />
         <Route
           path="/"
           element={logged ? <Layout /> : <Navigate to="/login" replace />}
