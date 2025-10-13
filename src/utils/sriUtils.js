@@ -5,9 +5,9 @@
 
 // Hashes SRI para recursos conhecidos
 export const SRI_HASHES = {
-  // Google Fonts - Roboto
+  // Google Fonts - Roboto (SRI temporariamente desabilitado)
   'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap': 
-    'sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3',
+    null, // SRI desabilitado temporariamente
   
   // AWS Amplify CDN (exemplo - deve ser atualizado conforme versão)
   'https://cdn.amplify.aws/aws-amplify/6.14.4/aws-amplify.min.js':
