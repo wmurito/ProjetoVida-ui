@@ -1,0 +1,23 @@
+{
+  "low": true,
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "allowlist": [],
+  "skip-dev": false,
+  "report-type": "summary",
+  "output-format": "text",
+  "config": {
+    "npm": {
+      "audit-level": "moderate",
+      "skip-dev": false
+    }
+  },
+  "exceptions": [],
+  "advisories": [],
+  "whitelist": [],
+  "report-type": "summary",
+  "output-format": "text",
+  "retry-count": 3,
+  "retry-delay": 1000
+}

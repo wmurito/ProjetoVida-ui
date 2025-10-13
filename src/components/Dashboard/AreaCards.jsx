@@ -54,7 +54,10 @@ const AreaCards = () => {
         setTaxaMortalidade(taxaMortalidade);
 
       } catch (err) {
-        console.error('Erro ao carregar KPIs:', err);
+        // Log seguro para produção
+        if (import.meta.env.DEV) {
+          console.error('Erro ao carregar KPIs:', err);
+        }
         setError('Erro ao carregar dados. Tente novamente.');
         // Resetar todos os KPIs para 0
         setTotalPacientes(0);

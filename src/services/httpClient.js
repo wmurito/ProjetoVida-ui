@@ -40,7 +40,10 @@ httpClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('Request error:', sanitizeLog(error.message));
+    // Log seguro para produção
+    if (import.meta.env.DEV) {
+      console.error('Request error:', sanitizeLog(error.message));
+    }
     return Promise.reject(error);
   }
 );
@@ -58,7 +61,10 @@ httpClient.interceptors.response.use(
   },
   (error) => {
     // Log sanitizado do erro
-    console.error('Response error:', sanitizeLog(error.message));
+    // Log seguro para produção
+    if (import.meta.env.DEV) {
+      console.error('Response error:', sanitizeLog(error.message));
+    }
 
     // Tratar erros específicos
     if (error.response?.status === 401) {

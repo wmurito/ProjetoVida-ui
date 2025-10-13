@@ -14,7 +14,7 @@ console.log('API_BASE_URL:', API_BASE_URL);
 
 // Verificar se há alguma configuração hardcoded
 const hardcodedUrls = [
-  'https://84i83ihklg.execute-api.us-east-1.amazonaws.com'
+  'https://pteq15e8a6.execute-api.us-east-1.amazonaws.com'
 ];
 
 console.log('🔍 URLs encontradas:');

@@ -1,0 +1,133 @@
+# Configurações de Segurança para AWS Amplify
+# Este arquivo define headers de segurança e configurações de produção
+
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Verificar se variáveis de ambiente estão configuradas
+        - echo "Verificando variáveis de ambiente..."
+        - |
+          if [ -z "$VITE_AWS_USER_POOL_ID" ]; then
+            echo "ERRO: VITE_AWS_USER_POOL_ID não configurado"
+            exit 1
+          fi
+        - |
+          if [ -z "$VITE_AWS_USER_POOL_CLIENT_ID" ]; then
+            echo "ERRO: VITE_AWS_USER_POOL_CLIENT_ID não configurado"
+            exit 1
+          fi
+        - |
+          if [ -z "$VITE_API_URL" ]; then
+            echo "ERRO: VITE_API_URL não configurado"
+            exit 1
+          fi
+        # Instalar dependências
+        - npm ci
+        # Auditoria de segurança
+        - npm audit --audit-level moderate
+        # Verificar vulnerabilidades conhecidas
+        - npx audit-ci --config audit-ci.json
+    build:
+      commands:
+        # Build com configurações de segurança
+        - npm run build
+        # Verificar se build foi bem-sucedido
+        - |
+          if [ ! -d "dist" ]; then
+            echo "ERRO: Build falhou - diretório dist não encontrado"
+            exit 1
+          fi
+        # Verificar se arquivos sensíveis não foram incluídos
+        - |
+          if find dist -name "*.env*" -o -name "*secret*" -o -name "*key*" | grep -q .; then
+            echo "ERRO: Arquivos sensíveis encontrados no build"
+            exit 1
+          fi
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .npm/**/*
+
+# Headers de segurança para produção
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      # Segurança básica
+      - key: 'Strict-Transport-Security'
+        value: 'max-age=31536000; includeSubDomains; preload'
+      - key: 'X-Content-Type-Options'
+        value: 'nosniff'
+      - key: 'X-Frame-Options'
+        value: 'DENY'
+      - key: 'X-XSS-Protection'
+        value: '1; mode=block'
+      - key: 'Referrer-Policy'
+        value: 'strict-origin-when-cross-origin'
+      - key: 'Permissions-Policy'
+        value: 'camera=(), microphone=(), geolocation=(), payment=()'
+      # Cache control para dados sensíveis
+      - key: 'Cache-Control'
+        value: 'no-store, no-cache, must-revalidate, proxy-revalidate'
+      - key: 'Pragma'
+        value: 'no-cache'
+      - key: 'Expires'
+        value: '0'
+  # Headers específicos para arquivos estáticos
+  - pattern: '**/*.js'
+    headers:
+      - key: 'Content-Type'
+        value: 'application/javascript; charset=utf-8'
+      - key: 'Cache-Control'
+        value: 'public, max-age=31536000, immutable'
+  - pattern: '**/*.css'
+    headers:
+      - key: 'Content-Type'
+        value: 'text/css; charset=utf-8'
+      - key: 'Cache-Control'
+        value: 'public, max-age=31536000, immutable'
+  - pattern: '**/*.html'
+    headers:
+      - key: 'Content-Type'
+        value: 'text/html; charset=utf-8'
+      - key: 'Cache-Control'
+        value: 'no-store, no-cache, must-revalidate'
+  # Headers para imagens
+  - pattern: '**/*.{jpg,jpeg,png,gif,svg,webp}'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=31536000, immutable'
+
+# Configurações de redirecionamento
+redirects:
+  # Redirecionar HTTP para HTTPS
+  - source: 'http://<domain>'
+    target: 'https://<domain>'
+    status: '301'
+  # Redirecionar www para domínio principal
+  - source: 'https://www.<domain>'
+    target: 'https://<domain>'
+    status: '301'
+  # Redirecionar rotas não encontradas para index.html (SPA)
+  - source: '/<*>'
+    target: '/index.html'
+    status: '200'
+
+# Configurações de ambiente
+environment:
+  variables:
+    # Configurações de build
+    NODE_ENV: production
+    NODE_OPTIONS: '--max-old-space-size=4096'
+    # Configurações de segurança
+    VITE_SECURE_COOKIES: 'true'
+    VITE_ENABLE_CSP: 'true'
+    VITE_ENABLE_SRI: 'true'
+    # Configurações de logging
+    VITE_LOG_LEVEL: 'error'
+    VITE_ENABLE_DEBUG: 'false'

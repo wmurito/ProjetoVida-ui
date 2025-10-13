@@ -2,30 +2,35 @@
 
 // Configuração de Content Security Policy (CSP)
 export const setupCSP = () => {
-  // Importar utilitários CSP
+  // Importar utilitários CSP e SRI
   import('../utils/cspUtils.js').then(({ setupCSPWithNonces, applyNonceToInlineScripts }) => {
-    // Configurar CSP com nonces seguros
-    setupCSPWithNonces();
-    
-    // Aplicar nonces a elementos inline existentes
-    applyNonceToInlineScripts();
-    
-    // Adicionar cabeçalhos de segurança adicionais
-    addSecurityHeaders();
-    
-    // Configurar detecção de inatividade
-    setupInactivityTimeout();
+    return import('../utils/sriUtils.js').then(({ applySriToExternalResources }) => {
+      // Configurar CSP com nonces seguros
+      setupCSPWithNonces();
+      
+      // Aplicar nonces a elementos inline existentes
+      applyNonceToInlineScripts();
+      
+      // Aplicar SRI a recursos externos
+      applySriToExternalResources();
+      
+      // Adicionar cabeçalhos de segurança adicionais
+      addSecurityHeaders();
+      
+      // Configurar detecção de inatividade
+      setupInactivityTimeout();
+    });
   }).catch(() => {
     // Fallback para CSP sem nonces se houver erro
     const meta = document.createElement('meta');
     meta.httpEquiv = 'Content-Security-Policy';
     meta.content = `
       default-src 'self';
-      script-src 'self' https://cdn.amplify.aws;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      script-src 'self' 'nonce-${window.__CSP_NONCE__ || 'fallback'}' https://cdn.amplify.aws;
+      style-src 'self' 'nonce-${window.__CSP_NONCE__ || 'fallback'}' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https://*.amazonaws.com;
-      connect-src 'self' https://*.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
+      connect-src 'self' https://pteq15e8a6.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
       frame-ancestors 'none';
       form-action 'self';
       upgrade-insecure-requests;
@@ -58,9 +63,9 @@ const addSecurityHeaders = () => {
   });
 };
 
-// Configurar timeout por inatividade (15 minutos)
+// Configurar timeout por inatividade (10 minutos)
 export const setupInactivityTimeout = () => {
-  const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutos
+  const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutos
   let inactivityTimer;
 
   const resetTimer = () => {
