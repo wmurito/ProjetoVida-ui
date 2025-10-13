@@ -10,14 +10,14 @@ export const PRODUCTION_SECURITY_CONFIG = {
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()'
   },
 
-  // CSP mais restritiva para produção
+  // CSP mais restritiva para produção com nonces
   CSP_POLICY: `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.amplify.aws;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    script-src 'self' 'nonce-${window.__CSP_NONCE__ || 'fallback'}' https://cdn.amplify.aws;
+    style-src 'self' 'nonce-${window.__CSP_NONCE__ || 'fallback'}' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: https://*.amazonaws.com;
-    connect-src 'self' https://*.amazonaws.com wss://*.amazonaws.com;
+    connect-src 'self' https://pteq15e8a6.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
     frame-ancestors 'none';
     form-action 'self';
     upgrade-insecure-requests;
@@ -33,8 +33,8 @@ export const PRODUCTION_SECURITY_CONFIG = {
 
   // Timeouts de segurança
   TIMEOUTS: {
-    SESSION: 15 * 60 * 1000, // 15 minutos
+    SESSION: 10 * 60 * 1000, // 10 minutos
     CSRF_TOKEN: 30 * 60 * 1000, // 30 minutos
-    INACTIVITY: 10 * 60 * 1000 // 10 minutos
+    INACTIVITY: 8 * 60 * 1000 // 8 minutos
   }
 };

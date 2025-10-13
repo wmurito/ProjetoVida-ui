@@ -1,6 +1,6 @@
 import requests
 
-url = "https://84i83ihklg.execute-api.us-east-1.amazonaws.com/"
+url = "https://pteq15e8a6.execute-api.us-east-1.amazonaws.com/"
 headers = {'Origin': 'https://master.d1yi28nqqe44f2.amplifyapp.com'}
 
 try:

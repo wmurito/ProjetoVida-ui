@@ -5,7 +5,7 @@ export const API_ENDPOINTS = {
   DASHBOARD: import.meta.env.VITE_API_DASHBOARD_ENDPOINT || '/api/dashboard'
 };
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://84i83ihklg.execute-api.us-east-1.amazonaws.com';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pteq15e8a6.execute-api.us-east-1.amazonaws.com';
 
 export const VALIDATION_RULES = {
   NAME_MIN_LENGTH: 2,

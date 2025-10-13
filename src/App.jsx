@@ -37,11 +37,14 @@ const App = () => {
     if (logged && currentUser && !import.meta.env.PROD) {
       getPacientes()
         .catch(error => {
-          console.error('Erro ao carregar dados iniciais:', {
-            message: sanitizeInput(error.message || 'Erro desconhecido'),
-            timestamp: new Date().toISOString(),
-            user: sanitizeInput(currentUser.username || 'unknown')
-          });
+          // Log seguro para produção
+          if (import.meta.env.DEV) {
+            console.error('Erro ao carregar dados iniciais:', {
+              message: sanitizeInput(error.message || 'Erro desconhecido'),
+              timestamp: new Date().toISOString(),
+              user: sanitizeInput(currentUser.username || 'unknown')
+            });
+          }
           toast.error('Erro ao carregar dados iniciais. Alguns recursos podem não funcionar corretamente.');
         });
     }
