@@ -21,8 +21,11 @@
 # Configurações sensíveis
 config.local.js
 settings.local.js
+src/aws-exports.js
 aws-exports.js
 aws-config.js
+amplifyconfiguration.json
+amplifyconfiguration.dart
 
 # Chaves e tokens
 *.key

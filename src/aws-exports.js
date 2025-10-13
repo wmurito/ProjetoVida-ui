@@ -1,9 +1,9 @@
 const awsConfig = {
     Auth: {
         Cognito: {
-            region: 'us-east-1', // sua região
-            userPoolId: 'us-east-1_h48q7uFnQ', // ID do User Pool
-            userPoolClientId: 'q902jjsdui59k28qk0g3s9o3v', // App Client ID
+            region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+            userPoolId: import.meta.env.VITE_AWS_USER_POOL_ID,
+            userPoolClientId: import.meta.env.VITE_AWS_USER_POOL_CLIENT_ID,
             loginWith: {
                 email: true
             }
