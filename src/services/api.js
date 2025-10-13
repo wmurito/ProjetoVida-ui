@@ -22,9 +22,11 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'X-Content-Type-Options': 'nosniff',
     'X-XSS-Protection': '1; mode=block',
-    'Referrer-Policy': 'strict-origin-when-cross-origin'
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'X-Requested-With': 'XMLHttpRequest'
   },
-  withCredentials: true
+  withCredentials: true,
+  timeout: 30000
 });
 
 // Função para verificar autorização
@@ -72,10 +74,12 @@ export const getAuthToken = async () => {
 // Interceptor para adicionar token de autenticação
 api.interceptors.request.use(
   async (config) => {
-    // Adicionar token de autenticação
-    const token = await getAuthToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Não adicionar Authorization para requisições OPTIONS (preflight)
+    if (config.method?.toUpperCase() !== 'OPTIONS') {
+      const token = await getAuthToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     
     return config;
