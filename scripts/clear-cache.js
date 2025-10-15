@@ -95,3 +95,4 @@ console.log('- Firefox: F12 → Network → Settings → Disable cache');
 console.log('- Safari: Develop → Empty Caches');
 
 console.log('\n✅ Limpeza concluída!');
+
