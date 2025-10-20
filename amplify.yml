@@ -6,6 +6,10 @@ frontend:
         - npm install
     build:
       commands:
+        - echo "VITE_API_URL=$VITE_API_URL" >> .env.production
+        - echo "VITE_AWS_REGION=$VITE_AWS_REGION" >> .env.production
+        - echo "VITE_AWS_USER_POOL_ID=$VITE_AWS_USER_POOL_ID" >> .env.production
+        - echo "VITE_AWS_USER_POOL_CLIENT_ID=$VITE_AWS_USER_POOL_CLIENT_ID" >> .env.production
         - npm run build
   artifacts:
     baseDirectory: dist

@@ -9,9 +9,9 @@ let lastErrorToast = null;
 let lastErrorTime = 0;
 const ERROR_TOAST_COOLDOWN = 5000; // 5 segundos
 
-const API_URL = 'https://pteq15e8a6.execute-api.us-east-1.amazonaws.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://pteq15e8a6.execute-api.us-east-1.amazonaws.com';
 
-// API URL configurada para produção
+// API URL configurada via variável de ambiente
 
 // Inicializar proteção CSRF
 initCSRFProtection();
