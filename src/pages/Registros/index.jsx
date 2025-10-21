@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPacientes } from '../../services/api';
+import { getPacientes, testPacientesEndpoint } from '../../services/api';
 import { sanitizeInput } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
 import EditModal from '../../components/ModalsPaciente/EditModal';
@@ -36,14 +36,29 @@ const Registros = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getPacientes();
-      setPacientes(response.data || []);
+      
+      console.log('Iniciando carregamento de pacientes...');
+      const response = await getPacientes(0, 100);
+      
+      console.log('Dados recebidos:', response.data);
+      const pacientesData = response.data || [];
+      
+      // Verificar se os dados estão no formato esperado
+      if (Array.isArray(pacientesData)) {
+        setPacientes(pacientesData);
+        console.log(`${pacientesData.length} pacientes carregados com sucesso`);
+      } else {
+        console.warn('Formato de dados inesperado:', pacientesData);
+        setPacientes([]);
+      }
+      
     } catch (err) {
       // Log seguro com sanitização
       console.error('Erro ao carregar pacientes:', {
         message: sanitizeInput(err.message || 'Erro desconhecido'),
         timestamp: new Date().toISOString(),
-        status: err.response?.status
+        status: err.response?.status,
+        data: err.response?.data
       });
       
       // Tratamento específico de erros
@@ -71,9 +86,9 @@ const Registros = () => {
   };
 
   const filteredPacientes = pacientes.filter(paciente =>
-    paciente.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    paciente.cpf?.includes(searchTerm) ||
-    paciente.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    paciente.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    paciente.telefone?.includes(searchTerm) ||
+    paciente.cidade?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const openModal = (paciente, type) => {
@@ -96,6 +111,23 @@ const Registros = () => {
     } catch (error) {
       console.error('Erro ao salvar paciente:', sanitizeInput(error.message));
       toast.error('Erro ao salvar alterações. Tente novamente.');
+    }
+  };
+
+  const handleTestEndpoint = async () => {
+    try {
+      console.log('Testando endpoint de pacientes...');
+      const response = await testPacientesEndpoint();
+      
+      if (response.data.status === 'success') {
+        toast.success(`Teste bem-sucedido! ${response.data.total_pacientes} pacientes encontrados na tabela.`);
+        console.log('Dados do teste:', response.data);
+      } else {
+        toast.error(`Erro no teste: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Erro no teste de endpoint:', error);
+      toast.error('Erro ao testar endpoint. Verifique o console para mais detalhes.');
     }
   };
 
@@ -125,11 +157,14 @@ const Registros = () => {
         <SearchContainer>
           <SearchInput
             type="text"
-            placeholder="Buscar por nome, CPF ou email..."
+            placeholder="Buscar por nome, telefone ou cidade..."
             value={searchTerm}
             onChange={handleSearch}
-            maxLength={100} // Limitar entrada
+            maxLength={100}
           />
+          <ActionButton onClick={handleTestEndpoint} style={{ marginLeft: '10px' }}>
+            Testar Conexão
+          </ActionButton>
         </SearchContainer>
       </Header>
 
@@ -142,18 +177,18 @@ const Registros = () => {
           <TableHeader>
             <TableRow>
               <TableCell>Nome</TableCell>
-              <TableCell>CPF</TableCell>
-              <TableCell>Email</TableCell>
+              <TableCell>Data Nascimento</TableCell>
+              <TableCell>Cidade</TableCell>
               <TableCell>Telefone</TableCell>
               <TableCell>Ações</TableCell>
             </TableRow>
           </TableHeader>
           <tbody>
             {filteredPacientes.map((paciente) => (
-              <TableRow key={paciente.id}>
-                <TableCell>{sanitizeInput(paciente.nome || '')}</TableCell>
-                <TableCell>{sanitizeInput(paciente.cpf || '')}</TableCell>
-                <TableCell>{sanitizeInput(paciente.email || '')}</TableCell>
+              <TableRow key={paciente.id_paciente}>
+                <TableCell>{sanitizeInput(paciente.nome_completo || '')}</TableCell>
+                <TableCell>{paciente.data_nascimento ? new Date(paciente.data_nascimento).toLocaleDateString('pt-BR') : ''}</TableCell>
+                <TableCell>{sanitizeInput(paciente.cidade || '')}</TableCell>
                 <TableCell>{sanitizeInput(paciente.telefone || '')}</TableCell>
                 <TableCell>
                   <ActionButton onClick={() => openModal(paciente, 'view')}>

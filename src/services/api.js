@@ -130,7 +130,28 @@ api.interceptors.response.use(
 
 // Endpoints de Pacientes
 export const getPacientes = async (skip = 0, limit = 100) => {
-  return api.get(`/pacientes/?skip=${skip}&limit=${limit}`);
+  try {
+    console.log(`Fazendo requisição para: /pacientes/?skip=${skip}&limit=${limit}`);
+    const response = await api.get(`/pacientes/?skip=${skip}&limit=${limit}`);
+    console.log(`Resposta recebida: ${response.data?.length || 0} pacientes`);
+    return response;
+  } catch (error) {
+    console.error('Erro na requisição getPacientes:', error);
+    throw error;
+  }
+};
+
+// Endpoint de teste para verificar conexão com tabela PACIENTE
+export const testPacientesEndpoint = async () => {
+  try {
+    console.log('Testando endpoint de pacientes...');
+    const response = await api.get('/pacientes/test');
+    console.log('Teste de endpoint:', response.data);
+    return response;
+  } catch (error) {
+    console.error('Erro no teste de endpoint:', error);
+    throw error;
+  }
 };
 
 // Endpoints do Dashboard
