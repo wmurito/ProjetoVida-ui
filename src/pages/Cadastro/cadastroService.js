@@ -58,8 +58,8 @@ const formatDataForApi = (formData) => {
 
     return data;
 };
-export const submitCadastro = async (formData, arquivoTermo) => {
-    // 1. Validação (Lembre-se de atualizar o schema)
+export const submitCadastro = async (formData) => {
+    // 1. Validação
     await validationSchema.validate(formData, { abortEarly: false });
 
     // 2. Autenticação
@@ -68,17 +68,12 @@ export const submitCadastro = async (formData, arquivoTermo) => {
 
     // 3. Transformação dos dados
     const dataToSubmit = formatDataForApi(formData);
-    
-    // 4. Montagem do FormData
-    const dadosFormulario = new FormData();
-    dadosFormulario.append('termo_consentimento', arquivoTermo);
-    dadosFormulario.append('data', JSON.stringify(dataToSubmit));
 
-    // 5. Chamada à API
-    const response = await api.post('/pacientes', dadosFormulario, {
+    // 4. Chamada à API
+    const response = await api.post('/pacientes', dataToSubmit, {
         headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
         }
     });
     

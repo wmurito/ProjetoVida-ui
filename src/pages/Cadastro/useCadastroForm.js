@@ -78,7 +78,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
     }, []);
 
     // Função de salvar com validação integrada
-    const handleSave = async (arquivoTermo) => {
+    const handleSave = async () => {
         setErrors({});
         setIsLoading(true);
         setSuccessMessage('');
@@ -86,7 +86,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         try {
             await validationSchema.validate(formData, { abortEarly: false });
             
-            await submitCadastro(formData, arquivoTermo);
+            await submitCadastro(formData);
             
             setSuccessMessage('Paciente cadastrado com sucesso! Redirecionando...');
             toast.success('Paciente cadastrado com sucesso!');
