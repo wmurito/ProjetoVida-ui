@@ -83,8 +83,11 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         setIsLoading(true);
         setSuccessMessage('');
 
+        console.log('Dados do formulário antes da validação:', formData);
+
         try {
             await validationSchema.validate(formData, { abortEarly: false });
+            console.log('Validação passou com sucesso!');
             
             await submitCadastro(formData);
             
@@ -98,14 +101,18 @@ export const useCadastroForm = (setActiveTab, navigate) => {
                 const validationErrors = {};
                 let firstErrorTab = null;
 
+                console.log('Erros de validação encontrados:', err.inner);
+
                 err.inner.forEach(error => {
                     validationErrors[error.path] = error.message;
+                    console.log(`Erro no campo: ${error.path} - ${error.message}`);
                     if (!firstErrorTab) {
                         firstErrorTab = errorFieldToTabMap[error.path];
                     }
                 });
                 
                 setErrors(validationErrors);
+                console.log('Todos os erros:', validationErrors);
                 toast.error('Por favor, corrija os erros indicados no formulário.');
 
                 if (firstErrorTab) {
@@ -113,6 +120,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
                 }
             } else { // Erro de API ou outro erro inesperado
                 console.error("Erro no cadastro:", err);
+                console.error("Detalhes do erro:", err.message, err.stack);
                 toast.error(err.message || 'Ocorreu um erro ao salvar. Tente novamente.');
             }
         } finally {

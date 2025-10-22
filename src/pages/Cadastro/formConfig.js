@@ -203,29 +203,10 @@ export const validationSchema = yup.object().shape({
   uf: yup.string().required('O UF é obrigatório'),
   telefone: yup.string().required('O telefone é obrigatório'),
 
-  // --- Aba: Histórico (Exemplos de validações condicionais) ---
-  historia_patologica: yup.object().shape({
-    neoplasia_previa: yup.object().shape({
-        qual: yup.string().when('has', {
-            is: true,
-            then: (schema) => schema.required('Qual neoplasia prévia é obrigatório'),
-            otherwise: (schema) => schema.notRequired(),
-        }),
-    }),
-  }),
+  // --- Aba: Histórico (Opcional) ---
+  historia_patologica: yup.object().notRequired(),
 
-  habitos_vida: yup.object().shape({
-    tabagismo_carga: yup.string().when('tabagismo', {
-        is: (val) => val !== 'nao',
-        then: (schema) => schema.required('A carga tabágica é obrigatória'),
-        otherwise: (schema) => schema.notRequired(),
-    }),
-    tabagismo_tempo_anos: yup.string().when('tabagismo', {
-        is: (val) => val !== 'nao',
-        then: (schema) => schema.required('O tempo de tabagismo é obrigatório'),
-        otherwise: (schema) => schema.notRequired(),
-    })
-  }),
+  habitos_vida: yup.object().notRequired(),
 
   // --- Aba: Dados Clínicos ---
   historia_doenca: yup.object().shape({
