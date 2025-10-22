@@ -231,7 +231,8 @@ const SecureUploadMobile = () => {
           const fileData = {
             fileName: file.name,
             fileType: file.type,
-            fileData: reader.result
+            fileData: reader.result,
+            paciente_id: 'temp'
           };
           
           // Enviar para o backend

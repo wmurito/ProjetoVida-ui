@@ -7,41 +7,58 @@ import {
     QRCodeContainer, QRCodeTitle, UploadOption, OrDivider
 } from './styles';
 import { validateFile } from '../../services/uploadService';
+import api from '../../services/api';
 
 const TermoAceiteModal = ({ isOpen, onConfirm, onCancel, termoAceito, setTermoAceito, arquivoTermo, setArquivoTermo, erroTermo }) => {
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [showQRCode, setShowQRCode] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [sessionId, setSessionId] = useState(null);
 
     useEffect(() => {
-        if (isOpen && showQRCode) {
-            const uploadUrl = `${window.location.origin}/upload-termo-mobile`;
-            setQrCodeUrl(uploadUrl);
-            
-            // Verificar localStorage a cada 2 segundos
-            const interval = setInterval(() => {
-                const stored = localStorage.getItem('termo_upload');
-                if (stored) {
-                    try {
-                        const data = JSON.parse(stored);
-                        // Converter base64 para File
-                        fetch(data.fileData)
-                            .then(res => res.blob())
-                            .then(blob => {
-                                const file = new File([blob], data.fileName, { type: data.fileType });
-                                setArquivoTermo(file);
-                                setShowQRCode(false);
-                                localStorage.removeItem('termo_upload');
-                            });
-                    } catch (e) {
-                        console.error('Erro ao processar arquivo:', e);
+        if (isOpen && showQRCode && !sessionId) {
+            createUploadSession();
+        }
+    }, [isOpen, showQRCode]);
+
+    useEffect(() => {
+        if (sessionId) {
+            const interval = setInterval(async () => {
+                try {
+                    const response = await api.get(`/upload-status/${sessionId}`);
+                    if (response.data) {
+                        const { fileName, fileType, fileData } = response.data;
+                        const blob = await fetch(fileData).then(res => res.blob());
+                        const file = new File([blob], fileName, { type: fileType });
+                        setArquivoTermo(file);
+                        setShowQRCode(false);
+                        setSessionId(null);
                     }
+                } catch (error) {
+                    // Arquivo ainda não foi enviado
                 }
             }, 2000);
             
             return () => clearInterval(interval);
         }
-    }, [isOpen, showQRCode, setArquivoTermo]);
+    }, [sessionId, setArquivoTermo]);
+
+    const createUploadSession = async () => {
+        setLoading(true);
+        try {
+            const response = await api.post('/create-upload-session');
+            const { session_id } = response.data;
+            setSessionId(session_id);
+            const uploadUrl = `${window.location.origin}/secure-upload/${session_id}`;
+            setQrCodeUrl(uploadUrl);
+        } catch (error) {
+            console.error('Erro ao criar sessão:', error);
+            alert('Erro ao gerar QR Code. Tente novamente.');
+            setShowQRCode(false);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -59,7 +76,12 @@ const TermoAceiteModal = ({ isOpen, onConfirm, onCancel, termoAceito, setTermoAc
     };
 
     const toggleQRCode = () => {
-        setShowQRCode(!showQRCode);
+        if (showQRCode) {
+            setShowQRCode(false);
+            setSessionId(null);
+        } else {
+            setShowQRCode(true);
+        }
     };
 
     return (
