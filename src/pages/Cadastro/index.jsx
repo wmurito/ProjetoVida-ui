@@ -11,7 +11,7 @@ import { errorFieldToTabMap, tabs } from './formConfig';
 // Componentes Reutilizáveis e de Seção
 import FamilyMemberModal from '../../components/FamilyMemberModal';
 import MetastaseModal from '../../components/MetastaseModal';
-import TermoAceiteModal from '../../components/TermoAceiteModal';
+
 import CirurgiaModal from '../../components/CirurgiaModal';
 import DadosPessoaisSection from '../../components/FormSections/DadosPessoaisSection';
 import HistoriaPatologicaSection from '../../components/FormSections/HistoriaPatologicaSection';
@@ -44,25 +44,11 @@ const CadastroPacientePage = () => {
         handleSubmitMember, handleSubmitMetastase, handleSubmitCirurgia,
     } = useCadastroModals(setFormData);
     
-    const [termoAceito, setTermoAceito] = useState(false);
-    const [arquivoTermo, setArquivoTermo] = useState(null);
-    const [erroTermo, setErroTermo] = useState('');
-    const [acessoLiberado, setAcessoLiberado] = useState(false);
-    
-    const handleConfirmarAceite = () => {
-        if (!termoAceito || !arquivoTermo) { 
-            setErroTermo('É necessário aceitar os termos e anexar o arquivo.'); 
-            return; 
-        }
-        setErroTermo(''); 
-        setAcessoLiberado(true);
-    };
-    
-    const handleCancelarAceite = () => navigate(-1);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await handleSave(arquivoTermo);
+        await handleSave();
     };
     
     const handleRemoveMember = (indexToRemove) => {
@@ -97,10 +83,6 @@ const CadastroPacientePage = () => {
     return (
         <Container>
             <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
-            <TermoAceiteModal isOpen={!acessoLiberado} onConfirm={handleConfirmarAceite} onCancel={handleCancelarAceite} termoAceito={termoAceito} setTermoAceito={setTermoAceito} arquivoTermo={arquivoTermo} setArquivoTermo={setArquivoTermo} erroTermo={erroTermo} />
-
-            {acessoLiberado && (
-                <>
                     <FamilyMemberModal isOpen={modalState.isFamilyModalOpen} onClose={() => closeModal('Family')} onSubmit={handleSubmitMember} member={modalState.editingData} />
                     <MetastaseModal isOpen={modalState.isMetastaseModalOpen} onClose={() => closeModal('Metastase')} onSubmit={handleSubmitMetastase} metastaseData={modalState.editingData} />
                     <CirurgiaModal
@@ -162,8 +144,6 @@ const CadastroPacientePage = () => {
                             <Button type="submit" disabled={isLoading}>{isLoading ? 'Salvando...' : 'Salvar Cadastro'}</Button>
                         </FixedSubmitButton>
                     </FormContainer>
-                </>
-            )}
         </Container>
     );
 };
