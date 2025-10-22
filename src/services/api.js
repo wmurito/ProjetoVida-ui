@@ -71,11 +71,21 @@ export const getAuthToken = async () => {
   }
 };
 
+// Rotas públicas que não precisam de autenticação
+const PUBLIC_ROUTES = [
+  '/create-upload-session',
+  '/upload-mobile/',
+  '/upload-status/'
+];
+
 // Interceptor para adicionar token de autenticação
 api.interceptors.request.use(
   async (config) => {
-    // Não adicionar Authorization para requisições OPTIONS (preflight)
-    if (config.method?.toUpperCase() !== 'OPTIONS') {
+    // Verificar se é uma rota pública
+    const isPublicRoute = PUBLIC_ROUTES.some(route => config.url?.includes(route));
+    
+    // Não adicionar Authorization para requisições OPTIONS (preflight) ou rotas públicas
+    if (config.method?.toUpperCase() !== 'OPTIONS' && !isPublicRoute) {
       const token = await getAuthToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -107,21 +117,27 @@ const showErrorToast = (message, type = 'error') => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Verificar se é uma rota pública
+    const isPublicRoute = PUBLIC_ROUTES.some(route => error.config?.url?.includes(route));
+    
     if (error.response) {
-      // Redirecionar para login em caso de erro de autenticação
-      if (error.response.status === 401) {
-        showErrorToast('Sessão expirada. Redirecionando para login...');
-        setTimeout(() => {
-          window.location.href = '/login';
-        }, 2000);
-      } else if (error.response.status === 403) {
-        showErrorToast('Acesso negado. Você não tem permissão para esta operação.');
-      } else {
-        showErrorToast('Erro na operação. Tente novamente.');
+      // Não mostrar toasts para rotas públicas (deixar o componente tratar)
+      if (!isPublicRoute) {
+        // Redirecionar para login em caso de erro de autenticação
+        if (error.response.status === 401) {
+          showErrorToast('Sessão expirada. Redirecionando para login...');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else if (error.response.status === 403) {
+          showErrorToast('Acesso negado. Você não tem permissão para esta operação.');
+        } else {
+          showErrorToast('Erro na operação. Tente novamente.');
+        }
       }
       
       // Log de erro sanitizado para produção
-    } else {
+    } else if (!isPublicRoute) {
       showErrorToast('Erro de conexão. Verifique sua internet.');
     }
     return Promise.reject(error);

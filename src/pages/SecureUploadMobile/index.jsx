@@ -143,7 +143,9 @@ const SecureUploadMobile = () => {
 
   // Validar sessionId
   useEffect(() => {
+    console.log('Session ID recebido:', sessionId);
     if (!sessionId || !sessionId.startsWith('upload-')) {
+      console.error('Session ID inválido:', sessionId);
       toast.error('Sessão inválida');
       navigate('/');
     }
@@ -235,8 +237,12 @@ const SecureUploadMobile = () => {
             paciente_id: 'temp'
           };
           
+          console.log('Enviando arquivo:', { fileName: file.name, fileType: file.type, sessionId });
+          
           // Enviar para o backend
-          await api.post(`/upload-mobile/${sessionId}`, fileData);
+          const response = await api.post(`/upload-mobile/${sessionId}`, fileData);
+          
+          console.log('Resposta do servidor:', response.data);
           
           setProgress(100);
           setSuccess(true);
@@ -249,14 +255,22 @@ const SecureUploadMobile = () => {
           clearInterval(progressInterval);
           setProgress(0);
           
+          console.error('Erro detalhado:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+          });
+          
           if (error.response?.status === 404) {
             setError('Sessão expirada. Tente novamente.');
           } else if (error.response?.status === 413) {
             setError('Arquivo muito grande.');
           } else if (error.response?.status === 415) {
             setError('Tipo de arquivo não suportado.');
+          } else if (error.response?.status === 422) {
+            setError(error.response?.data?.detail || 'Arquivo inválido.');
           } else {
-            setError('Erro ao enviar arquivo. Tente novamente.');
+            setError(error.response?.data?.detail || 'Erro ao enviar arquivo. Tente novamente.');
           }
           
           setUploading(false);
