@@ -211,7 +211,7 @@ export const validationSchema = yup.object().shape({
   // --- Aba: Dados Clínicos ---
   historia_doenca: yup.object().shape({
     sinal_sintoma_principal: yup.string().notRequired(),
-    data_sintomas: yup.date().notRequired().nullable().typeError('Forneça uma data válida'),
+    data_sintomas: yup.string().notRequired(),
     idade_diagnostico: yup.string().notRequired(),
     lado_acometido: yup.string().notRequired(),
   }),
