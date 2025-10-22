@@ -69,7 +69,6 @@ export const initialState = {
   naturalidade: '',
   endereco: '',
   cep: '',
-  logradouro: '',
   numero: '',
   complemento: '',
   bairro: '',
@@ -196,8 +195,8 @@ export const validationSchema = yup.object().shape({
   nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
   data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
   genero: yup.string().required('O gênero é obrigatório'),
+  endereco: yup.string().required('O endereço é obrigatório'),
   cep: yup.string().required('O CEP é obrigatório'),
-  logradouro: yup.string().required('O logradouro é obrigatório'),
   numero: yup.string().required('O número é obrigatório'),
   bairro: yup.string().required('O bairro é obrigatório'),
   cidade: yup.string().required('A cidade é obrigatória'),
@@ -230,31 +229,18 @@ export const validationSchema = yup.object().shape({
 
   // --- Aba: Dados Clínicos ---
   historia_doenca: yup.object().shape({
-    sinal_sintoma_principal: yup.string().required('O sinal/sintoma principal é obrigatório'),
-    data_sintomas: yup.date().required('A data dos primeiros sintomas é obrigatória').typeError('Forneça uma data válida').nullable(),
-    idade_diagnostico: yup.number()
-      .transform((value, originalValue) => originalValue === '' ? undefined : value)
-      .required('A idade ao diagnóstico é obrigatória')
-      .typeError('Deve ser um número')
-      .positive('Deve ser um número positivo'),
-    lado_acometido: yup.string().required('O lado acometido é obrigatório'),
+    sinal_sintoma_principal: yup.string().notRequired(),
+    data_sintomas: yup.date().notRequired().nullable().typeError('Forneça uma data válida'),
+    idade_diagnostico: yup.string().notRequired(),
+    lado_acometido: yup.string().notRequired(),
   }),
 
 
-  // --- Aba: Modelos Preditores de Risco ---
+  // --- Aba: Modelos Preditores de Risco (Opcional) ---
   modelos_preditores: yup.object().shape({
-    score_tyrer_cuzick: yup.number()
-      .transform((value, originalValue) => originalValue === '' ? null : value)
-      .nullable()
-      .typeError('Deve ser um número válido'),
-    score_canrisk: yup.number()
-      .transform((value, originalValue) => originalValue === '' ? null : value)
-      .nullable()
-      .typeError('Deve ser um número válido'),
-    score_gail: yup.number()
-      .transform((value, originalValue) => originalValue === '' ? null : value)
-      .nullable()
-      .typeError('Deve ser um número válido'),
+    score_tyrer_cuzick: yup.string().notRequired(),
+    score_canrisk: yup.string().notRequired(),
+    score_gail: yup.string().notRequired(),
   }),
 
   // --- Aba: Tratamento e Evolução ---
@@ -288,8 +274,8 @@ export const errorFieldToTabMap = {
   nome_completo: 'identificacao',
   data_nascimento: 'identificacao',
   genero: 'identificacao',
+  endereco: 'identificacao',
   cep: 'identificacao',
-  logradouro: 'identificacao',
   numero: 'identificacao',
   bairro: 'identificacao',
   cidade: 'identificacao',

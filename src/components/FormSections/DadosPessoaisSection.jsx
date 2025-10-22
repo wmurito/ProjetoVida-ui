@@ -39,11 +39,6 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                     <StyledInput id="cep" name="cep" value={formData.cep} onChange={handleChange} placeholder="00000-000" />
                     {errors.cep && <ErrorText>{errors.cep}</ErrorText>}
                 </FieldContainer>
-                <FieldContainer style={{ gridColumn: 'span 3' }}>
-                    <InputLabel htmlFor="logradouro">Logradouro</InputLabel>
-                    <StyledInput id="logradouro" name="logradouro" value={formData.logradouro} onChange={handleChange} />
-                    {errors.logradouro && <ErrorText>{errors.logradouro}</ErrorText>}
-                </FieldContainer>
 
                 <FieldContainer style={{ gridColumn: 'span 1' }}>
                     <InputLabel htmlFor="numero">Número</InputLabel>
