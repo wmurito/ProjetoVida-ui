@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPacientes, testPacientesEndpoint } from '../../services/api';
+import { getPacientes } from '../../services/api';
 import { sanitizeInput } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
 import EditModal from '../../components/ModalsPaciente/EditModal';
@@ -114,23 +114,6 @@ const Registros = () => {
     }
   };
 
-  const handleTestEndpoint = async () => {
-    try {
-      console.log('Testando endpoint de pacientes...');
-      const response = await testPacientesEndpoint();
-      
-      if (response.data.status === 'success') {
-        toast.success(`Teste bem-sucedido! ${response.data.total_pacientes} pacientes encontrados na tabela.`);
-        console.log('Dados do teste:', response.data);
-      } else {
-        toast.error(`Erro no teste: ${response.data.message}`);
-      }
-    } catch (error) {
-      console.error('Erro no teste de endpoint:', error);
-      toast.error('Erro ao testar endpoint. Verifique o console para mais detalhes.');
-    }
-  };
-
   if (loading) {
     return (
       <LoadingContainer>
@@ -162,9 +145,6 @@ const Registros = () => {
             onChange={handleSearch}
             maxLength={100}
           />
-          <ActionButton onClick={handleTestEndpoint} style={{ marginLeft: '10px' }}>
-            Testar Conexão
-          </ActionButton>
         </SearchContainer>
       </Header>
 

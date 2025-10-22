@@ -141,19 +141,6 @@ export const getPacientes = async (skip = 0, limit = 100) => {
   }
 };
 
-// Endpoint de teste para verificar conexão com tabela PACIENTE
-export const testPacientesEndpoint = async () => {
-  try {
-    console.log('Testando endpoint de pacientes...');
-    const response = await api.get('/pacientes/test');
-    console.log('Teste de endpoint:', response.data);
-    return response;
-  } catch (error) {
-    console.error('Erro no teste de endpoint:', error);
-    throw error;
-  }
-};
-
 // Endpoints do Dashboard
 export const getDashboardEstadiamento = async () => {
   return api.get(`/dashboard/estadiamento`);
