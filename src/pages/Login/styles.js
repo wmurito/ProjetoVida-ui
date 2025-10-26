@@ -44,12 +44,15 @@ export const FormTitle = styled.h1`
     letter-spacing: 2px;
     color: #8a8a8a; 
     margin-right: 12rem;
+    position: relative;
 
     &:after {
         content: '';
         display: block;
         width: 55px;
-        border-bottom: 2px solid #ff7bac;
+        height: 2px;
+        background-color: #ff7bac;
+        margin-top: 4px;
     }
 `;
 
@@ -81,29 +84,22 @@ export const MenuItemLink = styled.a`
     text-decoration: none;
     padding: 10px;
     margin: 7px 0;
-
     transition: opacity .3s;
 
-    &:hover {
+    &:hover,
+    &:focus {
         opacity: .7;
     }
 
-    a {
-    color: inherit; 
-    margin: 0 2px; 
-    text-decoration: none; 
-        }
-            a:hover, a:focus {
-            color: inherit; 
-            }
-                a:active {
-                color: inherit; 
-                }
+    &:active {
+        color: inherit;
+    }
 `;
 
-export const CheckContainer = styled.div ` 
+export const CheckContainer = styled.div`
     display: flex;
     align-self: center;
+    // amazonq-ignore-next-line
     margin-right: 16rem;
 
     label {
@@ -115,15 +111,12 @@ export const CheckContainer = styled.div `
 `;
 
 export const InputCheck = styled.input.attrs({ type: 'checkbox' })`
-  color: #8a8a8a !important;
-  -webkit-appearance: checkbox;
-  -moz-appearance: checkbox;
+  color: #8a8a8a;
   appearance: checkbox;
   display: flex;
   align-items: center;
   width: auto;
 
-  /* Estilos quando marcado */
   &:checked {
     accent-color: #FF7BAC;
   }

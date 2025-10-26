@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
     ModalOverlay, ModalContent, ModalHeader, ModalBody, 
@@ -19,31 +19,31 @@ const TermoAceiteModal = ({ isOpen, onConfirm, onCancel, termoAceito, setTermoAc
         if (isOpen && showQRCode && !sessionId) {
             createUploadSession();
         }
-    }, [isOpen, showQRCode]);
+    }, [isOpen, showQRCode, sessionId, createUploadSession]);
 
     useEffect(() => {
-        if (sessionId) {
-            const interval = setInterval(async () => {
-                try {
-                    const response = await api.get(`/upload-status/${sessionId}`);
-                    if (response.data) {
-                        const { fileName, fileType, fileData } = response.data;
-                        const blob = await fetch(fileData).then(res => res.blob());
-                        const file = new File([blob], fileName, { type: fileType });
-                        setArquivoTermo(file);
-                        setShowQRCode(false);
-                        setSessionId(null);
-                    }
-                } catch (error) {
-                    // Arquivo ainda não foi enviado
+        if (!sessionId) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const response = await api.get(`/upload-status/${sessionId}`);
+                if (response.data) {
+                    const { fileName, fileType, fileData } = response.data;
+                    const blob = await fetch(fileData).then(res => res.blob());
+                    const file = new File([blob], fileName, { type: fileType });
+                    setArquivoTermo(file);
+                    setShowQRCode(false);
+                    setSessionId(null);
                 }
-            }, 2000);
-            
-            return () => clearInterval(interval);
-        }
+            } catch (error) {
+                // Arquivo ainda não foi enviado
+            }
+        }, 2000);
+        
+        return () => clearInterval(interval);
     }, [sessionId, setArquivoTermo]);
 
-    const createUploadSession = async () => {
+    const createUploadSession = useCallback(async () => {
         setLoading(true);
         try {
             const response = await api.post('/create-upload-session');
@@ -58,7 +58,7 @@ const TermoAceiteModal = ({ isOpen, onConfirm, onCancel, termoAceito, setTermoAc
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     if (!isOpen) return null;
 

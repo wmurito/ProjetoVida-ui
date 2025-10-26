@@ -46,8 +46,8 @@ export const CloseButton = styled.button`
   font-size: 1.8rem;
   cursor: pointer;
   color: #888;
-  line-height: 1;
   padding: 0;
+  transition: color 0.2s;
 
   &:hover {
     color: #000;
@@ -59,6 +59,8 @@ export const ModalBody = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
+  max-height: 60vh;
+  overflow-y: auto;
 `;
 
 // Rodapé do modal (botão de salvar)
@@ -89,6 +91,12 @@ export const Input = styled.input`
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
 `;
 
 // Botão de Salvar
@@ -96,7 +104,7 @@ export const SaveButton = styled.button`
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
-  background-color: #007bff; // Azul
+  background-color: #007bff;
   color: white;
   font-size: 1rem;
   font-weight: bold;
@@ -105,5 +113,10 @@ export const SaveButton = styled.button`
 
   &:hover {
     background-color: #0056b3;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
 `;

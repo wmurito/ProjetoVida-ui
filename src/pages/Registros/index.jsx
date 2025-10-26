@@ -58,7 +58,8 @@ const Registros = () => {
         message: sanitizeInput(err.message || 'Erro desconhecido'),
         timestamp: new Date().toISOString(),
         status: err.response?.status,
-        data: err.response?.data
+        errorType: err.name,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
       });
       
       // Tratamento específico de erros

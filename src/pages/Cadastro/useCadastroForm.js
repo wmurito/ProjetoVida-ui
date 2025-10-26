@@ -46,30 +46,39 @@ export const useCadastroForm = (setActiveTab, navigate) => {
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors(prev => {
-            const { [name]: removed, ...newErrors } = prev;
-            return newErrors;
-        });
+        if (errors[name]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
     }, [errors]);
 
     const handleNestedChange = useCallback((e, section) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [section]: { ...prev[section], [name]: value } }));
         const errorKey = `${section}.${name}`;
-        if (errors[errorKey]) setErrors(prev => {
-            const { [errorKey]: removed, ...newErrors } = prev;
-            return newErrors;
-        });
+        if (errors[errorKey]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[errorKey];
+                return newErrors;
+            });
+        }
     }, [errors]);
 
     const handleNestedCheckbox = useCallback((e, section) => {
         const { name, checked } = e.target;
         setFormData(prev => ({ ...prev, [section]: { ...prev[section], [name]: checked } }));
         const errorKey = `${section}.${name}`;
-        if (errors[errorKey]) setErrors(prev => {
-            const { [errorKey]: removed, ...newErrors } = prev;
-            return newErrors;
-        });
+        if (errors[errorKey]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[errorKey];
+                return newErrors;
+            });
+        }
     }, [errors]);
 
     const resetForm = useCallback(() => {

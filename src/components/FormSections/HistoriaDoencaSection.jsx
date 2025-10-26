@@ -7,7 +7,7 @@ const HistoriaDoencaSection = ({ formData, errors, handleInputChange }) => {
             <FormGrid>
                 <FieldContainer style={{ gridColumn: 'span 2' }}>
                     <InputLabel htmlFor="hd_idade_diagnostico">Idade ao Diagnóstico</InputLabel>
-                    <StyledInput id="hd_idade_diagnostico" type="number" name="idade_diagnostico" value={formData.idade_diagnostico} onChange={handleInputChange} />
+                    <StyledInput id="hd_idade_diagnostico" type="number" name="idade_diagnostico" value={formData.idade_diagnostico} onChange={handleInputChange} min="0" max="150" />
                     {errors['historia_doenca.idade_diagnostico'] && <ErrorText>{errors['historia_doenca.idade_diagnostico']}</ErrorText>}
                 </FieldContainer>
             </FormGrid>

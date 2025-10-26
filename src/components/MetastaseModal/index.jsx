@@ -24,7 +24,23 @@ const MetastaseModal = ({ isOpen, onClose, onSubmit, metastaseData }) => {
     };
 
     const handleSubmit = () => {
-        onSubmit(currentMetastase);
+        if (!currentMetastase.local_metastase || !currentMetastase.local_metastase.trim()) {
+            alert('Por favor, informe o local da metástase.');
+            return;
+        }
+        
+        if (!currentMetastase.data_metastase) {
+            alert('Por favor, informe a data da metástase.');
+            return;
+        }
+        
+        try {
+            onSubmit(currentMetastase);
+            onClose();
+        } catch (error) {
+            console.error('Erro ao salvar metástase:', error);
+            alert('Erro ao salvar os dados. Por favor, tente novamente.');
+        }
     };
 
     return (

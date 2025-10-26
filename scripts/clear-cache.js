@@ -18,15 +18,33 @@ const itemsToClean = [
   'node_modules/.cache'
 ];
 
+// Diretório base do projeto
+const projectRoot = path.resolve(__dirname, '..');
+
+// Função para validar caminho seguro
+function isSafePath(targetPath) {
+  const resolvedPath = path.resolve(projectRoot, targetPath);
+  const normalizedPath = path.normalize(resolvedPath);
+  return normalizedPath.startsWith(projectRoot) && !normalizedPath.includes('..');
+}
+
 // Função para remover diretório/arquivo
 function removeItem(itemPath) {
   try {
-    if (fs.existsSync(itemPath)) {
-      if (fs.statSync(itemPath).isDirectory()) {
-        fs.rmSync(itemPath, { recursive: true, force: true });
+    // Validar caminho antes de qualquer operação
+    if (!isSafePath(itemPath)) {
+      console.error(`❌ Caminho inválido ou inseguro: ${itemPath}`);
+      return;
+    }
+    
+    const fullPath = path.resolve(projectRoot, itemPath);
+    
+    if (fs.existsSync(fullPath)) {
+      if (fs.statSync(fullPath).isDirectory()) {
+        fs.rmSync(fullPath, { recursive: true, force: true });
         console.log(`✅ Removido diretório: ${itemPath}`);
       } else {
-        fs.unlinkSync(itemPath);
+        fs.unlinkSync(fullPath);
         console.log(`✅ Removido arquivo: ${itemPath}`);
       }
     } else {
@@ -53,15 +71,35 @@ let foundOldUrls = false;
 
 // Procurar em arquivos JavaScript/TypeScript
 const searchInFiles = (dir, extensions = ['.js', '.jsx', '.ts', '.tsx', '.json']) => {
-  const files = fs.readdirSync(dir, { withFileTypes: true });
+  // Validar diretório antes de ler
+  const resolvedDir = path.resolve(projectRoot, dir);
+  if (!isSafePath(dir) || !resolvedDir.startsWith(projectRoot)) {
+    console.error(`❌ Diretório inválido: ${dir}`);
+    return;
+  }
+  
+  const files = fs.readdirSync(resolvedDir, { withFileTypes: true });
   
   files.forEach(file => {
-    const fullPath = path.join(dir, file.name);
+    const fullPath = path.join(resolvedDir, file.name);
+    
+    // Validar que o caminho completo está dentro do projeto
+    if (!fullPath.startsWith(projectRoot)) {
+      return;
+    }
     
     if (file.isDirectory() && !['node_modules', 'dist', '.git'].includes(file.name)) {
-      searchInFiles(fullPath, extensions);
+      // Validar caminho relativo antes da recursão
+      const relativePath = path.relative(projectRoot, fullPath);
+      if (isSafePath(relativePath)) {
+        searchInFiles(relativePath, extensions);
+      }
     } else if (file.isFile() && extensions.some(ext => file.name.endsWith(ext))) {
       try {
+        // Validar caminho do arquivo antes de ler
+        if (!fullPath.startsWith(projectRoot) || fullPath.includes('..')) {
+          return;
+        }
         const content = fs.readFileSync(fullPath, 'utf8');
         oldUrls.forEach(oldUrl => {
           if (content.includes(oldUrl)) {

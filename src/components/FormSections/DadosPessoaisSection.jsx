@@ -14,7 +14,7 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
 
                 <FieldContainer style={{ gridColumn: 'span 1' }}>
                     <InputLabel htmlFor="idade">Idade</InputLabel>
-                    <StyledInput id="idade" name="idade" type="number" value={formData.idade} onChange={handleChange} />
+                    <StyledInput id="idade" name="idade" type="number" value={formData.idade} onChange={handleChange} min="0" max="150" />
                     {errors.idade && <ErrorText>{errors.idade}</ErrorText>}
                 </FieldContainer>
                 <FieldContainer style={{ gridColumn: 'span 2' }}>
@@ -99,12 +99,12 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
 
                 <FieldContainer style={{ gridColumn: 'span 1' }}>
                     <InputLabel htmlFor="altura">Altura (m)</InputLabel>
-                    <StyledInput id="altura" name="altura" type="number" step="0.01" value={formData.altura} onChange={handleChange} placeholder="Ex: 1.75" />
+                    <StyledInput id="altura" name="altura" type="number" step="0.01" value={formData.altura} onChange={handleChange} placeholder="Ex: 1.75" min="0.5" max="3.0" />
                     {errors.altura && <ErrorText>{errors.altura}</ErrorText>}
                 </FieldContainer>
                 <FieldContainer style={{ gridColumn: 'span 1' }}>
                     <InputLabel htmlFor="peso">Peso (kg)</InputLabel>
-                    <StyledInput id="peso" name="peso" type="number" step="0.1" value={formData.peso} onChange={handleChange} placeholder="Ex: 70.5"/>
+                    <StyledInput id="peso" name="peso" type="number" step="0.1" value={formData.peso} onChange={handleChange} placeholder="Ex: 70.5" min="1" max="500" />
                     {errors.peso && <ErrorText>{errors.peso}</ErrorText>}
                 </FieldContainer>
                 <FieldContainer style={{ gridColumn: 'span 1' }}>

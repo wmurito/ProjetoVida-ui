@@ -18,18 +18,36 @@ export default defineConfig(({ mode }) => {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          aws: ['aws-amplify']
+          aws: ['aws-amplify'],
+          charts: ['chart.js', 'react-chartjs-2', 'echarts', 'echarts-for-react']
         }
       }
     },
-    sourcemap: false
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
+    chunkSizeWarningLimit: 1000
   },
   server: {
-    host: '0.0.0.0',  // Aceitar conexões de qualquer IP
+    host: '0.0.0.0',
     port: 5173,
     headers: {
       'X-Content-Type-Options': 'nosniff',
-      'X-XSS-Protection': '1; mode=block'
+      'X-XSS-Protection': '1; mode=block',
+      'X-Frame-Options': 'DENY'
+    }
+  },
+  preview: {
+    port: 4173,
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-XSS-Protection': '1; mode=block',
+      'X-Frame-Options': 'DENY'
     }
   }
 }})

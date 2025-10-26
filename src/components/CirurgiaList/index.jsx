@@ -72,7 +72,7 @@ const CirurgiaItem = ({ item, index, onEdit, onRemove, type }) => {
 
 
 const CirurgiaList = ({ formData, onEdit, onRemove }) => {
-    const { mamas = [], axilas = [], reconstrucoes = [] } = formData.tratamento.cirurgia;
+    const { mamas = [], axilas = [], reconstrucoes = [] } = formData?.tratamento?.cirurgia || {};
 
     const hasCirurgias = mamas.length > 0 || axilas.length > 0 || reconstrucoes.length > 0;
 

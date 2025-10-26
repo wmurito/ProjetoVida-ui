@@ -52,24 +52,33 @@ const Login = () => {
   }, [logged, navigate, authLoading]);
 
   useEffect(() => {
-    // Usar sessionStorage em vez de localStorage para maior segurança
-    const storedRememberMe = sessionStorage.getItem("rememberMe");
-    if (storedRememberMe === "true") {
-      setRememberMe(true);
-      const storedEmail = sessionStorage.getItem("username");
-      if (storedEmail) {
-        setEmail(storedEmail);
+    try {
+      // Usar sessionStorage em vez de localStorage para maior segurança
+      const storedRememberMe = sessionStorage.getItem("rememberMe");
+      if (storedRememberMe === "true") {
+        setRememberMe(true);
+        const storedEmail = sessionStorage.getItem("username");
+        if (storedEmail) {
+          setEmail(storedEmail);
+        }
       }
+    } catch (error) {
+      console.error('Erro ao acessar sessionStorage:', error);
     }
   }, []);
 
   useEffect(() => {
-    // Armazenar em sessionStorage em vez de localStorage
-    sessionStorage.setItem("rememberMe", rememberMe);
-    if (rememberMe) {
-      sessionStorage.setItem("username", sanitizeInput(email));
-    } else {
-      sessionStorage.removeItem("username");
+    try {
+      // Armazenar em sessionStorage em vez de localStorage
+      sessionStorage.setItem("rememberMe", rememberMe);
+      if (rememberMe) {
+        sessionStorage.setItem("username", sanitizeInput(email));
+      } else {
+        sessionStorage.removeItem("username");
+      }
+    } catch (error) {
+      console.error('Erro ao salvar em sessionStorage:', error);
+      toast.warning('Não foi possível salvar preferências');
     }
   }, [rememberMe, email]);
 
@@ -119,19 +128,34 @@ const Login = () => {
 
       const result = await login(sanitizedEmail, password, newPassword);
 
-      if (result?.newPasswordRequired) {
+      if (!result) {
+        toast.error("Erro ao processar login");
+        return;
+      }
+
+      if (result.newPasswordRequired) {
         toast.info("É necessário alterar sua senha");
         setIsChangingPassword(true);
         return;
       }
 
-      if (result?.success) {
+      if (result.mfaRequired) {
+        toast.info("Código MFA necessário");
+        return;
+      }
+
+      if (result.success) {
         toast.success("Login realizado com sucesso");
+      } else if (result.error) {
+        toast.error(result.error);
       } else {
         toast.error("Credenciais inválidas");
       }
     } catch (error) {
-      toast.error("Erro ao fazer login");
+      if (import.meta.env.DEV) {
+        console.error('Login error:', error);
+      }
+      toast.error(error?.message || "Erro ao fazer login");
     } finally {
       setLoading(false);
     }

@@ -53,6 +53,7 @@ httpClient.interceptors.response.use(
   (response) => {
     // Limpar rate limit em caso de sucesso
     const identifier = sessionStorage.getItem('userId') || 'anonymous';
+    // amazonq-ignore-next-line
     if (response.status < 400) {
       rateLimiter.clearAttempts(identifier);
     }

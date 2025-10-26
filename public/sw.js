@@ -8,9 +8,7 @@ const urlsToCache = [
 
 // Lista de domínios permitidos - configurar via variáveis de ambiente
 const ALLOWED_ORIGINS = [
-  self.location.origin,
-  // Domínios permitidos devem ser configurados via environment variables
-  ...(self.registration?.scope ? [new URL(self.registration.scope).origin] : [])
+  self.location.origin
 ];
 
 // Função para validar URLs de forma mais rigorosa
@@ -88,19 +86,40 @@ self.addEventListener('fetch', (event) => {
         }
         
         // Criar request seguro com headers limitados
-        const safeRequest = new Request(event.request.url, {
+        const requestHeaders = new Headers();
+        const acceptHeader = event.request.headers.get('Accept');
+        const acceptLangHeader = event.request.headers.get('Accept-Language');
+        
+        if (acceptHeader) requestHeaders.set('Accept', acceptHeader);
+        if (acceptLangHeader) requestHeaders.set('Accept-Language', acceptLangHeader);
+        
+        const getRequestConfig = () => ({
           method: 'GET',
-          headers: {
-            'Accept': event.request.headers.get('Accept') || '*/*',
-            'Accept-Language': event.request.headers.get('Accept-Language') || 'en-US,en;q=0.9'
-          },
-          mode: 'cors',
-          credentials: 'same-origin',
-          cache: 'default'
+          headers: requestHeaders,
+          mode: self.FETCH_MODE || 'cors',
+          credentials: self.FETCH_CREDENTIALS || 'same-origin',
+          cache: self.FETCH_CACHE || 'default'
         });
         
-        // Fazer fetch com request seguro
-        return fetch(safeRequest).then((response) => {
+        const requestConfig = getRequestConfig();
+        
+        // Validação final antes do fetch
+        if (!isValidUrl(event.request.url)) {
+          return new Response('Invalid URL', { status: 403 });
+        }
+        
+        const safeRequest = new Request(event.request.url, requestConfig);
+        
+        // Fazer fetch com request seguro e timeout
+        const fetchWithTimeout = (request, timeout = 5000) => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
+          
+          return fetch(request, { signal: controller.signal })
+            .finally(() => clearTimeout(timeoutId));
+        };
+        
+        return fetchWithTimeout(safeRequest).then((response) => {
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }

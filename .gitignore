@@ -27,6 +27,9 @@ aws-config.js
 amplifyconfiguration.json
 amplifyconfiguration.dart
 
+# Arquivo gerado - não commitar
+src/aws-exports.js
+
 # Chaves e tokens
 *.key
 *.pem
@@ -63,6 +66,7 @@ yarn.lock
 dist/
 build/
 out/
+.amplify-hosting/
 
 # Build analysis
 bundle-analyzer-report.html
@@ -72,18 +76,6 @@ webpack-bundle-analyzer-report.html
 # =============================================================================
 # 🧪 TESTES E COBERTURA
 # =============================================================================
-
-# Test files
-test_*.js
-*_test.js
-test_*.ts
-*_test.ts
-test_*.jsx
-*_test.jsx
-test_*.tsx
-*_test.tsx
-test_*.json
-*_test.json
 
 # Coverage reports
 coverage/
@@ -103,13 +95,6 @@ npm-audit-*.json
 yarn-audit-*.json
 vulnerability_*.json
 snyk-*.json
-
-# Debug files
-debug_*.js
-debug_*.ts
-debug_*.json
-check_*.js
-check_*.ts
 
 # =============================================================================
 # 💻 IDE E EDITORES
@@ -165,12 +150,9 @@ $RECYCLE.BIN/
 # 📚 DOCUMENTAÇÃO TEMPORÁRIA
 # =============================================================================
 
-# Documentação que não deve ir para produção
-*.md
-!README.md
-!CHANGELOG.md
-!LICENSE
-!LICENSE.txt
+# Documentação temporária
+TODO.md
+NOTES.md
 
 # =============================================================================
 # 🔧 FERRAMENTAS DE DESENVOLVIMENTO
@@ -229,20 +211,23 @@ public/
 # 🚨 REGRAS DE SEGURANÇA ADICIONAIS
 # =============================================================================
 
-# Qualquer arquivo que contenha dados pessoais
-*_personal*
-*_private*
-*_confidential*
-*_sensitive*
+# Backups e dumps
+*.backup
+*.bak
+*.dump
+*.sql
+*.sqlite
+*.db
 
-# Arquivos de configuração de produção
-prod_*
-production_*
-staging_*
+# Arquivos de usuários/dados
+users_*.json
+patients_*.json
+pacientes_*.json
 
-# Arquivos de deploy específicos
-deploy_*
-deployment_*
+# Certificados SSL
+*.csr
+*.der
+*.cer
 
 # =============================================================================
 # ⚠️ IMPORTANTE: NUNCA REMOVER ESTAS REGRAS!
