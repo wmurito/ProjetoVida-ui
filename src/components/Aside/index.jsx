@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
-import { signOut } from 'aws-amplify/auth';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../hooks/useAuth';
 import {
   Container,
   NavMenu,
@@ -20,19 +20,20 @@ import { FaSignOutAlt } from 'react-icons/fa';
 // Recebe apenas 'isClosed'. A função de toggle não é mais necessária aqui.
 const Aside = ({ isClosed, $menuAberto }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await signOut({ global: true });
-      localStorage.clear();
-      sessionStorage.clear();
+      await logout();
       toast.success('Logout realizado com sucesso!');
-      navigate('/login');
+      navigate('/login', { replace: true });
     } catch (error) {
+      console.error('Erro no logout:', error);
+      // Forçar limpeza mesmo com erro
       localStorage.clear();
       sessionStorage.clear();
-      toast.error('Erro ao fazer logout. Tente novamente.');
-      navigate('/login');
+      toast.error('Sessão encerrada');
+      navigate('/login', { replace: true });
     }
   };
 
