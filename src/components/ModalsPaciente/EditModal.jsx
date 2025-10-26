@@ -1,8 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { sanitizeInput, validateInput, detectAttack } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
-import { t } from '../../i18n';
-import httpClient from '../../services/httpClient';
 import { rateLimiter } from '../../services/rateLimiter';
 
 const EditModal = ({ paciente, onClose, onSave }) => {
@@ -13,7 +11,6 @@ const EditModal = ({ paciente, onClose, onSave }) => {
     telefone: '',
     endereco: '',
     dataNascimento: '',
-    // Adicione outros campos conforme necessário
   });
   
   const [errors, setErrors] = useState({});
@@ -35,37 +32,16 @@ const EditModal = ({ paciente, onClose, onSave }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validar nome
     if (!formData.nome.trim()) {
       newErrors.nome = 'Nome é obrigatório';
-    } else if (!validateInput(formData.nome, 'name', 100)) {
-      newErrors.nome = 'Nome inválido (apenas letras e espaços, 2-100 caracteres)';
     } else if (detectAttack(formData.nome)) {
       newErrors.nome = 'Nome contém caracteres não permitidos';
     }
 
-    // Validar CPF
-    if (!formData.cpf.trim()) {
-      newErrors.cpf = 'CPF é obrigatório';
-    } else if (!validateInput(formData.cpf, 'cpf')) {
-      newErrors.cpf = 'CPF inválido';
-    }
-
-    // Validar email
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!validateInput(formData.email, 'email', 255)) {
-      newErrors.email = 'Email inválido';
-    } else if (detectAttack(formData.email)) {
+    if (formData.email && detectAttack(formData.email)) {
       newErrors.email = 'Email contém caracteres não permitidos';
     }
 
-    // Validar telefone
-    if (formData.telefone && !validateInput(formData.telefone, 'phone')) {
-      newErrors.telefone = 'Telefone inválido';
-    }
-
-    // Validar outros campos
     Object.keys(formData).forEach(key => {
       if (formData[key] && detectAttack(formData[key])) {
         newErrors[key] = `${key} contém caracteres não permitidos`;
@@ -77,10 +53,8 @@ const EditModal = ({ paciente, onClose, onSave }) => {
   };
 
   const handleInputChange = (field, value) => {
-    // Sanitizar entrada em tempo real
     const sanitizedValue = sanitizeInput(value);
     
-    // Detectar tentativas de ataque
     if (detectAttack(value)) {
       toast.error('Entrada contém caracteres não permitidos');
       return;
@@ -91,7 +65,6 @@ const EditModal = ({ paciente, onClose, onSave }) => {
       [field]: sanitizedValue
     }));
 
-    // Limpar erro do campo se existir
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -103,7 +76,6 @@ const EditModal = ({ paciente, onClose, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Verificar rate limiting
     const userId = sessionStorage.getItem('userId') || 'anonymous';
     if (rateLimiter.isBlocked(userId)) {
       toast.error('Muitas tentativas. Aguarde antes de tentar novamente.');
@@ -118,7 +90,6 @@ const EditModal = ({ paciente, onClose, onSave }) => {
     setLoading(true);
     
     try {
-      // Sanitizar todos os dados antes de enviar
       const sanitizedData = Object.keys(formData).reduce((acc, key) => {
         acc[key] = sanitizeInput(formData[key]);
         return acc;
@@ -134,7 +105,6 @@ const EditModal = ({ paciente, onClose, onSave }) => {
     } catch (error) {
       console.error('Erro ao salvar paciente:', sanitizeInput(error.message));
       
-      // Tratamento específico de erros
       if (error.response?.status === 403) {
         toast.error('Você não tem permissão para editar este paciente');
       } else if (error.response?.status === 409) {
@@ -160,41 +130,76 @@ const EditModal = ({ paciente, onClose, onSave }) => {
   if (!paciente) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleClose} style={{
+    <div onClick={handleClose} style={{
       position: 'fixed',
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
+      backgroundColor: 'rgba(0,0,0,0.6)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 1000
+      zIndex: 1000,
+      backdropFilter: 'blur(4px)'
     }}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{
+      <div onClick={(e) => e.stopPropagation()} style={{
         backgroundColor: 'white',
-        borderRadius: '8px',
-        padding: '24px',
-        maxWidth: '600px',
+        borderRadius: '16px',
+        maxWidth: '700px',
         width: '90%',
         maxHeight: '90vh',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
       }}>
-        <div className="modal-header">
-          <h2>{t('editPatient')}</h2>
+        <div style={{
+          padding: '24px 32px',
+          borderBottom: '1px solid #e5e7eb',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: '#f9fafb'
+        }}>
+          <h2 style={{
+            margin: 0,
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#111827'
+          }}>Editar Paciente</h2>
           <button 
-            className="close-button" 
             onClick={handleClose}
             disabled={loading}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '28px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              color: '#6b7280',
+              padding: '0',
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '8px',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#f3f4f6')}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label htmlFor="nome">{t('name')} *</label>
+        <form onSubmit={handleSubmit} style={{ padding: '32px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <label htmlFor="nome" style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151'
+            }}>Nome Completo *</label>
             <input
               id="nome"
               type="text"
@@ -203,53 +208,191 @@ const EditModal = ({ paciente, onClose, onSave }) => {
               maxLength={100}
               required
               disabled={loading}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontSize: '15px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none',
+                transition: 'all 0.2s',
+                backgroundColor: loading ? '#f9fafb' : 'white',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             />
-            {errors.nome && <span className="error">{errors.nome}</span>}
+            {errors.nome && <span style={{
+              display: 'block',
+              marginTop: '6px',
+              fontSize: '13px',
+              color: '#ef4444'
+            }}>{errors.nome}</span>}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="cpf">{t('cpf')} *</label>
-            <input
-              id="cpf"
-              type="text"
-              value={formData.cpf}
-              onChange={(e) => handleInputChange('cpf', e.target.value)}
-              maxLength={14}
-              required
-              disabled={loading}
-            />
-            {errors.cpf && <span className="error">{errors.cpf}</span>}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
+            marginBottom: '24px'
+          }}>
+            <div>
+              <label htmlFor="cpf" style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>CPF</label>
+              <input
+                id="cpf"
+                type="text"
+                value={formData.cpf}
+                onChange={(e) => handleInputChange('cpf', e.target.value)}
+                maxLength={14}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '15px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  backgroundColor: loading ? '#f9fafb' : 'white',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+              {errors.cpf && <span style={{
+                display: 'block',
+                marginTop: '6px',
+                fontSize: '13px',
+                color: '#ef4444'
+              }}>{errors.cpf}</span>}
+            </div>
+
+            <div>
+              <label htmlFor="dataNascimento" style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>Data de Nascimento</label>
+              <input
+                id="dataNascimento"
+                type="date"
+                value={formData.dataNascimento}
+                onChange={(e) => handleInputChange('dataNascimento', e.target.value)}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '15px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  backgroundColor: loading ? '#f9fafb' : 'white',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">{t('email')} *</label>
-            <input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              maxLength={255}
-              required
-              disabled={loading}
-            />
-            {errors.email && <span className="error">{errors.email}</span>}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr',
+            gap: '16px',
+            marginBottom: '24px'
+          }}>
+            <div>
+              <label htmlFor="email" style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>Email</label>
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                maxLength={255}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '15px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  backgroundColor: loading ? '#f9fafb' : 'white',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+              {errors.email && <span style={{
+                display: 'block',
+                marginTop: '6px',
+                fontSize: '13px',
+                color: '#ef4444'
+              }}>{errors.email}</span>}
+            </div>
+
+            <div>
+              <label htmlFor="telefone" style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#374151'
+              }}>Telefone</label>
+              <input
+                id="telefone"
+                type="tel"
+                value={formData.telefone}
+                onChange={(e) => handleInputChange('telefone', e.target.value)}
+                maxLength={15}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '15px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  backgroundColor: loading ? '#f9fafb' : 'white',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              />
+              {errors.telefone && <span style={{
+                display: 'block',
+                marginTop: '6px',
+                fontSize: '13px',
+                color: '#ef4444'
+              }}>{errors.telefone}</span>}
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="telefone">{t('phone')}</label>
-            <input
-              id="telefone"
-              type="tel"
-              value={formData.telefone}
-              onChange={(e) => handleInputChange('telefone', e.target.value)}
-              maxLength={15}
-              disabled={loading}
-            />
-            {errors.telefone && <span className="error">{errors.telefone}</span>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="endereco">{t('address')}</label>
+          <div style={{ marginBottom: '24px' }}>
+            <label htmlFor="endereco" style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151'
+            }}>Endereço</label>
             <textarea
               id="endereco"
               value={formData.endereco}
@@ -257,36 +400,77 @@ const EditModal = ({ paciente, onClose, onSave }) => {
               maxLength={500}
               rows={3}
               disabled={loading}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontSize: '15px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                outline: 'none',
+                transition: 'all 0.2s',
+                backgroundColor: loading ? '#f9fafb' : 'white',
+                resize: 'vertical',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
+              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
             />
-            {errors.endereco && <span className="error">{errors.endereco}</span>}
+            {errors.endereco && <span style={{
+              display: 'block',
+              marginTop: '6px',
+              fontSize: '13px',
+              color: '#ef4444'
+            }}>{errors.endereco}</span>}
           </div>
 
-          <div className="form-group">
-            <label htmlFor="dataNascimento">{t('birthDate')}</label>
-            <input
-              id="dataNascimento"
-              type="date"
-              value={formData.dataNascimento}
-              onChange={(e) => handleInputChange('dataNascimento', e.target.value)}
-              disabled={loading}
-            />
-          </div>
-
-          <div className="modal-actions">
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            justifyContent: 'flex-end',
+            paddingTop: '24px',
+            borderTop: '1px solid #e5e7eb'
+          }}>
             <button 
               type="button" 
               onClick={handleClose}
               disabled={loading}
-              className="cancel-button"
+              style={{
+                padding: '12px 24px',
+                fontSize: '15px',
+                fontWeight: '500',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                backgroundColor: 'white',
+                color: '#374151',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                opacity: loading ? 0.5 : 1
+              }}
+              onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#f9fafb')}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
             >
-              {t('cancel')}
+              Cancelar
             </button>
             <button 
               type="submit" 
               disabled={loading}
-              className="save-button"
+              style={{
+                padding: '12px 32px',
+                fontSize: '15px',
+                fontWeight: '500',
+                border: 'none',
+                borderRadius: '8px',
+                backgroundColor: '#ff7bac',
+                color: 'white',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                opacity: loading ? 0.7 : 1
+              }}
+              onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#ff5a94')}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#ff7bac'}
             >
-              {loading ? t('saving') : t('save')}
+              {loading ? 'Salvando...' : 'Salvar Alterações'}
             </button>
           </div>
         </form>
