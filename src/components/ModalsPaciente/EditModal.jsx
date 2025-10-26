@@ -21,14 +21,13 @@ const EditModal = ({ paciente, onClose, onSave }) => {
 
   useEffect(() => {
     if (paciente) {
-      // Sanitizar dados do paciente antes de carregar no formulário
       setFormData({
-        nome: sanitizeInput(paciente.nome || ''),
+        nome: sanitizeInput(paciente.nome_completo || ''),
         cpf: sanitizeInput(paciente.cpf || ''),
         email: sanitizeInput(paciente.email || ''),
         telefone: sanitizeInput(paciente.telefone || ''),
         endereco: sanitizeInput(paciente.endereco || ''),
-        dataNascimento: paciente.dataNascimento || '',
+        dataNascimento: paciente.data_nascimento || '',
       });
     }
   }, [paciente]);

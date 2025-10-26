@@ -75,13 +75,13 @@ const ErrorContainer = styled.div`
 `;
 // --- Fim dos Styled Components ---
 
-const ViewModal = ({ open, onClose, pacienteId }) => {
+const ViewModal = ({ paciente, onClose }) => {
   const [pacienteData, setPacienteData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPaciente = async () => {
-      if (!open || !pacienteId) return;
+      if (!paciente?.id_paciente) return;
 
       setLoading(true);
       try {
@@ -89,7 +89,7 @@ const ViewModal = ({ open, onClose, pacienteId }) => {
         if (!token) {
           throw new Error('Token de autenticação não encontrado');
         }
-        const response = await api.get(`/pacientes/${pacienteId}`, {
+        const response = await api.get(`/pacientes/${paciente.id_paciente}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         setPacienteData(response.data);
@@ -102,7 +102,7 @@ const ViewModal = ({ open, onClose, pacienteId }) => {
     };
 
     fetchPaciente();
-  }, [open, pacienteId]);
+  }, [paciente]);
 
   const formatDate = (date) => {
     if (!date) return 'N/A';
@@ -147,9 +147,7 @@ const ViewModal = ({ open, onClose, pacienteId }) => {
     );
   };
 
-  if (!open) return null;
-
-  if (!open) return null;
+  if (!paciente) return null;
 
   return (
     <Overlay>
