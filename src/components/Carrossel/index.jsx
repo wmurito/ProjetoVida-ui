@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import capa from '../../assets/images/capa.jpeg';
 import diagnosticos from '../../assets/images/diagnosticos.jpeg';
 import tratamentos from '../../assets/images/tratamentos.jpeg';
@@ -9,6 +8,7 @@ import mapa from '../../assets/images/mapa.jpeg';
 const ImageGallery = () => {
   const images = [capa, diagnosticos, tratamentos, evolucao, mapa];
   const [selectedImage, setSelectedImage] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
 
   const handleImageClick = (index) => {
     if (index >= 0 && index < images.length) {
@@ -80,13 +80,31 @@ const ImageGallery = () => {
             <img
               src={image}
               alt={`Imagem ${index + 1}`}
+              onError={(e) => {
+                console.error(`Erro ao carregar imagem ${index + 1}`);
+                setImageErrors(prev => ({ ...prev, [index]: true }));
+                e.target.style.display = 'none';
+              }}
               style={{
                 width: '100%',
                 height: '300px',
                 objectFit: 'cover',
-                display: 'block'
+                display: imageErrors[index] ? 'none' : 'block'
               }}
             />
+            {imageErrors[index] && (
+              <div style={{
+                width: '100%',
+                height: '300px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f0f0f0',
+                color: '#999'
+              }}>
+                Imagem não disponível
+              </div>
+            )}
             <div style={{
               padding: '15px',
               backgroundColor: '#f8f9fa',
