@@ -2,14 +2,23 @@
 
 // Gera um token CSRF aleatório
 export const generateCSRFToken = () => {
-  const array = new Uint8Array(16);
-  window.crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  try {
+    const array = new Uint8Array(16);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  } catch (error) {
+    console.error('Erro ao gerar token CSRF:', error.message);
+    return Date.now().toString(36) + Math.random().toString(36).substring(2);
+  }
 };
 
 // Armazena o token CSRF em sessionStorage
 export const storeCSRFToken = (token) => {
-  sessionStorage.setItem('csrf_token', token);
+  try {
+    sessionStorage.setItem('csrf_token', token);
+  } catch (error) {
+    console.error('Erro ao armazenar token CSRF:', error.message);
+  }
 };
 
 // Obtém o token CSRF armazenado

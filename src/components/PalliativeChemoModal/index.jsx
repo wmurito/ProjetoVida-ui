@@ -27,7 +27,28 @@ const PalliativeChemoModal = ({ isOpen, onClose, onSubmit, chemoData }) => {
     };
 
     const handleSubmit = () => {
-        onSubmit(formData); // Envia os dados para a página principal
+        if (!formData.linha_tratamento_paliativo || !formData.linha_tratamento_paliativo.trim()) {
+            alert('Por favor, informe a linha de tratamento.');
+            return;
+        }
+        
+        if (!formData.qual_quimioterapia_paliativa || !formData.qual_quimioterapia_paliativa.trim()) {
+            alert('Por favor, informe o esquema de quimioterapia.');
+            return;
+        }
+        
+        if (!formData.inicio_quimioterapia_paliativa) {
+            alert('Por favor, informe a data de início.');
+            return;
+        }
+        
+        try {
+            onSubmit(formData);
+            onClose();
+        } catch (error) {
+            console.error('Erro ao salvar quimioterapia paliativa:', error);
+            alert('Erro ao salvar os dados. Por favor, tente novamente.');
+        }
     };
 
     return (

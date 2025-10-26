@@ -21,14 +21,27 @@ const translations = {
 let currentLanguage = 'pt';
 
 export const t = (key) => {
-  const keys = key.split('.');
-  let value = translations[currentLanguage];
-  
-  for (const k of keys) {
-    value = value?.[k];
+  if (!key || typeof key !== 'string') {
+    console.warn('Invalid translation key:', key);
+    return '';
   }
   
-  return value || key;
+  try {
+    const keys = key.split('.');
+    let value = translations[currentLanguage];
+    
+    for (const k of keys) {
+      if (!k || typeof value !== 'object') {
+        return key;
+      }
+      value = value[k];
+    }
+    
+    return value !== undefined && value !== null ? value : key;
+  } catch (error) {
+    console.error('Translation error:', error);
+    return key;
+  }
 };
 
 export const setLanguage = (lang) => {

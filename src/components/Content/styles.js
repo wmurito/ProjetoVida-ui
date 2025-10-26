@@ -5,7 +5,7 @@ export const Container = styled.div`
   padding: 20px;
   color: #8a8a8a;
   height: 100vh;
-  overflow-y: hidden;
+  overflow-y: auto;
 
   /* Estilos da barra de rolagem */
   &::-webkit-scrollbar {

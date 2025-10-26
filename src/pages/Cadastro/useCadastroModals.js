@@ -48,28 +48,46 @@ export const useCadastroModals = (setFormData) => {
 
     // --- FUNÇÃO DE SUBMIT DA CIRURGIA ATUALIZADA ---
     const handleSubmitCirurgia = (procedimentoData) => {
+        if (!procedimentoData || typeof procedimentoData !== 'object') {
+            console.error('Dados de procedimento inválidos');
+            return;
+        }
+
         const { tipo_procedimento, ...cirurgiaData } = procedimentoData;
         
-        // Remove a propriedade `tipo_procedimento` do objeto a ser salvo, pois ela já foi usada.
-        delete cirurgiaData.tipo_procedimento;
+        if (!tipo_procedimento || !['mamas', 'axilas', 'reconstrucoes'].includes(tipo_procedimento)) {
+            console.error('Tipo de procedimento inválido:', tipo_procedimento);
+            return;
+        }
 
-        setFormData(prev => {
-            const newState = JSON.parse(JSON.stringify(prev));
-            // O `tipo_procedimento` (mamas, axilas, reconstrucoes) define em qual array salvar.
-            const cirurgias = getNestedStateRef(newState, `tratamento.cirurgia.${tipo_procedimento}`);
+        try {
+            setFormData(prev => {
+                const newState = { ...prev };
+                
+                // Garantir que a estrutura existe
+                if (!newState.tratamento) newState.tratamento = {};
+                if (!newState.tratamento.cirurgia) newState.tratamento.cirurgia = {};
+                if (!newState.tratamento.cirurgia[tipo_procedimento]) {
+                    newState.tratamento.cirurgia[tipo_procedimento] = [];
+                }
+                
+                const cirurgias = [...newState.tratamento.cirurgia[tipo_procedimento]];
 
-            if (Array.isArray(cirurgias)) {
-                 if (modalState.editingIndex !== null) {
+                if (modalState.editingIndex !== null && modalState.editingIndex >= 0) {
                     // Modo de Edição
                     cirurgias[modalState.editingIndex] = cirurgiaData;
                 } else {
                     // Modo de Adição
                     cirurgias.push(cirurgiaData);
                 }
-            }
-            return newState;
-        });
-        closeModal('Cirurgia');
+                
+                newState.tratamento.cirurgia[tipo_procedimento] = cirurgias;
+                return newState;
+            });
+            closeModal('Cirurgia');
+        } catch (error) {
+            console.error('Erro ao salvar cirurgia:', error);
+        }
     };
 
     return {

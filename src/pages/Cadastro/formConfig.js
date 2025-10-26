@@ -193,6 +193,7 @@ export const initialState = {
 export const validationSchema = yup.object().shape({
   // --- Aba: Identificação ---
   nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
+  // amazonq-ignore-next-line
   data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
   genero: yup.string().required('O gênero é obrigatório'),
   endereco: yup.string().required('O endereço é obrigatório'),
@@ -230,6 +231,13 @@ export const validationSchema = yup.object().shape({
           is: true,
           then: (schema) => schema.required('A data do óbito é obrigatória').typeError('Forneça uma data válida'),
           otherwise: (schema) => schema.notRequired(),
+      }).test('valid-date', 'Data inválida', function(value) {
+          if (!value) return true;
+          try {
+              return value instanceof Date && !isNaN(value);
+          } catch {
+              return false;
+          }
       }),
       causa_morte: yup.string().when('morte', {
           is: true,

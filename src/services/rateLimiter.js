@@ -25,15 +25,13 @@ class RateLimiter {
     const now = Date.now();
     const attempts = this.attempts.get(safeIdentifier) || [];
     
-    // Remover tentativas antigas
+    // Remover tentativas antigas e adicionar nova
     const validAttempts = attempts.filter(time => now - time < windowMs);
-    
-    // Adicionar nova tentativa
     validAttempts.push(now);
-    this.attempts.set(safeIdentifier, validAttempts);
-
+    
     // Verificar se excedeu o limite
     if (validAttempts.length >= maxAttempts) {
+      this.attempts.set(safeIdentifier, validAttempts);
       this.blockedIPs.add(safeIdentifier);
       
       // Log do bloqueio
@@ -51,7 +49,8 @@ class RateLimiter {
       
       return false;
     }
-
+    
+    this.attempts.set(safeIdentifier, validAttempts);
     return true;
   }
 

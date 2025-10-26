@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './AreaCards.scss';
 import { getDashboardEstadiamento, getDashboardSobrevida, getDashboardRecidiva, getDashboardDeltaT } from '../../services/api';
 
@@ -19,39 +19,39 @@ const AreaCards = () => {
   // const s3BaseUrl = '...';
 
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
     const fetchAllKpiDataFromAPI = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // Buscar dados de todos os endpoints do dashboard
-        const [estadiamentoRes, sobrevidaRes, recidivaRes, deltaTRes] = await Promise.all([
+        // Buscar dados de todos os endpoints do dashboard com timeout
+        const [estadiamentoRes, sobrevidaRes] = await Promise.all([
           getDashboardEstadiamento(),
-          getDashboardSobrevida(),
-          getDashboardRecidiva(),
-          getDashboardDeltaT()
+          getDashboardSobrevida()
         ]);
 
-        const estadiamento = estadiamentoRes.data;
-        const sobrevida = sobrevidaRes.data;
-        const recidiva = recidivaRes.data;
-        const deltaT = deltaTRes.data;
+        if (!isMounted) return;
+
+        const estadiamento = estadiamentoRes.data || [];
+        const sobrevida = sobrevidaRes.data || [];
 
         // Calcular KPIs baseados nos dados recebidos
-        const totalPacientes = estadiamento.reduce((sum, item) => sum + item.total, 0);
-        const totalObitos = sobrevida.find(item => item.status === 'Óbito')?.total || 0;
-        const taxaMortalidade = totalPacientes > 0 ? (totalObitos / totalPacientes) * 100 : 0;
+        const totalPac = estadiamento.reduce((sum, item) => sum + (item.total || 0), 0);
+        const totalObt = sobrevida.find(item => item.status === 'Óbito')?.total || 0;
+        const taxaMort = totalPac > 0 ? (totalObt / totalPac) * 100 : 0;
         
-        // Para idade média e tamanho médio, usar valores padrão por enquanto
-        // (esses dados precisariam vir de endpoints específicos)
-        setIdadeMediaDiagnostico(0);
-        setTamanhoMedioTumor(0);
-        setMediaRiscoGail(0);
-        setMediaRiscoTyrer(0);
-
-        setTotalPacientes(totalPacientes);
-        setTotalObitos(totalObitos);
-        setTaxaMortalidade(taxaMortalidade);
+        if (isMounted) {
+          setTotalPacientes(totalPac);
+          setTotalObitos(totalObt);
+          setTaxaMortalidade(taxaMort);
+          setIdadeMediaDiagnostico(0);
+          setTamanhoMedioTumor(0);
+          setMediaRiscoGail(0);
+          setMediaRiscoTyrer(0);
+        }
 
       } catch (err) {
         // Log seguro para produção
@@ -68,12 +68,39 @@ const AreaCards = () => {
         setMediaRiscoGail(0);
         setMediaRiscoTyrer(0);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchAllKpiDataFromAPI();
-  }, []); // Roda apenas uma vez na montagem
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, []);
+
+  const formattedTaxaMortalidade = useMemo(() => 
+    (taxaMortalidade || 0).toFixed(1), [taxaMortalidade]
+  );
+
+  const formattedIdadeMedia = useMemo(() => 
+    (idadeMediaDiagnostico || 0).toFixed(0), [idadeMediaDiagnostico]
+  );
+
+  const formattedTamanhoMedio = useMemo(() => 
+    (tamanhoMedioTumor || 0).toFixed(1), [tamanhoMedioTumor]
+  );
+
+  const formattedRiscoGail = useMemo(() => 
+    (mediaRiscoGail || 0).toFixed(2), [mediaRiscoGail]
+  );
+
+  const formattedRiscoTyrer = useMemo(() => 
+    (mediaRiscoTyrer || 0).toFixed(2), [mediaRiscoTyrer]
+  );
 
   if (loading) {
     return <section className="content-area-cards loading">Carregando KPIs...</section>;
@@ -102,14 +129,14 @@ const AreaCards = () => {
       <div className="metric-card compact">
         <div className="card-header">Taxa de Mortalidade</div>
         <div className="card-content">
-          <div className="metric-value">{(taxaMortalidade || 0).toFixed(1)}%</div>
+          <div className="metric-value">{formattedTaxaMortalidade}%</div>
           <div className="metric-label">Geral</div>
         </div>
       </div>
       <div className="metric-card compact">
         <div className="card-header">Idade Média Diagnóstico</div>
         <div className="card-content">
-          <div className="metric-value">{(idadeMediaDiagnostico || 0).toFixed(0)}</div>
+          <div className="metric-value">{formattedIdadeMedia}</div>
           <div className="metric-label">Anos</div>
         </div>
       </div>
@@ -117,21 +144,21 @@ const AreaCards = () => {
       <div className="metric-card compact">
         <div className="card-header">Tamanho Médio Tumor</div>
         <div className="card-content">
-          <div className="metric-value">{(tamanhoMedioTumor || 0).toFixed(1)}</div>
+          <div className="metric-value">{formattedTamanhoMedio}</div>
           <div className="metric-label">cm</div>
         </div>
       </div>
       <div className="metric-card compact">
         <div className="card-header">Risco Gail (Média)</div>
         <div className="card-content">
-          <div className="metric-value">{(mediaRiscoGail || 0).toFixed(2)}%</div>
+          <div className="metric-value">{formattedRiscoGail}%</div>
           <div className="metric-label">Em 5 anos</div>
         </div>
       </div>
       <div className="metric-card compact">
         <div className="card-header">Risco Tyrer-Cuzick (Média)</div>
         <div className="card-content">
-          <div className="metric-value">{(mediaRiscoTyrer || 0).toFixed(2)}%</div>
+          <div className="metric-value">{formattedRiscoTyrer}%</div>
           <div className="metric-label">Em 10 anos</div>
         </div>
       </div>

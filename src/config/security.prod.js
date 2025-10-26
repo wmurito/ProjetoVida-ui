@@ -13,8 +13,8 @@ export const PRODUCTION_SECURITY_CONFIG = {
   // CSP mais restritiva para produção com nonces
   CSP_POLICY: `
     default-src 'self';
-    script-src 'self' 'nonce-${window.__CSP_NONCE__ || 'fallback'}' https://cdn.amplify.aws;
-    style-src 'self' 'nonce-${window.__CSP_NONCE__ || 'fallback'}' https://fonts.googleapis.com;
+    script-src 'self' 'nonce-${typeof window !== 'undefined' && window.__CSP_NONCE__ || 'fallback'}' https://cdn.amplify.aws;
+    style-src 'self' 'nonce-${typeof window !== 'undefined' && window.__CSP_NONCE__ || 'fallback'}' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: https://*.amazonaws.com;
     connect-src 'self' https://pteq15e8a6.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;

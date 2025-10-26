@@ -36,8 +36,23 @@ const TargetedTherapyModal = ({ isOpen, onClose, onSubmit, therapyData }) => {
     };
 
     const handleSubmit = () => {
-        onSubmit(currentTherapy);
-        onClose(); // Fecha o modal após submeter
+        if (!currentTherapy.qual_terapia_alvo || !currentTherapy.qual_terapia_alvo.trim()) {
+            alert('Por favor, informe qual terapia alvo.');
+            return;
+        }
+        
+        if (!currentTherapy.inicio_terapia_alvo) {
+            alert('Por favor, informe a data de início.');
+            return;
+        }
+        
+        try {
+            onSubmit(currentTherapy);
+            onClose();
+        } catch (error) {
+            console.error('Erro ao salvar terapia alvo:', error);
+            alert('Erro ao salvar os dados. Por favor, tente novamente.');
+        }
     };
 
     return (

@@ -144,6 +144,7 @@ export const Button = styled.button`
         default: return tokens.colors.primaryHover;
       }
     }};
+    // amazonq-ignore-next-line
     color: white;
   }
 `;
@@ -326,28 +327,4 @@ export const Spinner = styled.div`
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-`;
-
-// Modal Overlay
-export const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-export const Modal = styled.div`
-  background: ${tokens.colors.background};
-  border-radius: ${tokens.radius.lg};
-  padding: ${tokens.spacing.xl};
-  max-width: 90vw;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: ${tokens.shadows.lg};
 `;

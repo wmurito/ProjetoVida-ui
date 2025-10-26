@@ -75,7 +75,16 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
     }, [member, isOpen]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type } = e.target;
+        
+        // Validar campos numéricos
+        if (type === 'number') {
+            const numValue = parseInt(value, 10);
+            if (value !== '' && (isNaN(numValue) || numValue < 0 || numValue > 150)) {
+                return;
+            }
+        }
+        
         setFamiliarData(prev => ({ ...prev, [name]: value }));
     };
 
@@ -90,21 +99,37 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
     };
 
     const handleSave = () => {
-        // Converte os dados do modal para o formato da lista antes de submeter
-        const dataToSubmit = {
-            ...familiarData,
-            genero: genero,
-            tem_cancer_mama: familiarData.cancer_mama === 'sim',
-            tem_cancer_ovario: familiarData.cancer_ovario === 'sim',
-            bilateral: familiarData.bilateral === 'sim',
-        };
+        // Validar campos obrigatórios
+        if (!genero) {
+            alert('Por favor, selecione o gênero do familiar.');
+            return;
+        }
+        
+        if (!familiarData.parentesco) {
+            alert('Por favor, selecione o parentesco.');
+            return;
+        }
 
-        // Remove as propriedades internas do modal para não sujar o objeto final
-        delete dataToSubmit.cancer_mama;
-        delete dataToSubmit.cancer_ovario;
+        try {
+            // Converte os dados do modal para o formato da lista antes de submeter
+            const dataToSubmit = {
+                ...familiarData,
+                genero: genero,
+                tem_cancer_mama: familiarData.cancer_mama === 'sim',
+                tem_cancer_ovario: familiarData.cancer_ovario === 'sim',
+                bilateral: familiarData.bilateral === 'sim',
+            };
 
-        onSubmit(dataToSubmit);
-        onClose();
+            // Remove as propriedades internas do modal para não sujar o objeto final
+            delete dataToSubmit.cancer_mama;
+            delete dataToSubmit.cancer_ovario;
+
+            onSubmit(dataToSubmit);
+            onClose();
+        } catch (error) {
+            console.error('Erro ao salvar membro familiar:', error);
+            alert('Erro ao salvar os dados. Por favor, tente novamente.');
+        }
     };
 
     if (!isOpen) return null;
@@ -158,7 +183,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} /> Não</label>
                                     <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} /> Sim</label>
                                     {familiarData.cancer_mama === 'sim' && (
-                                        <StyledInput type="number" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} />
+                                        <StyledInput type="number" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </FieldContainer>
 
@@ -168,7 +193,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label><input type="radio" name="bilateral" checked={familiarData.bilateral === 'nao'} onChange={() => handleRadioChange('bilateral', 'nao')} /> Não</label>
                                     <label><input type="radio" name="bilateral" checked={familiarData.bilateral === 'sim'} onChange={() => handleRadioChange('bilateral', 'sim')} /> Sim</label>
                                     {familiarData.bilateral === 'sim' && (
-                                        <StyledInput type="number" name="idade_segunda_mama" placeholder="Idade 2ª mama" value={familiarData.idade_segunda_mama || ''} onChange={handleChange} />
+                                        <StyledInput type="number" name="idade_segunda_mama" placeholder="Idade 2ª mama" value={familiarData.idade_segunda_mama || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </FieldContainer>
 
@@ -178,7 +203,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label><input type="radio" name="cancer_ovario" checked={familiarData.cancer_ovario === 'nao'} onChange={() => handleRadioChange('cancer_ovario', 'nao')} /> Não</label>
                                     <label><input type="radio" name="cancer_ovario" checked={familiarData.cancer_ovario === 'sim'} onChange={() => handleRadioChange('cancer_ovario', 'sim')} /> Sim</label>
                                     {familiarData.cancer_ovario === 'sim' && (
-                                        <StyledInput type="number" name="idade_cancer_ovario" placeholder="Idade no início" value={familiarData.idade_cancer_ovario || ''} onChange={handleChange} />
+                                        <StyledInput type="number" name="idade_cancer_ovario" placeholder="Idade no início" value={familiarData.idade_cancer_ovario || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </FieldContainer>
                                 
@@ -201,7 +226,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} /> Não</label>
                                     <label><input type="radio" name="cancer_mama" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} /> Sim</label>
                                     {familiarData.cancer_mama === 'sim' && (
-                                        <StyledInput type="number" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} />
+                                        <StyledInput type="number" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </FieldContainer>
 

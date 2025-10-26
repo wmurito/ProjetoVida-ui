@@ -39,13 +39,34 @@ function fileExists(filePath) {
   return fs.existsSync(filePath);
 }
 
+// Sanitizar caminho de arquivo para prevenir command injection
+function sanitizeFilePath(filePath) {
+  // Remover caracteres perigosos e normalizar caminho
+  const normalized = path.normalize(filePath).replace(/[;&|`$(){}\[\]<>]/g, '');
+  // Verificar se o caminho está dentro do projeto
+  const resolved = path.resolve(normalized);
+  const projectRoot = path.resolve('.');
+  if (!resolved.startsWith(projectRoot)) {
+    throw new Error('Caminho inválido: fora do projeto');
+  }
+  return normalized;
+}
+
 // Remover arquivo do Git (mas manter localmente)
 function removeFromGit(filePath) {
   try {
-    if (fileExists(filePath)) {
-      execSync(`git rm --cached "${filePath}"`, { stdio: 'pipe' });
-      console.log(`✅ Removido do Git: ${filePath}`);
-      return true;
+    // Sanitizar caminho antes de usar
+    const safePath = sanitizeFilePath(filePath);
+    
+    if (fileExists(safePath)) {
+      // Usar spawn ao invés de execSync para prevenir injection
+      const { spawnSync } = require('child_process');
+      const result = spawnSync('git', ['rm', '--cached', safePath], { stdio: 'pipe' });
+      if (result.status === 0) {
+        console.log(`✅ Removido do Git: ${safePath}`);
+        return true;
+      }
+      throw new Error(result.stderr?.toString() || 'Erro ao remover arquivo');
     } else {
       console.log(`⚠️  Arquivo não encontrado: ${filePath}`);
       return false;
@@ -118,8 +139,10 @@ function main() {
       
       // Verificar se está sendo rastreado pelo Git
       try {
-        const gitStatus = execSync(`git ls-files "${file}"`, { encoding: 'utf8' });
-        if (gitStatus.trim()) {
+        const safeFile = sanitizeFilePath(file);
+        const { spawnSync } = require('child_process');
+        const result = spawnSync('git', ['ls-files', safeFile], { encoding: 'utf8' });
+        if (result.stdout && result.stdout.trim()) {
           console.log(`🚨 Arquivo está sendo rastreado pelo Git!`);
           
           if (removeFromGit(file)) {

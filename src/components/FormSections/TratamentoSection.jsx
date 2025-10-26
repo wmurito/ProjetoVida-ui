@@ -31,22 +31,30 @@ const TratamentoEmLista = ({ lista, path, setFormData, campos, title = "Adiciona
     const addTratamento = () => {
         const novoItem = campos.reduce((acc, campo) => ({ ...acc, [campo.name]: campo.initialValue || '' }), {});
         setFormData(prev => {
-            const newState = JSON.parse(JSON.stringify(prev));
-            const listRef = getNestedStateRef(newState, path);
-            if (Array.isArray(listRef)) {
-                listRef.push(novoItem);
+            const pathKeys = path.split('.');
+            const newState = { ...prev };
+            let current = newState;
+            for (let i = 0; i < pathKeys.length - 1; i++) {
+                current[pathKeys[i]] = { ...current[pathKeys[i]] };
+                current = current[pathKeys[i]];
             }
+            const lastKey = pathKeys[pathKeys.length - 1];
+            current[lastKey] = [...(current[lastKey] || []), novoItem];
             return newState;
         });
     };
 
     const removeTratamento = (indexToRemove) => {
         setFormData(prev => {
-            const newState = JSON.parse(JSON.stringify(prev));
-            const listRef = getNestedStateRef(newState, path);
-            if (Array.isArray(listRef)) {
-                listRef.splice(indexToRemove, 1);
+            const pathKeys = path.split('.');
+            const newState = { ...prev };
+            let current = newState;
+            for (let i = 0; i < pathKeys.length - 1; i++) {
+                current[pathKeys[i]] = { ...current[pathKeys[i]] };
+                current = current[pathKeys[i]];
             }
+            const lastKey = pathKeys[pathKeys.length - 1];
+            current[lastKey] = (current[lastKey] || []).filter((_, idx) => idx !== indexToRemove);
             return newState;
         });
     };
@@ -55,10 +63,17 @@ const TratamentoEmLista = ({ lista, path, setFormData, campos, title = "Adiciona
         const { name, value, type, checked } = e.target;
         const val = type === 'checkbox' ? checked : value;
         setFormData(prev => {
-            const newState = JSON.parse(JSON.stringify(prev));
-            const listRef = getNestedStateRef(newState, path);
-            if (Array.isArray(listRef) && listRef[index]) {
-                listRef[index][name] = val;
+            const pathKeys = path.split('.');
+            const newState = { ...prev };
+            let current = newState;
+            for (let i = 0; i < pathKeys.length - 1; i++) {
+                current[pathKeys[i]] = { ...current[pathKeys[i]] };
+                current = current[pathKeys[i]];
+            }
+            const lastKey = pathKeys[pathKeys.length - 1];
+            current[lastKey] = [...(current[lastKey] || [])];
+            if (current[lastKey][index]) {
+                current[lastKey][index] = { ...current[lastKey][index], [name]: val };
             }
             return newState;
         });

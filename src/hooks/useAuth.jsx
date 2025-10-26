@@ -16,6 +16,11 @@ const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutos em milissegundos
 
 export const AuthProvider = ({ children }) => {
+  if (!children) {
+    console.error('AuthProvider: children prop é obrigatória');
+    return null;
+  }
+  
   const [logged, setLogged] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pendingChallenge, setPendingChallenge] = useState(null);
@@ -23,28 +28,48 @@ export const AuthProvider = ({ children }) => {
   const [mfaRequired, setMfaRequired] = useState(false);
   
   // Estado para controle de tentativas de login
-  const [loginAttempts, setLoginAttempts] = useState(0);
-  const [lockoutUntil, setLockoutUntil] = useState(null);
+  const [loginAttempts, setLoginAttempts] = useState(() => {
+    try {
+      return parseInt(sessionStorage.getItem('loginAttempts') || '0', 10);
+    } catch {
+      return 0;
+    }
+  });
+  const [lockoutUntil, setLockoutUntil] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem('lockoutUntil');
+      return stored ? new Date(stored) : null;
+    } catch {
+      return null;
+    }
+  });
   
   // Estado para registro de auditoria
   const [securityEvents, setSecurityEvents] = useState([]);
 
   // Função para registrar eventos de segurança
   const logSecurityEvent = (eventType, details) => {
-    const event = {
-      timestamp: new Date().toISOString(),
-      eventType,
-      details,
-      userAgent: navigator.userAgent,
-      ipAddress: 'client-side' // O IP real seria capturado pelo backend
-    };
-    
-    setSecurityEvents(prev => [...prev, event]);
-    
-    // Em produção, enviar para o backend para armazenamento
-    if (import.meta.env.PROD) {
-      // Implementar envio para API de auditoria
-      // api.post('/security-events', event);
+    try {
+      if (!eventType) {
+        console.error('logSecurityEvent: eventType é obrigatório');
+        return;
+      }
+      
+      const event = {
+        timestamp: new Date().toISOString(),
+        eventType,
+        details: details || {},
+        userAgent: navigator.userAgent,
+        ipAddress: 'client-side'
+      };
+      
+      setSecurityEvents(prev => [...prev, event]);
+      
+      if (import.meta.env.PROD) {
+        // TODO: Implementar envio para API de auditoria
+      }
+    } catch (error) {
+      console.error('Erro ao registrar evento de segurança:', error.message);
     }
   };
 

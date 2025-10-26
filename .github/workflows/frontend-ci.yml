@@ -33,16 +33,29 @@ jobs:
     
     - name: 🔍 Run linting
       working-directory: ./ProjetoVida-ui
-      run: npm run lint || true
+      run: |
+        set +e
+        npm run lint
+        LINT_EXIT_CODE=$?
+        if [ $LINT_EXIT_CODE -ne 0 ]; then
+          echo "⚠️ Linting issues found (exit code: $LINT_EXIT_CODE)"
+        fi
+        set -e
     
     - name: 🧪 Run tests (if available)
       working-directory: ./ProjetoVida-ui
       run: |
+        set +e
         if [ -f "package.json" ] && grep -q '"test"' package.json; then
-          npm test || true
+          npm test -- --passWithNoTests
+          TEST_EXIT_CODE=$?
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "⚠️ Tests failed with exit code: $TEST_EXIT_CODE"
+          fi
         else
           echo "No tests configured"
         fi
+        set -e
     
     - name: 🏗️ Build application
       working-directory: ./ProjetoVida-ui
@@ -51,8 +64,15 @@ jobs:
     - name: 🔍 Security audit
       working-directory: ./ProjetoVida-ui
       run: |
-        npm audit --audit-level moderate --json > npm-audit-report.json || true
-        npm audit --audit-level moderate || true
+        set +e
+        npm audit --audit-level moderate --json > npm-audit-report.json
+        AUDIT_EXIT_CODE=$?
+        if [ $AUDIT_EXIT_CODE -ne 0 ] && [ $AUDIT_EXIT_CODE -ne 1 ]; then
+          echo "⚠️ Security audit failed with exit code $AUDIT_EXIT_CODE"
+          exit 0
+        fi
+        npm audit --audit-level moderate || echo "⚠️ Vulnerabilities found, check report"
+        set -e
     
     - name: 📊 Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -85,7 +105,8 @@ jobs:
               auditResults = '❌ Audit report not found';
             }
           } catch (e) {
-            auditResults = '❌ Could not parse audit results';
+            console.error('Error parsing audit results:', e.message);
+            auditResults = `❌ Could not parse audit results: ${e.message}`;
           }
           
           const comment = `# 🎨 Frontend Build Results

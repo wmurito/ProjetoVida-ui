@@ -11,11 +11,30 @@ const ImageGallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const handleImageClick = (index) => {
-    setSelectedImage(index);
+    if (index >= 0 && index < images.length) {
+      setSelectedImage(index);
+    }
+  };
+
+  const handleKeyPress = (event, index) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleImageClick(index);
+    }
   };
 
   const closeModal = () => {
     setSelectedImage(null);
+  };
+
+  const handleModalKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  };
+
+  const handleModalContentClick = (event) => {
+    event.stopPropagation();
   };
 
   return (
@@ -53,8 +72,9 @@ const ImageGallery = () => {
               }
             }}
             onClick={() => handleImageClick(index)}
+            onKeyDown={(e) => handleKeyPress(e, index)}
             role="button"
-            tabIndex="0"
+            tabIndex={0}
             aria-label={`Expandir imagem ${index + 1}`}
           >
             <img
@@ -100,17 +120,23 @@ const ImageGallery = () => {
             cursor: 'pointer'
           }}
           onClick={closeModal}
+          onKeyDown={handleModalKeyDown}
           role="dialog"
+          aria-modal="true"
           aria-label="Imagem expandida"
+          tabIndex={-1}
         >
-          <div style={{
-            position: 'relative',
-            maxWidth: '90%',
-            maxHeight: '90%',
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            padding: '20px'
-          }}>
+          <div 
+            style={{
+              position: 'relative',
+              maxWidth: '90%',
+              maxHeight: '90%',
+              backgroundColor: 'white',
+              borderRadius: '10px',
+              padding: '20px'
+            }}
+            onClick={handleModalContentClick}
+          >
             <button
               onClick={closeModal}
               style={{
@@ -128,23 +154,31 @@ const ImageGallery = () => {
             >
               ×
             </button>
-            <img
-              src={images[selectedImage]}
-              alt={`Imagem expandida ${selectedImage + 1}`}
-              style={{
-                maxWidth: '100%',
-                maxHeight: '80vh',
-                display: 'block',
-                margin: '0 auto'
-              }}
-            />
-            <div style={{
-              textAlign: 'center',
-              marginTop: '10px',
-              color: '#333'
-            }}>
-              {['Capa', 'Diagnósticos', 'Tratamentos', 'Evolução', 'Mapa'][selectedImage]}
-            </div>
+            {selectedImage >= 0 && selectedImage < images.length && (
+              <>
+                <img
+                  src={images[selectedImage]}
+                  alt={`Imagem expandida ${selectedImage + 1}`}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    console.error('Erro ao carregar imagem');
+                  }}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '80vh',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+                <div style={{
+                  textAlign: 'center',
+                  marginTop: '10px',
+                  color: '#333'
+                }}>
+                  {['Capa', 'Diagnósticos', 'Tratamentos', 'Evolução', 'Mapa'][selectedImage]}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

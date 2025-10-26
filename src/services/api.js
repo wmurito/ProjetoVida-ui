@@ -34,20 +34,36 @@ const checkAuthorization = async () => {
   try {
     const token = await getAuthToken();
     if (!token) {
-      throw new Error('Token não disponível');
+      if (import.meta.env.DEV) {
+        console.warn('Token não disponível');
+      }
+      return false;
     }
     
     // Verificar se o token é válido e não expirou
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      if (import.meta.env.DEV) {
+        console.error('Formato de token inválido');
+      }
+      return false;
+    }
+    
+    const payload = JSON.parse(atob(parts[1]));
     const currentTime = Math.floor(Date.now() / 1000);
     
     if (payload.exp < currentTime) {
-      throw new Error('Token expirado');
+      if (import.meta.env.DEV) {
+        console.warn('Token expirado');
+      }
+      return false;
     }
     
     return true;
   } catch (error) {
-    // Log de erro de autorização sanitizado
+    if (import.meta.env.DEV) {
+      console.error('Erro ao verificar autorização:', error.message);
+    }
     return false;
   }
 };

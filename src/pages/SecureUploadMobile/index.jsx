@@ -214,13 +214,13 @@ const SecureUploadMobile = () => {
     setUploading(true);
     setProgress(0);
     setError(null);
+    let progressInterval = null;
 
     try {
       // Simular progresso
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 90) {
-            clearInterval(progressInterval);
             return 90;
           }
           return prev + 10;
@@ -244,6 +244,7 @@ const SecureUploadMobile = () => {
           
           console.log('Resposta do servidor:', response.data);
           
+          if (progressInterval) clearInterval(progressInterval);
           setProgress(100);
           setSuccess(true);
           toast.success('Arquivo enviado com sucesso!');
@@ -252,14 +253,16 @@ const SecureUploadMobile = () => {
             window.close();
           }, 2000);
         } catch (error) {
-          clearInterval(progressInterval);
+          if (progressInterval) clearInterval(progressInterval);
           setProgress(0);
           
-          console.error('Erro detalhado:', {
-            message: error.message,
-            response: error.response?.data,
-            status: error.response?.status
-          });
+          if (import.meta.env.DEV) {
+            console.error('Erro detalhado:', {
+              message: error.message,
+              response: error.response?.data,
+              status: error.response?.status
+            });
+          }
           
           if (error.response?.status === 404) {
             setError('Sessão expirada. Tente novamente.');
@@ -278,7 +281,7 @@ const SecureUploadMobile = () => {
       };
       
       reader.onerror = () => {
-        clearInterval(progressInterval);
+        if (progressInterval) clearInterval(progressInterval);
         setProgress(0);
         setError('Erro ao processar arquivo');
         setUploading(false);
@@ -286,6 +289,7 @@ const SecureUploadMobile = () => {
       
       reader.readAsDataURL(file);
     } catch (error) {
+      if (progressInterval) clearInterval(progressInterval);
       setProgress(0);
       setError('Erro inesperado. Tente novamente.');
       setUploading(false);

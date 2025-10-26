@@ -115,18 +115,25 @@ const UploadMobile = () => {
     try {
       const base64 = await fileToBase64(file);
       
-      // Salvar no localStorage para o desktop recuperar
-      localStorage.setItem('termo_upload', JSON.stringify({
-        fileName: file.name,
-        fileType: file.type,
-        fileData: base64,
-        timestamp: Date.now()
-      }));
+      try {
+        localStorage.setItem('termo_upload', JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          fileData: base64,
+          timestamp: Date.now()
+        }));
+      } catch (storageError) {
+        if (storageError.name === 'QuotaExceededError') {
+          throw new Error('Arquivo muito grande. Tente um arquivo menor.');
+        }
+        throw new Error('Erro ao salvar arquivo. Verifique as configurações do navegador.');
+      }
       
       toast.success('Termo enviado! Pode fechar esta janela.');
       setTimeout(() => window.close(), 2000);
     } catch (error) {
-      toast.error('Erro ao processar arquivo');
+      console.error('Erro no upload:', { message: error.message, fileName: file.name });
+      toast.error(error.message || 'Erro ao processar arquivo');
     } finally {
       setUploading(false);
     }
