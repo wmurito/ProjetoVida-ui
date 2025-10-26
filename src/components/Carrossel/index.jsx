@@ -1,14 +1,46 @@
-import React, { useState } from 'react';
-import capa from '../../assets/images/capa.jpeg';
-import diagnosticos from '../../assets/images/diagnosticos.jpeg';
-import tratamentos from '../../assets/images/tratamentos.jpeg';
-import evolucao from '../../assets/images/evolucao.jpeg';
-import mapa from '../../assets/images/mapa.jpeg';
+import React, { useState, useEffect } from 'react';
 
 const ImageGallery = () => {
-  const images = [capa, diagnosticos, tratamentos, evolucao, mapa];
+  const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageErrors, setImageErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        const imageModules = await Promise.all([
+          import('../../assets/images/capa.jpeg'),
+          import('../../assets/images/diagnosticos.jpeg'),
+          import('../../assets/images/tratamentos.jpeg'),
+          import('../../assets/images/evolucao.jpeg'),
+          import('../../assets/images/mapa.jpeg')
+        ]);
+        setImages(imageModules.map(module => module.default));
+      } catch (error) {
+        console.error('Erro ao carregar imagens:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadImages();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px' }}>
+        Carregando imagens...
+      </div>
+    );
+  }
+
+  if (images.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
+        Nenhuma imagem disponível
+      </div>
+    );
+  }
 
   const handleImageClick = (index) => {
     if (index >= 0 && index < images.length) {
