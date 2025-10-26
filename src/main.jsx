@@ -6,7 +6,6 @@ import { AuthProvider } from "./hooks/useAuth";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 import { Amplify } from 'aws-amplify';
-import awsConfig from './aws-exports';
 import { setupCSP } from './services/securityConfig';
 import { toast } from 'react-toastify';
 import { securityLogger } from './services/securityLogger';
@@ -25,6 +24,25 @@ window.securityLogger = securityLogger;
 // Forçar HTTPS em produção
 if (import.meta.env.PROD && window.location.protocol !== 'https:') {
   window.location.replace(`https:${window.location.href.substring(window.location.protocol.length)}`);
+}
+
+// Configurar Amplify com variáveis de ambiente
+const awsConfig = {
+  Auth: {
+    Cognito: {
+      region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+      userPoolId: import.meta.env.VITE_AWS_USER_POOL_ID,
+      userPoolClientId: import.meta.env.VITE_AWS_USER_POOL_CLIENT_ID,
+      loginWith: {
+        email: true
+      }
+    }
+  }
+};
+
+// Validar variáveis obrigatórias
+if (!awsConfig.Auth.Cognito.userPoolId || !awsConfig.Auth.Cognito.userPoolClientId) {
+  console.error('ERRO: Variáveis de ambiente AWS não configuradas');
 }
 
 // Configurar Amplify com opções de segurança aprimoradas
