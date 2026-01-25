@@ -43,12 +43,28 @@ const CadastroPacientePage = () => {
         modalState, openModal, closeModal,
         handleSubmitMember, handleSubmitMetastase, handleSubmitCirurgia,
     } = useCadastroModals(setFormData);
-    
 
+    const currentTabIndex = tabs.findIndex(tab => tab.key === activeTab);
+    const isLastTab = currentTabIndex === tabs.length - 1;
+    const isFirstTab = currentTabIndex === 0;
+
+    const handleNext = () => {
+        if (currentTabIndex < tabs.length - 1) {
+            setActiveTab(tabs[currentTabIndex + 1].key);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentTabIndex > 0) {
+            setActiveTab(tabs[currentTabIndex - 1].key);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await handleSave();
+        if (isLastTab) {
+            await handleSave();
+        }
     };
     
     const handleRemoveMember = (indexToRemove) => {
@@ -111,9 +127,27 @@ const CadastroPacientePage = () => {
                                     )}
                                 </TabButton>
                             ))}
+                            <Button 
+                                type="button" 
+                                onClick={() => {
+                                    if (window.confirm('Tem certeza que deseja limpar todos os dados e começar do zero?')) {
+                                        localStorage.removeItem('cadastro_paciente_draft');
+                                        window.location.reload();
+                                    }
+                                }}
+                                style={{ 
+                                    marginLeft: 'auto', 
+                                    backgroundColor: '#dc3545', 
+                                    fontSize: '0.8em', 
+                                    padding: '5px 10px',
+                                    height: 'fit-content'
+                                }}
+                            >
+                                Limpar Rascunho
+                            </Button>
                         </TabNav>
 
-                        {/* RENDERIZAÇÃO DAS ABAS (Sua lógica original preservada) */}
+                        {/* RENDERIZAÇÃO DAS ABAS */}
                         {activeTab === 'identificacao' && (<Section><SectionTitle>Identificação e Dados Sociais</SectionTitle><DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} /></Section>)}
                         
                         {activeTab === 'historico' && (<><Section><SectionTitle>História Patológica Pregressa</SectionTitle><HistoriaPatologicaSection formData={formData.historia_patologica} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_patologica')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'historia_patologica')} /></Section><Section><SectionTitle>História Familiar</SectionTitle><HistoriaFamiliarSection familiares={formData.familiares} historiaFamiliar={formData.historia_familiar} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_familiar')} onAddMember={() => openModal('Family')} onEditMember={(member, index) => openModal('Family', member, index)} onRemoveMember={handleRemoveMember} /></Section><Section><SectionTitle>Hábitos de Vida</SectionTitle><HabitosDeVidaSection formData={formData.habitos_vida} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'habitos_vida')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'habitos_vida')} /></Section></>)}
@@ -140,8 +174,27 @@ const CadastroPacientePage = () => {
                             </>
                         )}
                         
+                        {/* BOTÕES DE NAVEGAÇÃO */}
                         <FixedSubmitButton>
-                            <Button type="submit" disabled={isLoading}>{isLoading ? 'Salvando...' : 'Salvar Cadastro'}</Button>
+                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'space-between', width: '100%' }}>
+                                {!isFirstTab && (
+                                    <Button type="button" onClick={handlePrevious} style={{ backgroundColor: '#6c757d' }}>
+                                        ← Anterior
+                                    </Button>
+                                )}
+                                
+                                <div style={{ marginLeft: 'auto' }}>
+                                    {!isLastTab ? (
+                                        <Button type="button" onClick={handleNext}>
+                                            Próximo →
+                                        </Button>
+                                    ) : (
+                                        <Button type="submit" disabled={isLoading}>
+                                            {isLoading ? 'Salvando...' : 'Salvar Cadastro'}
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
                         </FixedSubmitButton>
                     </FormContainer>
         </Container>

@@ -193,7 +193,6 @@ export const initialState = {
 export const validationSchema = yup.object().shape({
   // --- Aba: Identificação ---
   nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
-  // amazonq-ignore-next-line
   data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
   genero: yup.string().required('O gênero é obrigatório'),
   endereco: yup.string().required('O endereço é obrigatório'),
@@ -204,19 +203,18 @@ export const validationSchema = yup.object().shape({
   uf: yup.string().required('O UF é obrigatório'),
   telefone: yup.string().required('O telefone é obrigatório'),
 
-  // --- Aba: Histórico (Opcional) ---
-  historia_patologica: yup.object().notRequired(),
-
-  habitos_vida: yup.object().notRequired(),
-
-  // --- Aba: Dados Clínicos ---
+  // --- Aba: Dados Clínicos (CAMPOS OBRIGATÓRIOS DO BACKEND) ---
   historia_doenca: yup.object().shape({
-    sinal_sintoma_principal: yup.string().notRequired(),
-    data_sintomas: yup.string().notRequired(),
-    idade_diagnostico: yup.string().notRequired(),
-    lado_acometido: yup.string().notRequired(),
+    sinal_sintoma_principal: yup.string().required('O sinal/sintoma principal é obrigatório'),
+    data_sintomas: yup.date().required('A data dos sintomas é obrigatória').typeError('Forneça uma data válida'),
+    idade_diagnostico: yup.string().required('A idade do diagnóstico é obrigatória'),
+    lado_acometido: yup.string().required('O lado acometido é obrigatório'),
   }),
 
+  // --- Aba: Histórico (Opcional) ---
+  historia_patologica: yup.object().notRequired(),
+  habitos_vida: yup.object().notRequired(),
+  paridade: yup.object().notRequired(),
 
   // --- Aba: Modelos Preditores de Risco (Opcional) ---
   modelos_preditores: yup.object().shape({
@@ -225,7 +223,10 @@ export const validationSchema = yup.object().shape({
     score_gail: yup.string().notRequired(),
   }),
 
-  // --- Aba: Tratamento e Evolução ---
+  // --- Aba: Tratamento (Opcional) ---
+  tratamento: yup.object().notRequired(),
+
+  // --- Aba: Evolução ---
   desfecho: yup.object().shape({
       data_morte: yup.date().nullable().when('morte', {
           is: true,
