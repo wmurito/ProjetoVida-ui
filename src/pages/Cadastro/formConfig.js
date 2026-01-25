@@ -191,7 +191,7 @@ export const initialState = {
 // --- SCHEMA DE VALIDAÇÃO (YUP) ---
 // Schema expandido para cobrir os campos mais importantes e condicionais.
 export const validationSchema = yup.object().shape({
-  // --- Aba: Identificação ---
+  // --- Aba: Identificação (OBRIGATÓRIOS) ---
   nome_completo: yup.string().required('O nome completo é obrigatório').min(3, 'O nome deve ter pelo menos 3 caracteres'),
   data_nascimento: yup.date().required('A data de nascimento é obrigatória').typeError('Forneça uma data válida').nullable(),
   genero: yup.string().required('O gênero é obrigatório'),
@@ -203,42 +203,37 @@ export const validationSchema = yup.object().shape({
   uf: yup.string().required('O UF é obrigatório'),
   telefone: yup.string().required('O telefone é obrigatório'),
 
-  // --- Aba: Dados Clínicos (CAMPOS OBRIGATÓRIOS DO BACKEND) ---
+  // --- CAMPOS CONDICIONAIS (só validar se preenchidos) ---
   historia_doenca: yup.object().shape({
-    sinal_sintoma_principal: yup.string().required('O sinal/sintoma principal é obrigatório'),
-    data_sintomas: yup.date().required('A data dos sintomas é obrigatória').typeError('Forneça uma data válida'),
-    idade_diagnostico: yup.string().required('A idade do diagnóstico é obrigatória'),
-    lado_acometido: yup.string().required('O lado acometido é obrigatório'),
+    sinal_sintoma_principal: yup.string().when('$isSubmitting', {
+      is: true,
+      then: (schema) => schema.required('O sinal/sintoma principal é obrigatório'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+    data_sintomas: yup.date().when('$isSubmitting', {
+      is: true, 
+      then: (schema) => schema.required('A data dos sintomas é obrigatória').typeError('Forneça uma data válida'),
+      otherwise: (schema) => schema.nullable().notRequired()
+    }),
+    lado_acometido: yup.string().when('$isSubmitting', {
+      is: true,
+      then: (schema) => schema.required('O lado acometido é obrigatório'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+    idade_diagnostico: yup.string().notRequired(),
   }),
 
-  // --- Aba: Histórico (Opcional) ---
+  // --- DEMAIS CAMPOS OPCIONAIS ---
   historia_patologica: yup.object().notRequired(),
   habitos_vida: yup.object().notRequired(),
   paridade: yup.object().notRequired(),
-
-  // --- Aba: Modelos Preditores de Risco (Opcional) ---
-  modelos_preditores: yup.object().shape({
-    score_tyrer_cuzick: yup.string().notRequired(),
-    score_canrisk: yup.string().notRequired(),
-    score_gail: yup.string().notRequired(),
-  }),
-
-  // --- Aba: Tratamento (Opcional) ---
+  modelos_preditores: yup.object().notRequired(),
   tratamento: yup.object().notRequired(),
-
-  // --- Aba: Evolução ---
   desfecho: yup.object().shape({
       data_morte: yup.date().nullable().when('morte', {
           is: true,
           then: (schema) => schema.required('A data do óbito é obrigatória').typeError('Forneça uma data válida'),
           otherwise: (schema) => schema.notRequired(),
-      }).test('valid-date', 'Data inválida', function(value) {
-          if (!value) return true;
-          try {
-              return value instanceof Date && !isNaN(value);
-          } catch {
-              return false;
-          }
       }),
       causa_morte: yup.string().when('morte', {
           is: true,
