@@ -216,10 +216,7 @@ export const submitCadastro = async (formData) => {
     
     // 1. Validação
     console.log('🔍 Validando dados...');
-    await validationSchema.validate(formData, { 
-        abortEarly: false,
-        context: { isSubmitting: true }
-    });
+    await validationSchema.validate(formData, { abortEarly: false });
     console.log('✅ Validação concluída');
 
     // 2. Autenticação

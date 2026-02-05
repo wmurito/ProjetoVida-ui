@@ -205,22 +205,11 @@ export const validationSchema = yup.object().shape({
 
   // --- CAMPOS CONDICIONAIS (só validar se preenchidos) ---
   historia_doenca: yup.object().shape({
-    sinal_sintoma_principal: yup.string().when('$isSubmitting', {
-      is: true,
-      then: (schema) => schema.required('O sinal/sintoma principal é obrigatório'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    data_sintomas: yup.date().when('$isSubmitting', {
-      is: true, 
-      then: (schema) => schema.required('A data dos sintomas é obrigatória').typeError('Forneça uma data válida'),
-      otherwise: (schema) => schema.nullable().notRequired()
-    }),
-    lado_acometido: yup.string().when('$isSubmitting', {
-      is: true,
-      then: (schema) => schema.required('O lado acometido é obrigatório'),
-      otherwise: (schema) => schema.notRequired()
-    }),
-    idade_diagnostico: yup.string().notRequired(),
+    idade_diagnostico: yup.string().required('A idade do diagnóstico é obrigatória'),
+    // Demais campos opcionais
+    sinal_sintoma_principal: yup.string().notRequired(),
+    data_sintomas: yup.date().nullable().notRequired(),
+    lado_acometido: yup.string().notRequired(),
   }),
 
   // --- DEMAIS CAMPOS OPCIONAIS ---

@@ -155,10 +155,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         console.log('Dados do formulário:', JSON.stringify(formData, null, 2));
 
         try {
-            await validationSchema.validate(formData, { 
-                abortEarly: false,
-                context: { isSubmitting: true }
-            });
+            await validationSchema.validate(formData, { abortEarly: false });
             console.log('✅ Validação passou com sucesso!');
             
             console.log('=== ENVIANDO PARA API ===');
