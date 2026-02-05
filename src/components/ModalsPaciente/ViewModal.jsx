@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import api, { getAuthToken } from '../../services/api';
 import styled from 'styled-components';
-import { Overlay, Button, Spinner } from '../UI';
+import { Button, Spinner } from '../UI';
 
 // --- Styled Components ---
 const DetailGrid = styled.div`
@@ -43,11 +43,21 @@ const SectionTitle = styled.h3`
   font-weight: 600;
 `;
 
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+`;
+
 const ModalBox = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   width: 90%;
   max-width: 1000px;
   background: white;
@@ -56,6 +66,7 @@ const ModalBox = styled.div`
   padding: 32px;
   max-height: 90vh;
   overflow-y: auto;
+  z-index: 10000;
 `;
 
 const LoadingContainer = styled.div`
