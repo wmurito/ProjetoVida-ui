@@ -118,32 +118,173 @@ const ViewModal = ({ paciente, onClose }) => {
   const renderDetails = (data) => {
     if (!data) return null;
 
+    // Separar dados por seções
+    const sections = {
+      identificacao: {},
+      historia_patologica: {},
+      historia_familiar: {},
+      habitos_vida: {},
+      paridade: {},
+      historia_doenca: {},
+      modelos_preditores: {},
+      outros: {}
+    };
+
+    // Organizar dados por seções baseado nos prefixos
+    Object.entries(data).map(([key, value]) => {
+      if (['id_paciente', 'familiares', 'tratamento', 'desfecho'].includes(key)) return;
+      
+      if (key.startsWith('hp_')) {
+        sections.historia_patologica[key.replace('hp_', '')] = value;
+      } else if (key.startsWith('hf_')) {
+        sections.historia_familiar[key.replace('hf_', '')] = value;
+      } else if (key.startsWith('hv_')) {
+        sections.habitos_vida[key.replace('hv_', '')] = value;
+      } else if (key.startsWith('p_')) {
+        sections.paridade[key.replace('p_', '')] = value;
+      } else if (key.startsWith('hd_')) {
+        sections.historia_doenca[key.replace('hd_', '')] = value;
+      } else if (key.startsWith('mp_')) {
+        sections.modelos_preditores[key.replace('mp_', '')] = value;
+      } else if (['nome_completo', 'data_nascimento', 'genero', 'estado_civil', 'cor_etnia', 'escolaridade', 'renda_familiar', 'naturalidade', 'endereco', 'cep', 'numero', 'complemento', 'bairro', 'cidade', 'uf', 'telefone', 'altura', 'peso', 'imc', 'idade'].includes(key)) {
+        sections.identificacao[key] = value;
+      } else {
+        sections.outros[key] = value;
+      }
+    });
+
+    const renderSection = (title, sectionData) => {
+      const hasData = Object.values(sectionData).some(value => value !== null && value !== '' && value !== false);
+      if (!hasData) return null;
+
+      return (
+        <div key={title}>
+          <SectionTitle>{title}</SectionTitle>
+          <DetailGrid>
+            {Object.entries(sectionData).map(([key, value]) => {
+              if (value === null || value === '' || (typeof value === 'boolean' && !value && !key.includes('has') && !key.includes('uso') && !key.includes('teve'))) return null;
+
+              const label = key
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, (l) => l.toUpperCase());
+
+              let displayValue = value;
+              if (typeof value === 'boolean') {
+                displayValue = formatBoolean(value);
+              } else if (key.includes('data') && value) {
+                displayValue = formatDate(value);
+              } else if (value === null || value === '') {
+                displayValue = 'N/A';
+              }
+
+              return (
+                <DetailItem key={key}>
+                  <Label>{label}</Label>
+                  <Value>{displayValue}</Value>
+                </DetailItem>
+              );
+            })}
+          </DetailGrid>
+        </div>
+      );
+    };
+
     return (
-      <DetailGrid>
-        {Object.entries(data).map(([key, value]) => {
-          if (['id', 'paciente_id'].includes(key)) return null;
-
-          const label = key
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (l) => l.toUpperCase());
-
-          let displayValue = value;
-          if (typeof value === 'boolean') {
-            displayValue = formatBoolean(value);
-          } else if (key.includes('data') && value) {
-            displayValue = formatDate(value);
-          } else if (value === null || value === '') {
-            displayValue = 'N/A';
-          }
-
-          return (
-            <DetailItem key={key}>
-              <Label>{label}</Label>
-              <Value>{displayValue}</Value>
-            </DetailItem>
-          );
-        })}
-      </DetailGrid>
+      <>
+        {renderSection('Identificação e Dados Pessoais', sections.identificacao)}
+        {renderSection('História Patológica', sections.historia_patologica)}
+        {renderSection('História Familiar', sections.historia_familiar)}
+        {renderSection('Hábitos de Vida', sections.habitos_vida)}
+        {renderSection('Paridade', sections.paridade)}
+        {renderSection('História da Doença', sections.historia_doenca)}
+        {renderSection('Modelos Preditores', sections.modelos_preditores)}
+        {renderSection('Outros Dados', sections.outros)}
+        
+        {/* Familiares */}
+        {data.familiares && data.familiares.length > 0 && (
+          <div>
+            <SectionTitle>Familiares</SectionTitle>
+            {data.familiares.map((familiar, index) => (
+              <div key={index}>
+                <h4 style={{ color: '#666', marginBottom: '10px' }}>Familiar {index + 1}</h4>
+                <DetailGrid>
+                  {Object.entries(familiar).map(([key, value]) => {
+                    if (['id_familiar', 'id_paciente'].includes(key) || !value) return null;
+                    
+                    const label = key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+                    const displayValue = typeof value === 'boolean' ? formatBoolean(value) : value;
+                    
+                    return (
+                      <DetailItem key={key}>
+                        <Label>{label}</Label>
+                        <Value>{displayValue}</Value>
+                      </DetailItem>
+                    );
+                  })}
+                </DetailGrid>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Tratamento */}
+        {data.tratamento && (
+          <div>
+            <SectionTitle>Tratamento</SectionTitle>
+            <DetailGrid>
+              {Object.entries(data.tratamento).map(([key, value]) => {
+                if (['id_tratamento', 'id_paciente', 'cirurgias', 'quimio_paliativa', 'radio_paliativa', 'endo_paliativa', 'imuno_paliativa', 'imunohistoquimicas'].includes(key)) return null;
+                if (!value || value === '') return null;
+                
+                const label = key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+                let displayValue = value;
+                
+                if (typeof value === 'boolean') {
+                  displayValue = formatBoolean(value);
+                } else if (key.includes('data') && value) {
+                  displayValue = formatDate(value);
+                }
+                
+                return (
+                  <DetailItem key={key}>
+                    <Label>{label}</Label>
+                    <Value>{displayValue}</Value>
+                  </DetailItem>
+                );
+              })}
+            </DetailGrid>
+          </div>
+        )}
+        
+        {/* Desfecho */}
+        {data.desfecho && (
+          <div>
+            <SectionTitle>Desfecho</SectionTitle>
+            <DetailGrid>
+              {Object.entries(data.desfecho).map(([key, value]) => {
+                if (['id_desfecho', 'id_paciente', 'metastases', 'eventos'].includes(key)) return null;
+                if (value === null || value === '' || (typeof value === 'boolean' && !value)) return null;
+                
+                const label = key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+                let displayValue = value;
+                
+                if (typeof value === 'boolean') {
+                  displayValue = formatBoolean(value);
+                } else if (key.includes('data') && value) {
+                  displayValue = formatDate(value);
+                }
+                
+                return (
+                  <DetailItem key={key}>
+                    <Label>{label}</Label>
+                    <Value>{displayValue}</Value>
+                  </DetailItem>
+                );
+              })}
+            </DetailGrid>
+          </div>
+        )}
+      </>
     );
   };
 
@@ -158,7 +299,9 @@ const ViewModal = ({ paciente, onClose }) => {
           </LoadingContainer>
         ) : pacienteData ? (
           <>
-            <SectionTitle>Dados do Paciente</SectionTitle>
+            <h2 style={{ marginBottom: '20px', color: '#2D3748', borderBottom: '2px solid #ff7bac', paddingBottom: '10px' }}>
+              Detalhes do Paciente: {pacienteData.nome_completo || 'N/A'}
+            </h2>
             {renderDetails(pacienteData)}
 
             <ButtonContainer>
