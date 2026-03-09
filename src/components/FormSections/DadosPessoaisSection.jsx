@@ -3,6 +3,18 @@ import { FormGrid, FieldContainer, InputLabel, StyledInput, StyledSelect, ErrorT
 import { corEtniaOptions, escolaridadeOptions, rendaFamiliarOptions } from '../../pages/Cadastro/formConfig';
 
 const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
+    const calcularIdade = (dataNascimento) => {
+        if (!dataNascimento) return '';
+        const hoje = new Date();
+        const nascimento = new Date(dataNascimento + "T00:00:00");
+        let idade = hoje.getFullYear() - nascimento.getFullYear();
+        const m = hoje.getMonth() - nascimento.getMonth();
+        if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+            idade--;
+        }
+        return idade;
+    };
+
     return (
         <SectionContent>
             <FormGrid>
@@ -14,8 +26,7 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
 
                 <FieldContainer style={{ gridColumn: 'span 1' }}>
                     <InputLabel htmlFor="idade">Idade</InputLabel>
-                    <StyledInput id="idade" name="idade" type="number" value={formData.idade} onChange={handleChange} min="0" max="150" />
-                    {errors.idade && <ErrorText>{errors.idade}</ErrorText>}
+                    <StyledInput id="idade" name="idade" type="text" value={calcularIdade(formData.data_nascimento)} readOnly disabled />
                 </FieldContainer>
                 <FieldContainer style={{ gridColumn: 'span 2' }}>
                     <InputLabel htmlFor="data_nascimento">Data de Nascimento</InputLabel>
