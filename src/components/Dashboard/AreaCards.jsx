@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import './AreaCards.scss';
 import { getDashboardEstadiamento, getDashboardSobrevida, getDashboardRecidiva, getDashboardDeltaT } from '../../services/api';
 
 const AreaCards = () => {
@@ -8,15 +7,12 @@ const AreaCards = () => {
   const [totalObitos, setTotalObitos] = useState(0);
   const [taxaMortalidade, setTaxaMortalidade] = useState(0);
   const [idadeMediaDiagnostico, setIdadeMediaDiagnostico] = useState(0);
-  const [tamanhoMedioTumor, setTamanhoMedioTumor] = useState(0); // Já estava aqui!
+  const [tamanhoMedioTumor, setTamanhoMedioTumor] = useState(0);
   const [mediaRiscoGail, setMediaRiscoGail] = useState(0);
   const [mediaRiscoTyrer, setMediaRiscoTyrer] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Não precisamos mais do s3BaseUrl
-  // const s3BaseUrl = '...';
 
   useEffect(() => {
     let isMounted = true;
@@ -27,7 +23,6 @@ const AreaCards = () => {
       setError(null);
 
       try {
-        // Buscar dados de todos os endpoints do dashboard com timeout
         const [estadiamentoRes, sobrevidaRes] = await Promise.all([
           getDashboardEstadiamento(),
           getDashboardSobrevida()
@@ -38,11 +33,10 @@ const AreaCards = () => {
         const estadiamento = estadiamentoRes.data || [];
         const sobrevida = sobrevidaRes.data || [];
 
-        // Calcular KPIs baseados nos dados recebidos
         const totalPac = estadiamento.reduce((sum, item) => sum + (item.total || 0), 0);
         const totalObt = sobrevida.find(item => item.status === 'Óbito')?.total || 0;
         const taxaMort = totalPac > 0 ? (totalObt / totalPac) * 100 : 0;
-        
+
         if (isMounted) {
           setTotalPacientes(totalPac);
           setTotalObitos(totalObt);
@@ -54,12 +48,10 @@ const AreaCards = () => {
         }
 
       } catch (err) {
-        // Log seguro para produção
         if (import.meta.env.DEV) {
           console.error('Erro ao carregar KPIs:', err);
         }
         setError('Erro ao carregar dados. Tente novamente.');
-        // Resetar todos os KPIs para 0
         setTotalPacientes(0);
         setTotalObitos(0);
         setTaxaMortalidade(0);
@@ -82,86 +74,53 @@ const AreaCards = () => {
     };
   }, []);
 
-  const formattedTaxaMortalidade = useMemo(() => 
+  const formattedTaxaMortalidade = useMemo(() =>
     (taxaMortalidade || 0).toFixed(1), [taxaMortalidade]
   );
 
-  const formattedIdadeMedia = useMemo(() => 
+  const formattedIdadeMedia = useMemo(() =>
     (idadeMediaDiagnostico || 0).toFixed(0), [idadeMediaDiagnostico]
   );
 
-  const formattedTamanhoMedio = useMemo(() => 
+  const formattedTamanhoMedio = useMemo(() =>
     (tamanhoMedioTumor || 0).toFixed(1), [tamanhoMedioTumor]
   );
 
-  const formattedRiscoGail = useMemo(() => 
+  const formattedRiscoGail = useMemo(() =>
     (mediaRiscoGail || 0).toFixed(2), [mediaRiscoGail]
   );
 
-  const formattedRiscoTyrer = useMemo(() => 
+  const formattedRiscoTyrer = useMemo(() =>
     (mediaRiscoTyrer || 0).toFixed(2), [mediaRiscoTyrer]
   );
 
   if (loading) {
-    return <section className="content-area-cards loading">Carregando KPIs...</section>;
+    return <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 p-4 animate-pulse">Carregando KPIs...</section>;
   }
 
-  if (error && !loading) { 
-     return <section className="content-area-cards error">Erro ao carregar KPIs: {error}</section>;
+  if (error && !loading) {
+    return <section className="p-4 text-red-600 bg-red-50 rounded-lg">Erro ao carregar KPIs: {error}</section>;
   }
+
+  const MetricCard = ({ title, value, label }) => (
+    <div className="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-5 border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+      <h3 className="text-sm font-medium text-slate-500 mb-2 truncate">{title}</h3>
+      <div className="flex items-baseline gap-2">
+        <span className="text-2xl font-bold text-slate-800">{value}</span>
+        <span className="text-xs text-slate-400 font-medium">{label}</span>
+      </div>
+    </div>
+  );
 
   return (
-    <section className="content-area-cards">
-      <div className="metric-card compact">
-        <div className="card-header">Total de Casos</div>
-        <div className="card-content">
-          <div className="metric-value">{totalPacientes}</div>
-          <div className="metric-label">Pacientes</div>
-        </div>
-      </div>
-      <div className="metric-card compact">
-        <div className="card-header">Total de Óbitos</div>
-        <div className="card-content">
-          <div className="metric-value">{totalObitos}</div>
-          <div className="metric-label">Óbitos Registrados</div>
-        </div>
-      </div>
-      <div className="metric-card compact">
-        <div className="card-header">Taxa de Mortalidade</div>
-        <div className="card-content">
-          <div className="metric-value">{formattedTaxaMortalidade}%</div>
-          <div className="metric-label">Geral</div>
-        </div>
-      </div>
-      <div className="metric-card compact">
-        <div className="card-header">Idade Média Diagnóstico</div>
-        <div className="card-content">
-          <div className="metric-value">{formattedIdadeMedia}</div>
-          <div className="metric-label">Anos</div>
-        </div>
-      </div>
-      {/* Card Adicionado/Confirmado para Tamanho Médio do Tumor */}
-      <div className="metric-card compact">
-        <div className="card-header">Tamanho Médio Tumor</div>
-        <div className="card-content">
-          <div className="metric-value">{formattedTamanhoMedio}</div>
-          <div className="metric-label">cm</div>
-        </div>
-      </div>
-      <div className="metric-card compact">
-        <div className="card-header">Risco Gail (Média)</div>
-        <div className="card-content">
-          <div className="metric-value">{formattedRiscoGail}%</div>
-          <div className="metric-label">Em 5 anos</div>
-        </div>
-      </div>
-      <div className="metric-card compact">
-        <div className="card-header">Risco Tyrer-Cuzick (Média)</div>
-        <div className="card-content">
-          <div className="metric-value">{formattedRiscoTyrer}%</div>
-          <div className="metric-label">Em 10 anos</div>
-        </div>
-      </div>
+    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-4 mb-6">
+      <MetricCard title="Total de Casos" value={totalPacientes} label="Pacientes" />
+      <MetricCard title="Total de Óbitos" value={totalObitos} label="Registrados" />
+      <MetricCard title="Mortalidade" value={`${formattedTaxaMortalidade}%`} label="Geral" />
+      <MetricCard title="Idade Média Diagnóstico" value={formattedIdadeMedia} label="Anos" />
+      <MetricCard title="Tamanho Médio Tumor" value={formattedTamanhoMedio} label="cm" />
+      <MetricCard title="Risco Gail (Média)" value={`${formattedRiscoGail}%`} label="Em 5 anos" />
+      <MetricCard title="Risco Tyrer-Cuzick" value={`${formattedRiscoTyrer}%`} label="Em 10 anos" />
     </section>
   );
 };

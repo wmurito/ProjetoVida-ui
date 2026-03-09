@@ -13,8 +13,7 @@ const AreaCharts = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Buscar dados de todos os endpoints do dashboard
+
         const [estadiamentoRes, sobrevidaRes, recidivaRes, deltaTRes, estatisticasTemporaisRes] = await Promise.all([
           getDashboardEstadiamento(),
           getDashboardSobrevida(),
@@ -29,13 +28,11 @@ const AreaCharts = () => {
         const deltaT = deltaTRes.data;
         const estatisticasTemporais = estatisticasTemporaisRes.data;
 
-        // Preparar dados para o gráfico de estatísticas de pacientes
         const chartData = {
           estadiamento: estadiamento,
           sobrevida: sobrevida,
           recidiva: recidiva,
           deltaT: deltaT,
-          // Dados reais do backend para gráfico de linha
           months: estatisticasTemporais.months || [],
           newPatients: estatisticasTemporais.newPatients || [],
           consultations: estatisticasTemporais.consultations || []
@@ -44,13 +41,10 @@ const AreaCharts = () => {
         setChartData(chartData);
         setError(null);
       } catch (err) {
-        // Log de erro sanitizado para produção
-        
-        // Sanitizar mensagem de erro antes de exibir
-        const sanitizedMessage = sanitizeInput(err.message || 'Erro desconhecido');
+        if (import.meta.env.DEV) {
+          console.error('Erro:', sanitizeInput(err.message || 'Erro desconhecido'));
+        }
         setError('Erro ao carregar dados dos gráficos');
-        
-        // Notificação amigável ao usuário
         toast.error('Não foi possível carregar os gráficos. Tente novamente.');
       } finally {
         setLoading(false);
@@ -63,20 +57,18 @@ const AreaCharts = () => {
   const getOption = () => {
     if (!chartData) return {};
 
-    // Verificar se há dados reais para exibir
     const hasData = chartData.months && chartData.months.length > 0;
-    const hasRealData = chartData.estadiamento && chartData.estadiamento.length > 0;
-    
+
     if (!hasData) {
       return {
-        backgroundColor: 'white',
+        backgroundColor: 'transparent',
         title: {
           text: 'Estatísticas de Pacientes',
           left: 'center',
           top: 20,
           textStyle: {
-            color: '#2c3e50',
-            fontSize: 18,
+            color: '#334155', // text-slate-700
+            fontSize: 16,
             fontWeight: '600'
           }
         },
@@ -86,8 +78,8 @@ const AreaCharts = () => {
           top: 'middle',
           style: {
             text: 'Nenhum dado disponível',
-            fontSize: 16,
-            fill: '#7f8c8d',
+            fontSize: 14,
+            fill: '#94a3b8', // text-slate-400
             fontWeight: '500'
           }
         }
@@ -99,31 +91,31 @@ const AreaCharts = () => {
       tooltip: {
         trigger: 'axis',
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderColor: '#d94c77',
+        borderColor: '#0f172a', // text-slate-900 border
         borderWidth: 1,
         textStyle: {
-          color: '#2c3e50'
+          color: '#334155'
         },
         axisPointer: {
-          type: 'cross',
-          crossStyle: {
-            color: '#d94c77'
+          type: 'line',
+          lineStyle: {
+            color: '#cbd5e1'
           }
         }
       },
       legend: {
         data: ['Novos Pacientes', 'Consultas'],
-        top: 50,
+        top: 10,
         textStyle: {
-          color: '#2c3e50',
+          color: '#475569',
           fontSize: 12
         }
       },
       grid: {
-        left: '5%',
-        right: '5%',
-        bottom: '10%',
-        top: '10%',
+        left: '2%',
+        right: '4%',
+        bottom: '5%',
+        top: '15%',
         containLabel: true,
         backgroundColor: 'transparent'
       },
@@ -133,38 +125,32 @@ const AreaCharts = () => {
         data: chartData.months || [],
         axisLine: {
           lineStyle: {
-            color: '#e0e0e0'
+            color: '#e2e8f0'
           }
         },
         axisLabel: {
-          color: '#7f8c8d',
+          color: '#64748b',
           fontSize: 11
         },
         axisTick: {
-          lineStyle: {
-            color: '#e0e0e0'
-          }
+          show: false
         }
       },
       yAxis: {
         type: 'value',
         axisLine: {
-          lineStyle: {
-            color: '#e0e0e0'
-          }
+          show: false
         },
         axisLabel: {
-          color: '#7f8c8d',
+          color: '#64748b',
           fontSize: 11
         },
         axisTick: {
-          lineStyle: {
-            color: '#e0e0e0'
-          }
+          show: false
         },
         splitLine: {
           lineStyle: {
-            color: '#f0f0f0',
+            color: '#f1f5f9',
             type: 'dashed'
           }
         }
@@ -174,16 +160,10 @@ const AreaCharts = () => {
           name: 'Novos Pacientes',
           type: 'line',
           smooth: true,
-          symbol: 'circle',
-          symbolSize: 6,
+          symbol: 'none',
           lineStyle: {
-            color: '#d94c77',
+            color: '#0ea5e9', // sky-500
             width: 3
-          },
-          itemStyle: {
-            color: '#d94c77',
-            borderColor: '#fff',
-            borderWidth: 2
           },
           areaStyle: {
             color: {
@@ -193,14 +173,8 @@ const AreaCharts = () => {
               x2: 0,
               y2: 1,
               colorStops: [
-                {
-                  offset: 0,
-                  color: 'rgba(217, 76, 119, 0.3)'
-                },
-                {
-                  offset: 1,
-                  color: 'rgba(217, 76, 119, 0.05)'
-                }
+                { offset: 0, color: 'rgba(14, 165, 233, 0.2)' },
+                { offset: 1, color: 'rgba(14, 165, 233, 0)' }
               ]
             }
           },
@@ -210,16 +184,10 @@ const AreaCharts = () => {
           name: 'Consultas',
           type: 'line',
           smooth: true,
-          symbol: 'circle',
-          symbolSize: 6,
+          symbol: 'none',
           lineStyle: {
-            color: '#3498db',
+            color: '#14b8a6', // teal-500
             width: 3
-          },
-          itemStyle: {
-            color: '#3498db',
-            borderColor: '#fff',
-            borderWidth: 2
           },
           areaStyle: {
             color: {
@@ -229,14 +197,8 @@ const AreaCharts = () => {
               x2: 0,
               y2: 1,
               colorStops: [
-                {
-                  offset: 0,
-                  color: 'rgba(52, 152, 219, 0.3)'
-                },
-                {
-                  offset: 1,
-                  color: 'rgba(52, 152, 219, 0.05)'
-                }
+                { offset: 0, color: 'rgba(20, 184, 166, 0.2)' },
+                { offset: 1, color: 'rgba(20, 184, 166, 0)' }
               ]
             }
           },
@@ -246,49 +208,37 @@ const AreaCharts = () => {
     };
   };
 
-
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '400px' 
-      }}>
-        Carregando gráficos...
+      <div className="w-full h-96 flex justify-center items-center bg-white rounded-xl shadow-sm border border-slate-100 animate-pulse">
+        <span className="text-slate-400 font-medium">Carregando gráficos...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '400px',
-        color: '#ff4444'
-      }}>
-        {error}
+      <div className="w-full h-96 flex justify-center items-center bg-red-50 rounded-xl border border-red-100">
+        <span className="text-red-500 font-medium">{error}</span>
       </div>
     );
   }
 
-  const hasRealData = chartData && chartData.estadiamento && chartData.estadiamento.length > 0;
-
   return (
-    <div className="area-charts">
-      <div className="metric-card chart-card chart-full-width">
-        <div className="card-header">Estatísticas de Pacientes</div>
-        <div className="card-content">
-          <ReactECharts 
-            option={getOption()} 
+    <div className="w-full mb-6">
+      <div className="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-5 border border-slate-100">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-slate-800">Estatísticas de Pacientes e Consultas</h2>
+          <p className="text-sm text-slate-500">Acompanhamento temporal do volume de novos registros e retornos.</p>
+        </div>
+        <div className="w-full">
+          <ReactECharts
+            option={getOption()}
             style={{ height: '350px', width: '100%' }}
-            opts={{ renderer: 'canvas' }}
+            opts={{ renderer: 'svg' }} // SVG is usually sharper for responsive charts
           />
         </div>
       </div>
-      
     </div>
   );
 };

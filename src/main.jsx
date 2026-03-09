@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./hooks/useAuth";
 import ErrorBoundary from "./components/ErrorBoundary";
+import "./App.css";
 
 import { Amplify } from 'aws-amplify';
 import { setupCSP } from './services/securityConfig';
