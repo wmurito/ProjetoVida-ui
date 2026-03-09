@@ -1,7 +1,8 @@
 import React, { useState, useEffect, memo } from 'react';
-import { sanitizeInput, validateInput, detectAttack } from '../../services/securityConfig';
+import { sanitizeInput, detectAttack } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
 import { rateLimiter } from '../../services/rateLimiter';
+import { FiX, FiEdit3 } from 'react-icons/fi';
 
 const EditModal = ({ paciente, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
     endereco: '',
     dataNascimento: '',
   });
-  
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +55,7 @@ const EditModal = ({ paciente, onClose, onSave }) => {
 
   const handleInputChange = (field, value) => {
     const sanitizedValue = sanitizeInput(value);
-    
+
     if (detectAttack(value)) {
       toast.error('Entrada contém caracteres não permitidos');
       return;
@@ -75,20 +76,20 @@ const EditModal = ({ paciente, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const userId = sessionStorage.getItem('userId') || 'anonymous';
     if (rateLimiter.isBlocked(userId)) {
       toast.error('Muitas tentativas. Aguarde antes de tentar novamente.');
       return;
     }
-    
+
     if (!validateForm()) {
       toast.error('Por favor, corrija os erros no formulário');
       return;
     }
 
     setLoading(true);
-    
+
     try {
       const sanitizedData = Object.keys(formData).reduce((acc, key) => {
         acc[key] = sanitizeInput(formData[key]);
@@ -99,12 +100,11 @@ const EditModal = ({ paciente, onClose, onSave }) => {
         ...paciente,
         ...sanitizedData
       });
-      
-      toast.success('Paciente atualizado com sucesso!');
+
       onClose();
     } catch (error) {
       console.error('Erro ao salvar paciente:', sanitizeInput(error.message));
-      
+
       if (error.response?.status === 403) {
         toast.error('Você não tem permissão para editar este paciente');
       } else if (error.response?.status === 409) {
@@ -130,76 +130,32 @@ const EditModal = ({ paciente, onClose, onSave }) => {
   if (!paciente) return null;
 
   return (
-    <div onClick={handleClose} style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      backdropFilter: 'blur(4px)'
-    }}>
-      <div onClick={(e) => e.stopPropagation()} style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        maxWidth: '700px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-      }}>
-        <div style={{
-          padding: '24px 32px',
-          borderBottom: '1px solid #e5e7eb',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          backgroundColor: '#f9fafb'
-        }}>
-          <h2 style={{
-            margin: 0,
-            fontSize: '24px',
-            fontWeight: '600',
-            color: '#111827'
-          }}>Editar Paciente</h2>
-          <button 
+    <div
+      onClick={handleClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden relative"
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50 shrink-0">
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <FiEdit3 className="text-teal-500" /> Editar Paciente
+          </h2>
+          <button
             onClick={handleClose}
             disabled={loading}
-            style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '28px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              color: '#6b7280',
-              padding: '0',
-              width: '32px',
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '8px',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#f3f4f6')}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ×
+            <FiX className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ padding: '32px' }}>
-          <div style={{ marginBottom: '24px' }}>
-            <label htmlFor="nome" style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#374151'
-            }}>Nome Completo *</label>
+        <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6">
+          <div className="mb-5">
+            <label htmlFor="nome" className="block text-sm font-medium text-slate-700 mb-1.5">
+              Nome Completo *
+            </label>
             <input
               id="nome"
               type="text"
@@ -208,42 +164,16 @@ const EditModal = ({ paciente, onClose, onSave }) => {
               maxLength={100}
               required
               disabled={loading}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                fontSize: '15px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                outline: 'none',
-                transition: 'all 0.2s',
-                backgroundColor: loading ? '#f9fafb' : 'white',
-                boxSizing: 'border-box'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              className={`w-full px-4 py-2.5 bg-white border ${errors.nome ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300'} rounded-lg text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:bg-slate-50 transition-colors`}
             />
-            {errors.nome && <span style={{
-              display: 'block',
-              marginTop: '6px',
-              fontSize: '13px',
-              color: '#ef4444'
-            }}>{errors.nome}</span>}
+            {errors.nome && <span className="block mt-1.5 text-xs font-medium text-rose-500">{errors.nome}</span>}
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '16px',
-            marginBottom: '24px'
-          }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
             <div>
-              <label htmlFor="cpf" style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151'
-              }}>CPF</label>
+              <label htmlFor="cpf" className="block text-sm font-medium text-slate-700 mb-1.5">
+                CPF
+              </label>
               <input
                 id="cpf"
                 type="text"
@@ -251,73 +181,31 @@ const EditModal = ({ paciente, onClose, onSave }) => {
                 onChange={(e) => handleInputChange('cpf', e.target.value)}
                 maxLength={14}
                 disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  fontSize: '15px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  transition: 'all 0.2s',
-                  backgroundColor: loading ? '#f9fafb' : 'white',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                className={`w-full px-4 py-2.5 bg-white border ${errors.cpf ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300'} rounded-lg text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:bg-slate-50 transition-colors`}
               />
-              {errors.cpf && <span style={{
-                display: 'block',
-                marginTop: '6px',
-                fontSize: '13px',
-                color: '#ef4444'
-              }}>{errors.cpf}</span>}
+              {errors.cpf && <span className="block mt-1.5 text-xs font-medium text-rose-500">{errors.cpf}</span>}
             </div>
 
             <div>
-              <label htmlFor="dataNascimento" style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151'
-              }}>Data de Nascimento</label>
+              <label htmlFor="dataNascimento" className="block text-sm font-medium text-slate-700 mb-1.5">
+                Data de Nascimento
+              </label>
               <input
                 id="dataNascimento"
                 type="date"
                 value={formData.dataNascimento}
                 onChange={(e) => handleInputChange('dataNascimento', e.target.value)}
                 disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  fontSize: '15px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  transition: 'all 0.2s',
-                  backgroundColor: loading ? '#f9fafb' : 'white',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm shadow-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:bg-slate-50 transition-colors"
               />
             </div>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr',
-            gap: '16px',
-            marginBottom: '24px'
-          }}>
-            <div>
-              <label htmlFor="email" style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151'
-              }}>Email</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
+            <div className="lg:col-span-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
@@ -325,36 +213,15 @@ const EditModal = ({ paciente, onClose, onSave }) => {
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 maxLength={255}
                 disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  fontSize: '15px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  transition: 'all 0.2s',
-                  backgroundColor: loading ? '#f9fafb' : 'white',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                className={`w-full px-4 py-2.5 bg-white border ${errors.email ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300'} rounded-lg text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:bg-slate-50 transition-colors`}
               />
-              {errors.email && <span style={{
-                display: 'block',
-                marginTop: '6px',
-                fontSize: '13px',
-                color: '#ef4444'
-              }}>{errors.email}</span>}
+              {errors.email && <span className="block mt-1.5 text-xs font-medium text-rose-500">{errors.email}</span>}
             </div>
 
-            <div>
-              <label htmlFor="telefone" style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#374151'
-              }}>Telefone</label>
+            <div className="lg:col-span-1">
+              <label htmlFor="telefone" className="block text-sm font-medium text-slate-700 mb-1.5">
+                Telefone
+              </label>
               <input
                 id="telefone"
                 type="tel"
@@ -362,37 +229,16 @@ const EditModal = ({ paciente, onClose, onSave }) => {
                 onChange={(e) => handleInputChange('telefone', e.target.value)}
                 maxLength={15}
                 disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  fontSize: '15px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  transition: 'all 0.2s',
-                  backgroundColor: loading ? '#f9fafb' : 'white',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                className={`w-full px-4 py-2.5 bg-white border ${errors.telefone ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300'} rounded-lg text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:bg-slate-50 transition-colors`}
               />
-              {errors.telefone && <span style={{
-                display: 'block',
-                marginTop: '6px',
-                fontSize: '13px',
-                color: '#ef4444'
-              }}>{errors.telefone}</span>}
+              {errors.telefone && <span className="block mt-1.5 text-xs font-medium text-rose-500">{errors.telefone}</span>}
             </div>
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label htmlFor="endereco" style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#374151'
-            }}>Endereço</label>
+          <div className="mb-2">
+            <label htmlFor="endereco" className="block text-sm font-medium text-slate-700 mb-1.5">
+              Endereço
+            </label>
             <textarea
               id="endereco"
               value={formData.endereco}
@@ -400,77 +246,28 @@ const EditModal = ({ paciente, onClose, onSave }) => {
               maxLength={500}
               rows={3}
               disabled={loading}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                fontSize: '15px',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                outline: 'none',
-                transition: 'all 0.2s',
-                backgroundColor: loading ? '#f9fafb' : 'white',
-                resize: 'vertical',
-                fontFamily: 'inherit',
-                boxSizing: 'border-box'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#ff7bac'}
-              onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+              className={`w-full px-4 py-2.5 bg-white border ${errors.endereco ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300'} rounded-lg text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:bg-slate-50 transition-colors resize-y`}
             />
-            {errors.endereco && <span style={{
-              display: 'block',
-              marginTop: '6px',
-              fontSize: '13px',
-              color: '#ef4444'
-            }}>{errors.endereco}</span>}
+            {errors.endereco && <span className="block mt-1.5 text-xs font-medium text-rose-500">{errors.endereco}</span>}
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            justifyContent: 'flex-end',
-            paddingTop: '24px',
-            borderTop: '1px solid #e5e7eb'
-          }}>
-            <button 
-              type="button" 
+          <div className="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-200">
+            <button
+              type="button"
               onClick={handleClose}
               disabled={loading}
-              style={{
-                padding: '12px 24px',
-                fontSize: '15px',
-                fontWeight: '500',
-                border: '1px solid #d1d5db',
-                borderRadius: '8px',
-                backgroundColor: 'white',
-                color: '#374151',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s',
-                opacity: loading ? 0.5 : 1
-              }}
-              onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#f9fafb')}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+              className="px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
-              style={{
-                padding: '12px 32px',
-                fontSize: '15px',
-                fontWeight: '500',
-                border: 'none',
-                borderRadius: '8px',
-                backgroundColor: '#ff7bac',
-                color: 'white',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s',
-                opacity: loading ? 0.7 : 1
-              }}
-              onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#ff5a94')}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#ff7bac'}
+              className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[140px]"
             >
-              {loading ? 'Salvando...' : 'Salvar Alterações'}
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : 'Salvar Alterações'}
             </button>
           </div>
         </form>

@@ -1,90 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import api, { getAuthToken } from '../../services/api';
-import styled from 'styled-components';
-import { Button, Spinner } from '../UI';
-
-// --- Styled Components ---
-const DetailGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 12px 25px;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 20px;
-`;
-
-const DetailItem = styled.div`
-  padding-bottom: 10px;
-  border-bottom: 1px dotted #e0e0e0;
-`;
-
-const Label = styled.strong`
-  display: block;
-  color: #4A5568;
-  margin-bottom: 4px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-transform: capitalize;
-`;
-
-const Value = styled.span`
-  color: #1A202C;
-  word-break: break-word;
-`;
-
-const SectionTitle = styled.h3`
-  margin-top: 10px;
-  margin-bottom: 15px;
-  color: #ff7bac;
-  font-size: 1.25rem;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 10px;
-  font-weight: 600;
-`;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-`;
-
-const ModalBox = styled.div`
-  position: relative;
-  width: 90%;
-  max-width: 1000px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  padding: 32px;
-  max-height: 90vh;
-  overflow-y: auto;
-  z-index: 10000;
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 40px;
-`;
-
-const ButtonContainer = styled.div`
-  margin-top: 24px;
-  text-align: right;
-`;
-
-const ErrorContainer = styled.div`
-  text-align: center;
-  padding: 32px;
-`;
-// --- Fim dos Styled Components ---
+import { FiX, FiActivity } from 'react-icons/fi';
 
 const ViewModal = ({ paciente, onClose }) => {
   const [pacienteData, setPacienteData] = useState(null);
@@ -144,7 +61,7 @@ const ViewModal = ({ paciente, onClose }) => {
     // Organizar dados por seções baseado nos prefixos
     Object.entries(data).map(([key, value]) => {
       if (['id_paciente', 'familiares', 'tratamento', 'desfecho'].includes(key)) return;
-      
+
       if (key.startsWith('hp_')) {
         sections.historia_patologica[key.replace('hp_', '')] = value;
       } else if (key.startsWith('hf_')) {
@@ -169,9 +86,9 @@ const ViewModal = ({ paciente, onClose }) => {
       if (!hasData) return null;
 
       return (
-        <div key={title}>
-          <SectionTitle>{title}</SectionTitle>
-          <DetailGrid>
+        <div key={title} className="mb-6">
+          <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">{title}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
             {Object.entries(sectionData).map(([key, value]) => {
               if (value === null || value === '' || (typeof value === 'boolean' && !value && !key.includes('has') && !key.includes('uso') && !key.includes('teve'))) return null;
 
@@ -189,19 +106,19 @@ const ViewModal = ({ paciente, onClose }) => {
               }
 
               return (
-                <DetailItem key={key}>
-                  <Label>{label}</Label>
-                  <Value>{displayValue}</Value>
-                </DetailItem>
+                <div key={key} className="pb-2 border-b border-dotted border-slate-200 flex flex-col">
+                  <strong className="text-sm font-semibold text-slate-500 mb-1 capitalize">{label}</strong>
+                  <span className="text-sm text-slate-800 break-words">{displayValue}</span>
+                </div>
               );
             })}
-          </DetailGrid>
+          </div>
         </div>
       );
     };
 
     return (
-      <>
+      <div className="px-6 py-4">
         {renderSection('Identificação e Dados Pessoais', sections.identificacao)}
         {renderSection('História Patológica', sections.historia_patologica)}
         {renderSection('História Familiar', sections.historia_familiar)}
@@ -210,127 +127,139 @@ const ViewModal = ({ paciente, onClose }) => {
         {renderSection('História da Doença', sections.historia_doenca)}
         {renderSection('Modelos Preditores', sections.modelos_preditores)}
         {renderSection('Outros Dados', sections.outros)}
-        
+
         {/* Familiares */}
         {data.familiares && data.familiares.length > 0 && (
-          <div>
-            <SectionTitle>Familiares</SectionTitle>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">Familiares</h3>
             {data.familiares.map((familiar, index) => (
-              <div key={index}>
-                <h4 style={{ color: '#666', marginBottom: '10px' }}>Familiar {index + 1}</h4>
-                <DetailGrid>
+              <div key={index} className="mb-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <h4 className="text-sm font-semibold text-slate-600 mb-3">Familiar {index + 1}</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
                   {Object.entries(familiar).map(([key, value]) => {
                     if (['id_familiar', 'id_paciente'].includes(key) || !value) return null;
-                    
+
                     const label = key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
                     const displayValue = typeof value === 'boolean' ? formatBoolean(value) : value;
-                    
+
                     return (
-                      <DetailItem key={key}>
-                        <Label>{label}</Label>
-                        <Value>{displayValue}</Value>
-                      </DetailItem>
+                      <div key={key} className="flex flex-col">
+                        <strong className="text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">{label}</strong>
+                        <span className="text-sm text-slate-800">{displayValue}</span>
+                      </div>
                     );
                   })}
-                </DetailGrid>
+                </div>
               </div>
             ))}
           </div>
         )}
-        
+
         {/* Tratamento */}
         {data.tratamento && (
-          <div>
-            <SectionTitle>Tratamento</SectionTitle>
-            <DetailGrid>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">Tratamento</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
               {Object.entries(data.tratamento).map(([key, value]) => {
-                if (['id_tratamento', 'id_paciente', 'cirurgias', 'quimio_paliativa', 'radio_paliativa', 'endo_paliativa', 'imuno_paliativa', 'imunohistoquimicas'].includes(key)) return null;
-                if (!value || value === '') return null;
-                
+                const hiddenKeys = ['id_tratamento', 'id_paciente', 'cirurgias', 'quimioterapia', 'radioterapia', 'endocrinoterapia', 'imunoterapia', 'imunohistoquimicas', 'core_biopsy', 'mamotomia', 'paaf'];
+                if (hiddenKeys.includes(key) || !value || value === '') return null;
+
                 const label = key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
                 let displayValue = value;
-                
+
                 if (typeof value === 'boolean') {
                   displayValue = formatBoolean(value);
                 } else if (key.includes('data') && value) {
                   displayValue = formatDate(value);
                 }
-                
+
                 return (
-                  <DetailItem key={key}>
-                    <Label>{label}</Label>
-                    <Value>{displayValue}</Value>
-                  </DetailItem>
+                  <div key={key} className="pb-2 border-b border-dotted border-slate-200 flex flex-col">
+                    <strong className="text-sm font-semibold text-slate-500 mb-1 capitalize">{label}</strong>
+                    <span className="text-sm text-slate-800 break-words">{displayValue}</span>
+                  </div>
                 );
               })}
-            </DetailGrid>
+            </div>
           </div>
         )}
-        
+
         {/* Desfecho */}
         {data.desfecho && (
-          <div>
-            <SectionTitle>Desfecho</SectionTitle>
-            <DetailGrid>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">Desfecho</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
               {Object.entries(data.desfecho).map(([key, value]) => {
                 if (['id_desfecho', 'id_paciente', 'metastases', 'eventos'].includes(key)) return null;
                 if (value === null || value === '' || (typeof value === 'boolean' && !value)) return null;
-                
+
                 const label = key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
                 let displayValue = value;
-                
+
                 if (typeof value === 'boolean') {
                   displayValue = formatBoolean(value);
                 } else if (key.includes('data') && value) {
                   displayValue = formatDate(value);
                 }
-                
+
                 return (
-                  <DetailItem key={key}>
-                    <Label>{label}</Label>
-                    <Value>{displayValue}</Value>
-                  </DetailItem>
+                  <div key={key} className="pb-2 border-b border-dotted border-slate-200 flex flex-col">
+                    <strong className="text-sm font-semibold text-slate-500 mb-1 capitalize">{label}</strong>
+                    <span className="text-sm text-slate-800 break-words">{displayValue}</span>
+                  </div>
                 );
               })}
-            </DetailGrid>
+            </div>
           </div>
         )}
-      </>
+      </div>
     );
   };
 
   if (!paciente) return null;
 
   return (
-    <Overlay>
-      <ModalBox>
-        {loading ? (
-          <LoadingContainer>
-            <Spinner size="40px" />
-          </LoadingContainer>
-        ) : pacienteData ? (
-          <>
-            <h2 style={{ marginBottom: '20px', color: '#2D3748', borderBottom: '2px solid #ff7bac', paddingBottom: '10px' }}>
-              Detalhes do Paciente: {pacienteData.nome_completo || 'N/A'}
-            </h2>
-            {renderDetails(pacienteData)}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+      <div
+        className="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50 shrink-0">
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <FiActivity className="text-teal-500" /> Detalhes do Paciente: <span className="text-teal-700">{pacienteData ? pacienteData.nome_completo : 'Carregando...'}</span>
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-2 rounded-full transition-colors"
+          >
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
 
-            <ButtonContainer>
-              <Button onClick={onClose} variant="secondary">
-                Fechar
-              </Button>
-            </ButtonContainer>
-          </>
-        ) : (
-          <ErrorContainer>
-            <p>Dados não encontrados.</p>
-            <Button onClick={onClose} variant="secondary">
-              Fechar
-            </Button>
-          </ErrorContainer>
-        )}
-      </ModalBox>
-    </Overlay>
+        <div className="flex-grow overflow-y-auto">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+            </div>
+          ) : pacienteData ? (
+            renderDetails(pacienteData)
+          ) : (
+            <div className="flex justify-center items-center h-64 text-slate-500 flex-col">
+              <p className="text-lg">Dados não encontrados.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end shrink-0">
+          <button
+            onClick={onClose}
+            className="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium rounded-lg transition-colors"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
