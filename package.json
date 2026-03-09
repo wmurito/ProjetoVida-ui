@@ -36,7 +36,6 @@
     "react-tooltip": "^5.28.0",
     "recharts": "^2.15.1",
     "sass": "^1.79.1",
-    "styled-components": "^6.1.12",
     "yup": "^1.6.1"
   },
   "devDependencies": {
