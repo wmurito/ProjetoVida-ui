@@ -1,91 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { validateFile, fileToBase64 } from '../../services/uploadService';
-
-const Container = styled.div`
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #ff7bac 0%, #ff6ba0 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-`;
-
-const Card = styled.div`
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  max-width: 500px;
-  width: 100%;
-`;
-
-const Title = styled.h1`
-  color: #333;
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-  text-align: center;
-`;
-
-const Subtitle = styled.p`
-  color: #666;
-  margin-bottom: 25px;
-  text-align: center;
-  font-size: 0.9rem;
-`;
-
-const FileInput = styled.input`
-  display: none;
-`;
-
-const FileLabel = styled.label`
-  display: block;
-  padding: 20px;
-  border: 2px dashed #ff7bac;
-  border-radius: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  background: #fce4ec;
-  
-  &:hover {
-    border-color: #ff6ba0;
-    background: #f8bbd0;
-  }
-`;
-
-const UploadButton = styled.button`
-  width: 100%;
-  padding: 15px;
-  margin-top: 20px;
-  background: #ff7bac;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-  
-  &:hover {
-    background: #ff6ba0;
-  }
-  
-  &:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
-const FileName = styled.p`
-  margin-top: 15px;
-  color: #ff7bac;
-  font-weight: 500;
-  text-align: center;
-`;
 
 const UploadMobile = () => {
   const [file, setFile] = useState(null);
@@ -94,14 +9,14 @@ const UploadMobile = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-    
+
     const validation = validateFile(selectedFile);
     if (!validation.isValid) {
       toast.error(validation.errors.join('. '));
       setFile(null);
       return;
     }
-    
+
     setFile(selectedFile);
   };
 
@@ -110,11 +25,11 @@ const UploadMobile = () => {
       toast.error('Selecione um arquivo');
       return;
     }
-    
+
     setUploading(true);
     try {
       const base64 = await fileToBase64(file);
-      
+
       try {
         localStorage.setItem('termo_upload', JSON.stringify({
           fileName: file.name,
@@ -128,7 +43,7 @@ const UploadMobile = () => {
         }
         throw new Error('Erro ao salvar arquivo. Verifique as configurações do navegador.');
       }
-      
+
       toast.success('Termo enviado! Pode fechar esta janela.');
       setTimeout(() => window.close(), 2000);
     } catch (error) {
@@ -140,44 +55,40 @@ const UploadMobile = () => {
   };
 
   return (
-    <Container>
-      <Card>
-        <Title>📄 Enviar Termo de Consentimento</Title>
-        <Subtitle>Selecione o arquivo assinado do seu dispositivo</Subtitle>
-        
-        
-        <div style={{ 
-          marginBottom: '20px', 
-          padding: '10px', 
-          backgroundColor: '#e3f2fd', 
-          borderRadius: '8px',
-          fontSize: '0.9rem',
-          color: '#1976d2',
-          textAlign: 'center'
-        }}>
+    <div className="min-h-screen flex flex-col items-center justify-center p-5 bg-gradient-to-br from-pink-400 to-pink-500 font-sans">
+      <div className="bg-white p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] w-full max-w-[500px]">
+        <h1 className="text-slate-800 mb-2.5 text-2xl text-center font-bold">📄 Enviar Termo de Consentimento</h1>
+        <p className="text-slate-600 mb-6 text-center text-sm font-medium">Selecione o arquivo assinado do seu dispositivo</p>
+
+        <div className="mb-5 p-3 bg-sky-50 rounded-lg text-sm text-sky-700 text-center font-medium border border-sky-100 shadow-sm">
           ⚠️ Formatos aceitos: PDF, JPG, PNG (máximo 5MB)
         </div>
-        
-        <FileLabel htmlFor="file-upload">
+
+        <label
+          htmlFor="file-upload"
+          className="block p-5 border-2 border-dashed border-pink-400 rounded-xl text-center cursor-pointer transition-all bg-pink-50 hover:bg-pink-100 hover:border-pink-500 text-pink-600 font-semibold shadow-sm"
+        >
           {file ? '✓ Arquivo selecionado' : '📎 Toque para selecionar arquivo'}
-        </FileLabel>
-        <FileInput 
-          id="file-upload" 
-          type="file" 
+        </label>
+        <input
+          id="file-upload"
+          type="file"
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleFileChange}
+          className="hidden"
         />
-        
-        {file && <FileName>{file.name}</FileName>}
-        
-        <UploadButton 
-          onClick={handleUpload} 
+
+        {file && <p className="mt-4 text-pink-500 font-semibold text-center">{file.name}</p>}
+
+        <button
+          onClick={handleUpload}
           disabled={!file || uploading}
+          className="w-full p-4 mt-5 bg-pink-400 text-white border-none rounded-lg text-base font-bold cursor-pointer transition-colors shadow-sm hover:bg-pink-500 disabled:bg-slate-300 disabled:cursor-not-allowed"
         >
           {uploading ? 'Enviando...' : 'Enviar Arquivo'}
-        </UploadButton>
-      </Card>
-    </Container>
+        </button>
+      </div>
+    </div>
   );
 };
 

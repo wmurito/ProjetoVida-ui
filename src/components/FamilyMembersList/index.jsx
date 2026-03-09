@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 const allParentescoOptions = [
     { value: 'pai', label: 'Pai' }, { value: 'avo_paterno', label: 'Avô Paterno' }, { value: 'avo_materno', label: 'Avô Materno' },
     { value: 'irmao', label: 'Irmão' }, { value: 'tio_paterno', label: 'Tio Paterno' }, { value: 'tio_materno', label: 'Tio Materno' },
@@ -11,57 +10,63 @@ const allParentescoOptions = [
     { value: 'sobrinha', label: 'Sobrinha' }, { value: 'filha', label: 'Filha' },
 ];
 
-// Cria um mapa para busca rápida do label a partir do value
 const parentescoLabelMap = new Map(allParentescoOptions.map(opt => [opt.value, opt.label]));
 
 const getParentescoLabel = (value) => {
-    return parentescoLabelMap.get(value) || value; // Retorna o label ou o próprio valor se não for encontrado
+    return parentescoLabelMap.get(value) || value;
 };
-
 
 const FamilyMembersList = ({ members, onEdit, onRemove }) => {
     if (!members || members.length === 0) {
         return (
-            <p style={{ color: '#6c757d', textAlign: 'center', padding: '20px 0', fontStyle: 'italic' }}>
+            <p className="text-slate-500 text-center py-5 italic font-medium">
                 Nenhum membro da família adicionado.
             </p>
         );
     }
 
     return (
-        <div style={{ width: '100%', marginTop: '15px' }}>
+        <div className="w-full mt-4 flex flex-col gap-3">
             {members.map((member, index) => (
-                <div key={member.id || index} style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '15px', marginBottom: '10px', background: '#f8f9fa' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #dee2e6', paddingBottom: '10px' }}>
-                        <strong style={{ color: '#495057', textTransform: 'capitalize' }}>
-                            {/* Usa a função para obter o nome formatado */}
+                <div key={member.id || index} className="border border-slate-200 rounded-lg p-4 bg-slate-50 shadow-sm transition-shadow hover:shadow-md">
+                    <div className="flex justify-between items-center mb-3 border-b border-slate-200 pb-3">
+                        <strong className="text-slate-700 capitalize text-base">
                             {getParentescoLabel(member.parentesco)}
                         </strong>
-                        <div>
-                            <button type="button" onClick={() => onEdit(member, index)} className="bg-slate-200 text-slate-700 hover:bg-slate-300 font-medium px-3 py-1 rounded text-xs transition-colors mr-2">
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => onEdit(member, index)}
+                                className="bg-slate-200 text-slate-700 hover:bg-slate-300 font-medium px-4 py-1.5 rounded-md text-sm transition-colors cursor-pointer"
+                            >
                                 Editar
                             </button>
-                            <button type="button" onClick={() => onRemove(index)} className="bg-rose-500 text-white hover:bg-rose-600 font-medium px-3 py-1 rounded text-xs transition-colors">
+                            <button
+                                type="button"
+                                onClick={() => onRemove(index)}
+                                className="bg-rose-500 text-white hover:bg-rose-600 font-medium px-4 py-1.5 rounded-md text-sm transition-colors cursor-pointer shadow-sm shadow-rose-500/30"
+                            >
                                 Remover
                             </button>
                         </div>
                     </div>
-                    <div>
-                        <p style={{ margin: '5px 0' }}>
-                            <strong>Câncer de mama:</strong> {member.tem_cancer_mama ? `Sim (idade: ${member.idade_cancer_mama || 'N/I'})` : 'Não'}
+
+                    <div className="flex flex-col gap-2 text-sm text-slate-600 font-medium">
+                        <p className="m-0">
+                            <strong className="text-slate-800">Câncer de mama:</strong> {member.tem_cancer_mama ? `Sim (idade: ${member.idade_cancer_mama || 'N/I'})` : 'Não'}
                         </p>
                         {member.bilateral && (
-                            <p style={{ margin: '5px 0' }}>
-                                <strong>Bilateral:</strong> Sim (2ª mama aos {member.idade_segunda_mama || 'N/I'} anos)
+                            <p className="m-0">
+                                <strong className="text-slate-800">Bilateral:</strong> Sim (2ª mama aos {member.idade_segunda_mama || 'N/I'} anos)
                             </p>
                         )}
                         {member.genero === 'feminino' && (
-                            <p style={{ margin: '5px 0' }}>
-                                <strong>Câncer de ovário:</strong> {member.tem_cancer_ovario ? `Sim (idade: ${member.idade_cancer_ovario || 'N/I'})` : 'Não'}
+                            <p className="m-0">
+                                <strong className="text-slate-800">Câncer de ovário:</strong> {member.tem_cancer_ovario ? `Sim (idade: ${member.idade_cancer_ovario || 'N/I'})` : 'Não'}
                             </p>
                         )}
-                        <p style={{ margin: '5px 0' }}>
-                            <strong>Gene BRCA:</strong> {member.gene_brca || 'Desconhecido'}
+                        <p className="m-0">
+                            <strong className="text-slate-800">Gene BRCA:</strong> <span className="capitalize">{member.gene_brca || 'Desconhecido'}</span>
                         </p>
                     </div>
                 </div>

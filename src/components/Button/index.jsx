@@ -1,16 +1,14 @@
-import React from 'react'; 
+import React from 'react';
 
-import { Container } from './styles'; 
-
-const Button = ({ children, ...rest }) => {
-  // Define o componente funcional `Button`, que recebe `children` e qualquer outra prop via spread operator (`...rest`)
+const Button = ({ children, className = '', ...rest }) => {
   return (
-    <Container {...rest}>
+    <button
+      className={`w-2/5 tracking-[4px] my-9 mx-0 p-3 rounded-full text-white bg-pink-400 transition-opacity hover:opacity-70 ${className}`}
+      {...rest}
+    >
       {children}
-      {/* Renderiza o conteúdo (texto ou elementos) passado como `children` dentro do botão */}
-    </Container>
+    </button>
   );
 };
 
 export default Button;
-// Exporta o componente `Button` como padrão para ser utilizado em outras partes da aplicação

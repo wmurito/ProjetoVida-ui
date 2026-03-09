@@ -1,72 +1,6 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { uploadTermoAceite, validateFile } from '../../services/uploadService';
-
-const Container = styled.div`
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-`;
-
-const Title = styled.h3`
-  color: #333;
-  margin-bottom: 15px;
-`;
-
-const FileInput = styled.input`
-  display: none;
-`;
-
-const FileLabel = styled.label`
-  display: inline-block;
-  padding: 12px 24px;
-  background: #d94c77;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-  
-  &:hover {
-    background: #c43d66;
-  }
-`;
-
-const UploadButton = styled.button`
-  padding: 12px 24px;
-  margin-left: 10px;
-  background: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-  
-  &:hover {
-    background: #229954;
-  }
-  
-  &:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
-const FileName = styled.p`
-  margin: 10px 0;
-  color: #666;
-  font-size: 14px;
-`;
-
-const Info = styled.div`
-  margin-top: 15px;
-  padding: 10px;
-  background: #e3f2fd;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #1976d2;
-`;
 
 const UploadTermo = ({ pacienteId, onSuccess }) => {
   const [file, setFile] = useState(null);
@@ -75,14 +9,14 @@ const UploadTermo = ({ pacienteId, onSuccess }) => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-    
+
     const validation = validateFile(selectedFile);
     if (!validation.isValid) {
       toast.error(validation.errors.join('. '));
       setFile(null);
       return;
     }
-    
+
     setFile(selectedFile);
   };
 
@@ -91,7 +25,7 @@ const UploadTermo = ({ pacienteId, onSuccess }) => {
       toast.error('Selecione um arquivo');
       return;
     }
-    
+
     setUploading(true);
     try {
       await uploadTermoAceite(pacienteId, file);
@@ -106,34 +40,39 @@ const UploadTermo = ({ pacienteId, onSuccess }) => {
   };
 
   return (
-    <Container>
-      <Title>📄 Upload do Termo de Aceite</Title>
-      
-      <div>
-        <FileLabel htmlFor="file-upload">
+    <div className="p-5 bg-white rounded-lg shadow-sm border border-slate-100">
+      <h3 className="text-slate-800 font-semibold mb-4 flex items-center gap-2">📄 Upload do Termo de Aceite</h3>
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <label
+          htmlFor="file-upload"
+          className="inline-block px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-md cursor-pointer transition-colors shadow-sm"
+        >
           {file ? '✓ Arquivo Selecionado' : '📎 Selecionar Arquivo'}
-        </FileLabel>
-        <FileInput 
-          id="file-upload" 
-          type="file" 
+        </label>
+        <input
+          id="file-upload"
+          type="file"
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleFileChange}
+          className="hidden"
         />
-        
-        <UploadButton 
-          onClick={handleUpload} 
+
+        <button
+          onClick={handleUpload}
           disabled={!file || uploading}
+          className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-md cursor-pointer transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed shadow-sm"
         >
           {uploading ? 'Enviando...' : 'Enviar'}
-        </UploadButton>
+        </button>
       </div>
-      
-      {file && <FileName>📎 {file.name}</FileName>}
-      
-      <Info>
-        ℹ️ Formatos aceitos: PDF, JPG, PNG (máximo 5MB)
-      </Info>
-    </Container>
+
+      {file && <p className="mt-3 text-sm text-slate-600 font-medium">📎 {file.name}</p>}
+
+      <div className="mt-4 p-3 bg-sky-50 border border-sky-100 rounded-md text-sm text-sky-700 flex items-center gap-2">
+        <span className="text-lg">ℹ️</span> Formatos aceitos: PDF, JPG, PNG (máximo 5MB)
+      </div>
+    </div>
   );
 };
 

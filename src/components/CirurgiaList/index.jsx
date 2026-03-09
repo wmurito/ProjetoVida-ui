@@ -1,19 +1,6 @@
 import React from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import {
-    ListContainer,
-    ListItem,
-    ListItemContent,
-    ListItemActions,
-    ListHeader,
-    ListTitle,
-    ActionButton,
-    EmptyMessage,
-    DetailsGrid,
-    DetailItem
-} from './styles';
 
-// Função para formatar os nomes dos campos para exibição
 const formatLabel = (key) => {
     const labels = {
         data: 'Data',
@@ -42,34 +29,40 @@ const formatLabel = (key) => {
 
 const CirurgiaItem = ({ item, index, onEdit, onRemove, type }) => {
     return (
-        <ListItem>
-            <ListItemContent>
-                <DetailsGrid>
+        <div className="flex justify-between items-start p-4 border-b border-slate-100 last:border-none hover:bg-slate-50 transition-colors">
+            <div className="flex-grow">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-x-6 gap-y-2">
                     {Object.entries(item).map(([key, value]) => {
-                        // Não exibe campos vazios
                         if (value === '' || value === null || value === false) return null;
-                        
+
                         return (
-                            <DetailItem key={key}>
-                                <strong>{formatLabel(key)}:</strong> 
-                                <span>{typeof value === 'boolean' ? 'Sim' : value}</span>
-                            </DetailItem>
+                            <div key={key} className="flex flex-col text-sm">
+                                <strong className="font-semibold text-slate-700 mb-0.5">{formatLabel(key)}:</strong>
+                                <span className="text-slate-600 font-medium">{typeof value === 'boolean' ? 'Sim' : value}</span>
+                            </div>
                         );
                     })}
-                </DetailsGrid>
-            </ListItemContent>
-            <ListItemActions>
-                <ActionButton onClick={() => onEdit(item, type, index)} title="Editar">
+                </div>
+            </div>
+            <div className="flex gap-3 ml-4 shrink-0">
+                <button
+                    onClick={() => onEdit(item, type, index)}
+                    title="Editar"
+                    className="bg-transparent border-none cursor-pointer text-slate-400 hover:text-amber-500 text-lg p-1 transition-colors"
+                >
                     <FaEdit />
-                </ActionButton>
-                <ActionButton onClick={() => onRemove(type, index)} title="Remover">
+                </button>
+                <button
+                    onClick={() => onRemove(type, index)}
+                    title="Remover"
+                    className="bg-transparent border-none cursor-pointer text-slate-400 hover:text-rose-500 text-lg p-1 transition-colors"
+                >
                     <FaTrash />
-                </ActionButton>
-            </ListItemActions>
-        </ListItem>
+                </button>
+            </div>
+        </div>
     );
 };
-
 
 const CirurgiaList = ({ formData, onEdit, onRemove }) => {
     const { mamas = [], axilas = [], reconstrucoes = [] } = formData?.tratamento?.cirurgia || {};
@@ -77,32 +70,38 @@ const CirurgiaList = ({ formData, onEdit, onRemove }) => {
     const hasCirurgias = mamas.length > 0 || axilas.length > 0 || reconstrucoes.length > 0;
 
     return (
-        <ListContainer>
+        <div className="mt-6 border border-slate-200 rounded-lg bg-white overflow-hidden shadow-sm">
             {mamas.length > 0 && (
                 <>
-                    <ListHeader><ListTitle>Cirurgias da Mama</ListTitle></ListHeader>
+                    <div className="px-4 py-3 bg-slate-100 border-b border-slate-200">
+                        <h4 className="m-0 text-base font-semibold text-slate-800">Cirurgias da Mama</h4>
+                    </div>
                     {mamas.map((item, index) => <CirurgiaItem key={`mama-${index}`} item={item} index={index} onEdit={onEdit} onRemove={onRemove} type="mamas" />)}
                 </>
             )}
 
             {axilas.length > 0 && (
                 <>
-                    <ListHeader><ListTitle>Cirurgias da Axila</ListTitle></ListHeader>
+                    <div className="px-4 py-3 bg-slate-100 border-b border-slate-200">
+                        <h4 className="m-0 text-base font-semibold text-slate-800">Cirurgias da Axila</h4>
+                    </div>
                     {axilas.map((item, index) => <CirurgiaItem key={`axila-${index}`} item={item} index={index} onEdit={onEdit} onRemove={onRemove} type="axilas" />)}
                 </>
             )}
 
             {reconstrucoes.length > 0 && (
                 <>
-                    <ListHeader><ListTitle>Reconstruções Mamárias</ListTitle></ListHeader>
+                    <div className="px-4 py-3 bg-slate-100 border-b border-slate-200">
+                        <h4 className="m-0 text-base font-semibold text-slate-800">Reconstruções Mamárias</h4>
+                    </div>
                     {reconstrucoes.map((item, index) => <CirurgiaItem key={`reconstrucao-${index}`} item={item} index={index} onEdit={onEdit} onRemove={onRemove} type="reconstrucoes" />)}
                 </>
             )}
-            
+
             {!hasCirurgias && (
-                <EmptyMessage>Nenhum procedimento cirúrgico adicionado.</EmptyMessage>
+                <p className="text-center p-8 text-slate-500 font-medium italic">Nenhum procedimento cirúrgico adicionado.</p>
             )}
-        </ListContainer>
+        </div>
     );
 };
 

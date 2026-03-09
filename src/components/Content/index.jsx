@@ -1,10 +1,9 @@
-import React from "react"; 
-import { Container } from "./styles"; 
+import React from "react";
 
-const Content = ({ children }) => ( // Define o componente Content, que recebe `children` como uma propriedade.
-    <Container> 
-       {children}  {/* Renderiza o conteúdo passado como filhos para o componente Content dentro do Container. */}
-    </Container>
+const Content = ({ children }) => (
+    <div className="p-5 text-slate-500 h-screen overflow-y-auto scrollbar-thin scrollbar-track-slate-100 scrollbar-thumb-pink-400" style={{ gridArea: 'CT' }}>
+        {children}
+    </div>
 );
 
-export default Content; 
+export default Content;

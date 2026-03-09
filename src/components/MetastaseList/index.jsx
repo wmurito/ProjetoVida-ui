@@ -1,9 +1,8 @@
 import React from 'react';
-import { ListContainer, ListItem, ListItemText, ActionButtons, EditButton, RemoveButton } from './styles'; // Reutilize os estilos da TargetedTherapyList
 
 const MetastaseList = ({ metastases, onEdit, onRemove }) => {
     if (!metastases || metastases.length === 0) {
-        return <p style={{ color: '#6c757d', textAlign: 'center', marginTop: '10px' }}>Nenhuma metástase adicionada.</p>;
+        return <p className="text-slate-500 text-center mt-3 text-sm font-medium">Nenhuma metástase adicionada.</p>;
     }
 
     const formatDate = (dateStr) => {
@@ -18,23 +17,33 @@ const MetastaseList = ({ metastases, onEdit, onRemove }) => {
     };
 
     return (
-        <ListContainer>
+        <div className="w-full mt-4 border border-slate-200 rounded-lg p-3 bg-slate-50">
             {metastases.map((meta, index) => {
                 if (!meta || typeof meta !== 'object') return null;
                 return (
-                    <ListItem key={index}>
-                        <ListItemText>
-                            <strong>Local:</strong> {meta.local_metastase || 'Não informado'} <br />
-                            <strong>Data:</strong> {formatDate(meta.data_metastase)}
-                        </ListItemText>
-                        <ActionButtons>
-                            <EditButton onClick={() => onEdit(meta, index)}>Editar</EditButton>
-                            <RemoveButton onClick={() => onRemove(index)}>Remover</RemoveButton>
-                        </ActionButtons>
-                    </ListItem>
+                    <div key={index} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 border-b border-slate-200 last:border-b-0 gap-3 sm:gap-0">
+                        <div className="text-sm text-slate-600 leading-relaxed">
+                            <strong className="text-slate-800">Local:</strong> {meta.local_metastase || 'Não informado'} <br />
+                            <strong className="text-slate-800">Data:</strong> {formatDate(meta.data_metastase)}
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => onEdit(meta, index)}
+                                className="px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-800 border-none rounded-md cursor-pointer text-[13px] font-medium transition-all active:scale-95 shadow-sm"
+                            >
+                                Editar
+                            </button>
+                            <button
+                                onClick={() => onRemove(index)}
+                                className="px-3 py-1.5 bg-pink-400 hover:bg-pink-500 text-white border-none rounded-md cursor-pointer text-[13px] font-medium transition-all active:scale-95 shadow-sm"
+                            >
+                                Remover
+                            </button>
+                        </div>
+                    </div>
                 );
             })}
-        </ListContainer>
+        </div>
     );
 };
 

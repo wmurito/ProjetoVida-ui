@@ -1,136 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
-
-const Container = styled.div`
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #ff7bac 0%, #ff6ba0 100%);
-`;
-
-const Card = styled.div`
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  max-width: 500px;
-  width: 100%;
-`;
-
-const Title = styled.h1`
-  color: #333;
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-  text-align: center;
-`;
-
-const Subtitle = styled.p`
-  color: #666;
-  margin-bottom: 25px;
-  text-align: center;
-  font-size: 0.9rem;
-`;
-
-const FileInput = styled.input`
-  display: none;
-`;
-
-const FileLabel = styled.label`
-  display: block;
-  padding: 20px;
-  border: 2px dashed #ff7bac;
-  border-radius: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  background: #fce4ec;
-  
-  &:hover {
-    border-color: #ff6ba0;
-    background: #f8bbd0;
-  }
-`;
-
-const UploadButton = styled.button`
-  width: 100%;
-  padding: 15px;
-  margin-top: 20px;
-  background: #ff7bac;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-  
-  &:hover {
-    background: #ff6ba0;
-  }
-  
-  &:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
-const FileName = styled.p`
-  margin-top: 15px;
-  color: #ff7bac;
-  font-weight: 500;
-  text-align: center;
-`;
-
-const ProgressBar = styled.div`
-  width: 100%;
-  height: 8px;
-  background: #f0f0f0;
-  border-radius: 4px;
-  margin-top: 15px;
-  overflow: hidden;
-`;
-
-const ProgressFill = styled.div`
-  height: 100%;
-  background: #ff7bac;
-  width: ${props => props.progress}%;
-  transition: width 0.3s ease;
-`;
-
-const ErrorMessage = styled.div`
-  color: #dc3545;
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 10px;
-  margin-top: 15px;
-  font-size: 0.9rem;
-`;
-
-const SuccessMessage = styled.div`
-  color: #155724;
-  background: #d4edda;
-  border: 1px solid #c3e6cb;
-  border-radius: 4px;
-  padding: 10px;
-  margin-top: 15px;
-  font-size: 0.9rem;
-`;
-
-const FileInfo = styled.div`
-  margin-top: 15px;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  color: #666;
-`;
 
 const SecureUploadMobile = () => {
   const { sessionId } = useParams();
@@ -178,10 +49,10 @@ const SecureUploadMobile = () => {
 
     // Verificar extensão
     const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png'];
-    const hasValidExtension = allowedExtensions.some(ext => 
+    const hasValidExtension = allowedExtensions.some(ext =>
       selectedFile.name.toLowerCase().endsWith(ext)
     );
-    
+
     if (!hasValidExtension) {
       errors.push('Extensão de arquivo não permitida');
     }
@@ -193,7 +64,7 @@ const SecureUploadMobile = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       const errors = validateFile(selectedFile);
-      
+
       if (errors.length > 0) {
         setError(errors.join('. '));
         setFile(null);
@@ -236,26 +107,26 @@ const SecureUploadMobile = () => {
             fileData: reader.result,
             paciente_id: 'temp'
           };
-          
+
           console.log('Enviando arquivo:', { fileName: file.name, fileType: file.type, sessionId });
-          
+
           // Enviar para o backend
           const response = await api.post(`/upload-mobile/${sessionId}`, fileData);
-          
+
           console.log('Resposta do servidor:', response.data);
-          
+
           if (progressInterval) clearInterval(progressInterval);
           setProgress(100);
           setSuccess(true);
           toast.success('Arquivo enviado com sucesso!');
-          
+
           setTimeout(() => {
             window.close();
           }, 2000);
         } catch (error) {
           if (progressInterval) clearInterval(progressInterval);
           setProgress(0);
-          
+
           if (import.meta.env.DEV) {
             console.error('Erro detalhado:', {
               message: error.message,
@@ -263,7 +134,7 @@ const SecureUploadMobile = () => {
               status: error.response?.status
             });
           }
-          
+
           if (error.response?.status === 404) {
             setError('Sessão expirada. Tente novamente.');
           } else if (error.response?.status === 413) {
@@ -275,18 +146,18 @@ const SecureUploadMobile = () => {
           } else {
             setError(error.response?.data?.detail || 'Erro ao enviar arquivo. Tente novamente.');
           }
-          
+
           setUploading(false);
         }
       };
-      
+
       reader.onerror = () => {
         if (progressInterval) clearInterval(progressInterval);
         setProgress(0);
         setError('Erro ao processar arquivo');
         setUploading(false);
       };
-      
+
       reader.readAsDataURL(file);
     } catch (error) {
       if (progressInterval) clearInterval(progressInterval);
@@ -305,49 +176,56 @@ const SecureUploadMobile = () => {
   };
 
   return (
-    <Container>
-      <Card>
-        <Title>📄 Enviar Termo de Consentimento</Title>
-        <Subtitle>Selecione o arquivo assinado do seu dispositivo</Subtitle>
-        
-        <FileLabel htmlFor="file-upload">
+    <div className="min-h-screen flex flex-col items-center justify-center p-5 bg-gradient-to-br from-pink-400 to-pink-500 font-sans">
+      <div className="bg-white p-8 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.2)] w-full max-w-[500px]">
+        <h1 className="text-slate-800 mb-2.5 text-2xl text-center font-bold">📄 Enviar Termo de Consentimento</h1>
+        <p className="text-slate-600 mb-6 text-center text-sm font-medium">Selecione o arquivo assinado do seu dispositivo</p>
+
+        <label
+          htmlFor="file-upload"
+          className="block p-5 border-2 border-dashed border-pink-400 rounded-xl text-center cursor-pointer transition-all bg-pink-50 hover:bg-pink-100 hover:border-pink-500 text-pink-600 font-semibold shadow-sm"
+        >
           {file ? '✓ Arquivo selecionado' : '📎 Toque para selecionar arquivo'}
-        </FileLabel>
-        <FileInput 
-          id="file-upload" 
-          type="file" 
+        </label>
+        <input
+          id="file-upload"
+          type="file"
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleFileChange}
           disabled={uploading}
+          className="hidden"
         />
-        
+
         {file && (
-          <FileInfo>
-            <div><strong>Nome:</strong> {file.name}</div>
-            <div><strong>Tamanho:</strong> {formatFileSize(file.size)}</div>
-            <div><strong>Tipo:</strong> {file.type}</div>
-          </FileInfo>
+          <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 font-medium leading-relaxed">
+            <div><strong className="text-slate-800">Nome:</strong> {file.name}</div>
+            <div><strong className="text-slate-800">Tamanho:</strong> {formatFileSize(file.size)}</div>
+            <div><strong className="text-slate-800">Tipo:</strong> {file.type}</div>
+          </div>
         )}
-        
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        {success && <SuccessMessage>Arquivo enviado com sucesso!</SuccessMessage>}
-        
+
+        {error && <div className="mt-4 p-3 bg-red-100/50 border border-red-200 text-red-600 rounded-md text-sm font-medium">{error}</div>}
+        {success && <div className="mt-4 p-3 bg-emerald-100/50 border border-emerald-200 text-emerald-600 rounded-md text-sm font-medium">Arquivo enviado com sucesso!</div>}
+
         {uploading && (
-          <ProgressBar>
-            <ProgressFill progress={progress} />
-          </ProgressBar>
+          <div className="w-full h-2 bg-slate-100 rounded-full mt-4 overflow-hidden">
+            <div
+              className="h-full bg-pink-400 transition-[width] duration-300 ease-in-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         )}
-        
-        <UploadButton 
-          onClick={handleUpload} 
+
+        <button
+          onClick={handleUpload}
           disabled={!file || uploading || success}
+          className="w-full p-4 mt-5 bg-pink-400 text-white border-none rounded-lg text-base font-bold cursor-pointer transition-colors shadow-sm hover:bg-pink-500 disabled:bg-slate-300 disabled:cursor-not-allowed"
         >
           {uploading ? 'Enviando...' : success ? 'Enviado!' : 'Enviar Arquivo'}
-        </UploadButton>
-      </Card>
-    </Container>
+        </button>
+      </div>
+    </div>
   );
 };
 
 export default SecureUploadMobile;
-

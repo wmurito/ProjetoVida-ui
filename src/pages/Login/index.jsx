@@ -5,31 +5,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { sanitizeInput } from "../../services/securityConfig";
 
-import Input from "../../components/Input";
-import Button from "../../components/Button";
-import logoImg from "../../assets/logo.png";
-
-import { Checkbox, CheckboxLabel } from "../../components/UI";
-
-import {
-  FaGithub,
-  FaInstagram,
-  FaLinkedin
-} from "react-icons/fa";
-
-import {
-  Body,
-  Container,
-  ImgLogo,
-  Form,
-  FormTitle,
-  Footer,
-  FooterDev,
-  MenuItemLink,
-  CheckContainer,
-  PasswordContainer,
-  ShowPasswordButton
-} from "./styles";
+import logoImg from "../../assets/logovida.png";
+import logoTexto from "../../assets/logo.png";
+import { FaGithub, FaInstagram, FaLinkedin, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -53,7 +31,6 @@ const Login = () => {
 
   useEffect(() => {
     try {
-      // Usar sessionStorage em vez de localStorage para maior segurança
       const storedRememberMe = sessionStorage.getItem("rememberMe");
       if (storedRememberMe === "true") {
         setRememberMe(true);
@@ -69,7 +46,6 @@ const Login = () => {
 
   useEffect(() => {
     try {
-      // Armazenar em sessionStorage em vez de localStorage
       sessionStorage.setItem("rememberMe", rememberMe);
       if (rememberMe) {
         sessionStorage.setItem("username", sanitizeInput(email));
@@ -82,23 +58,12 @@ const Login = () => {
     }
   }, [rememberMe, email]);
 
-  // Validação de senha forte
   const validatePassword = (password) => {
-    if (password.length < 8) {
-      return "A senha deve ter pelo menos 8 caracteres";
-    }
-    if (!/[A-Z]/.test(password)) {
-      return "A senha deve conter pelo menos uma letra maiúscula";
-    }
-    if (!/[a-z]/.test(password)) {
-      return "A senha deve conter pelo menos uma letra minúscula";
-    }
-    if (!/[0-9]/.test(password)) {
-      return "A senha deve conter pelo menos um número";
-    }
-    if (!/[^A-Za-z0-9]/.test(password)) {
-      return "A senha deve conter pelo menos um caractere especial";
-    }
+    if (password.length < 8) return "A senha deve ter pelo menos 8 caracteres";
+    if (!/[A-Z]/.test(password)) return "A senha deve conter pelo menos uma letra maiúscula";
+    if (!/[a-z]/.test(password)) return "A senha deve conter pelo menos uma letra minúscula";
+    if (!/[0-9]/.test(password)) return "A senha deve conter pelo menos um número";
+    if (!/[^A-Za-z0-9]/.test(password)) return "A senha deve conter pelo menos um caractere especial";
     return "";
   };
 
@@ -107,11 +72,9 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Sanitizar entradas
       const sanitizedEmail = sanitizeInput(email);
 
       if (isChangingPassword) {
-        // Validar força da senha
         const passwordValidation = validatePassword(newPassword);
         if (passwordValidation) {
           setPasswordError(passwordValidation);
@@ -163,142 +126,157 @@ const Login = () => {
 
   if (authLoading) {
     return (
-      <Body>
-        <Container>
-          <ImgLogo>
-            <img src={logoImg} alt="Logo VIDA" />
-          </ImgLogo>
-          <div style={{ textAlign: 'center', padding: '20px' }}>
-            Carregando...
-          </div>
-        </Container>
-      </Body>
+      <div
+        className="min-h-screen bg-cover bg-center flex items-center justify-center p-4 bg-slate-900"
+        style={{ backgroundImage: `url(${logoImg})`, backgroundColor: 'rgba(0,0,0,0.6)', backgroundBlendMode: 'overlay' }}
+      >
+        <div className="flex flex-col items-center">
+          <img src={logoTexto} alt="Logo VIDA" className="w-48 mb-8" />
+          <div className="text-white text-lg font-medium animate-pulse">Carregando espere...</div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Body>
-      <Container>
-        <ImgLogo>
-          <img src={logoImg} alt="Logo VIDA" />
-        </ImgLogo>
+    <div
+      className="min-h-screen relative flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat overflow-hidden"
+      style={{ backgroundImage: `url(${logoImg})`, backgroundColor: 'rgba(15, 23, 42, 0.65)', backgroundBlendMode: 'overlay' }}
+    >
+      <div className="flex flex-col items-center w-full z-10">
+        <div className="mb-12">
+          <img src={logoTexto} alt="Logo VIDA" className="w-48 drop-shadow-lg" />
+        </div>
 
-        <Form onSubmit={handleLogin}>
-          <FormTitle>Conectar</FormTitle>
+        <form
+          onSubmit={handleLogin}
+          className="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] p-10 flex flex-col w-full max-w-[480px]"
+        >
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold text-slate-500 tracking-widest uppercase inline-block pb-1 relative">
+              Conectar
+              <span className="absolute bottom-0 left-0 w-14 h-1 bg-pink-400 rounded-full"></span>
+            </h1>
+          </div>
 
-          <Input
-            type="email"
-            placeholder="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoFocus
-          />
-
-          <PasswordContainer>
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+          <div className="flex flex-col gap-4 mb-6">
+            <input
+              type="email"
+              placeholder="E-mail"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition-colors"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
+              autoFocus
             />
-            <ShowPasswordButton
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? "Ocultar" : "Mostrar"}
-            </ShowPasswordButton>
-          </PasswordContainer>
 
-          {isChangingPassword && (
-            <>
-              <PasswordContainer>
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Nova senha"
-                  value={newPassword}
-                  onChange={(e) => {
-                    setNewPassword(e.target.value);
-                    setPasswordError("");
-                  }}
-                  required
-                />
-              </PasswordContainer>
+            <div className="relative w-full">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Senha"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition-colors pr-12"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-pink-500 transition-colors bg-transparent border-none appearance-none outline-none focus:outline-none"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex="-1"
+              >
+                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+              </button>
+            </div>
 
-              <PasswordContainer>
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Confirmar nova senha"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setPasswordError("");
-                  }}
-                  required
-                />
-              </PasswordContainer>
-              
-              {passwordError && (
-                <div style={{ color: 'red', marginBottom: '10px', fontSize: '14px' }}>
-                  {passwordError}
+            {isChangingPassword && (
+              <div className="flex flex-col gap-4 border-t border-slate-100 pt-4 mt-2">
+                <p className="text-sm font-medium text-amber-600 mb-1">Criação de nova senha obrigatória</p>
+                <div className="relative w-full">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Nova senha"
+                    className="w-full px-4 py-3 bg-slate-50 border border-amber-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors pr-12"
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      setPasswordError("");
+                    }}
+                    required
+                  />
                 </div>
-              )}
-            </>
-          )}
 
-          <CheckContainer>
-            <CheckboxLabel>
-              <Checkbox
+                <div className="relative w-full">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Confirmar nova senha"
+                    className="w-full px-4 py-3 bg-slate-50 border border-amber-200 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors pr-12"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setPasswordError("");
+                    }}
+                    required
+                  />
+                </div>
+
+                {passwordError && (
+                  <div className="text-rose-500 text-sm font-medium animate-pulse">
+                    {passwordError}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center mb-8">
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-500 group select-none transition-colors hover:text-slate-700">
+              <input
+                type="checkbox"
+                className="w-4 h-4 rounded border-slate-300 text-pink-500 focus:ring-pink-500 focus:ring-2 cursor-pointer transition-colors accent-pink-500"
                 checked={rememberMe}
                 onChange={() => setRememberMe(!rememberMe)}
               />
               Lembrar-me
-            </CheckboxLabel>
-          </CheckContainer>
+            </label>
+          </div>
 
-          <Button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3.5 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-pink-500/30"
+          >
             {loading
               ? isChangingPassword
                 ? "Trocando senha..."
                 : "Entrando..."
               : isChangingPassword
-              ? "Trocar senha"
-              : "Entrar"}
-          </Button>
-        </Form>
+                ? "Trocar senha"
+                : "Entrar"}
+          </button>
+        </form>
 
-        <Footer>
-          COPYRIGHT 2024 © VIDA | VISUALIZAÇÃO & DADOS EM SAÚDE DA MAMA
-        </Footer>
+        <div className="absolute bottom-16 text-xs tracking-[0.15em] text-white/70 text-center uppercase font-light">
+          COPYRIGHT {new Date().getFullYear()} © VIDA | VISUALIZAÇÃO & DADOS EM SAÚDE DA MAMA
+        </div>
 
-        <FooterDev>
+        <div className="absolute bottom-6 flex items-center justify-center gap-2 text-xs tracking-wider text-white/50 text-center font-light">
           Desenvolvido por Maryângela Soares
-          <MenuItemLink
-            href="https://github.com/maryangelasoares"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaGithub />
-          </MenuItemLink>
-          <MenuItemLink
-            href="https://instagram.com/maryangelasoares"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaInstagram />
-          </MenuItemLink>
-          <MenuItemLink
-            href="https://linkedin.com/in/maryangelasoares"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaLinkedin />
-          </MenuItemLink>
-        </FooterDev>
-      </Container>
+          <div className="flex items-center gap-3 ml-2">
+            <a href="https://github.com/maryangelasoares" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-opacity">
+              <FaGithub size={16} />
+            </a>
+            <a href="https://instagram.com/maryangelasoares" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-opacity">
+              <FaInstagram size={16} />
+            </a>
+            <a href="https://linkedin.com/in/maryangelasoares" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-opacity">
+              <FaLinkedin size={16} />
+            </a>
+          </div>
+        </div>
+      </div>
       <ToastContainer />
-    </Body>
+    </div>
   );
 };
 
