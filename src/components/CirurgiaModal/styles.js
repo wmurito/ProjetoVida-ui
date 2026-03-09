@@ -60,7 +60,7 @@ export const ModalFooter = styled.footer`
 `;
 
 // CORREÇÃO: O caminho do import foi ajustado de '../../../' para '../../'
-export { FormGrid, FieldContainer, InputLabel, StyledInput, StyledSelect, CheckboxLabel, StyledCheckbox } from '../../pages/Cadastro/styles';
+export { FormGrid, FieldContainer, InputLabel, StyledInput, StyledSelect, CheckboxLabel, StyledCheckbox } from '../FormSections/FormComponents';
 
 const BaseButton = styled.button`
     display: inline-flex;

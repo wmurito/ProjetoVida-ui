@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Button } from '../../pages/Cadastro/styles'; // Reutilize seu botão
+
 
 const containerStyle = { width: '100%', marginTop: '15px' };
 const itemStyle = { border: '1px solid #e9ecef', borderRadius: '8px', padding: '15px', marginBottom: '10px', background: '#f8f9fa' };
@@ -20,8 +20,8 @@ const PalliativeChemoList = ({ chemos, onEdit, onRemove }) => {
                     <div style={headerStyle}>
                         <strong style={titleStyle}>{chemo.linha_tratamento_paliativo}</strong>
                         <div>
-                            <Button type="button" onClick={() => onEdit(chemo, index)} style={editBtnStyle}>Editar</Button>
-                            <Button type="button" onClick={() => onRemove(index)} style={removeBtnStyle}>Remover</Button>
+                            <button type="button" onClick={() => onEdit(chemo, index)} className="bg-slate-200 text-slate-700 hover:bg-slate-300 font-medium px-3 py-1 rounded text-xs transition-colors mr-2">Editar</button>
+                            <button type="button" onClick={() => onRemove(index)} className="bg-rose-500 text-white hover:bg-rose-600 font-medium px-3 py-1 rounded text-xs transition-colors">Remover</button>
                         </div>
                     </div>
                     <div>

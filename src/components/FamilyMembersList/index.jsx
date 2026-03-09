@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../pages/Cadastro/styles';
+
 
 const allParentescoOptions = [
     { value: 'pai', label: 'Pai' }, { value: 'avo_paterno', label: 'Avô Paterno' }, { value: 'avo_materno', label: 'Avô Materno' },
@@ -38,12 +38,12 @@ const FamilyMembersList = ({ members, onEdit, onRemove }) => {
                             {getParentescoLabel(member.parentesco)}
                         </strong>
                         <div>
-                            <Button type="button" onClick={() => onEdit(member, index)} style={{ padding: '5px 10px', fontSize: '0.8rem', marginRight: '10px' }}>
+                            <button type="button" onClick={() => onEdit(member, index)} className="bg-slate-200 text-slate-700 hover:bg-slate-300 font-medium px-3 py-1 rounded text-xs transition-colors mr-2">
                                 Editar
-                            </Button>
-                            <Button type="button" onClick={() => onRemove(index)} style={{ padding: '5px 10px', fontSize: '0.8rem', background: '#ff7bac', borderColor: '#ff7bac' }}>
+                            </button>
+                            <button type="button" onClick={() => onRemove(index)} className="bg-rose-500 text-white hover:bg-rose-600 font-medium px-3 py-1 rounded text-xs transition-colors">
                                 Remover
-                            </Button>
+                            </button>
                         </div>
                     </div>
                     <div>
