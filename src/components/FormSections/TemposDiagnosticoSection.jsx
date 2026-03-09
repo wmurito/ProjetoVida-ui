@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormGrid, FieldContainer, InputLabel, StyledInput, SectionContent } from '../../pages/Cadastro/styles';
+import { FormGrid, FieldContainer, InputLabel, StyledInput, SectionContent } from './FormComponents';
 
 const TemposDiagnosticoSection = ({ formData, handleInputChange }) => {
     if (!formData || !handleInputChange) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormGrid, FieldContainer, InputLabel, StyledInput, ErrorText, SectionContent } from '../../pages/Cadastro/styles';
+import { FormGrid, FieldContainer, InputLabel, StyledInput, ErrorText, SectionContent } from './FormComponents';
 
 const HistoriaDoencaSection = ({ formData, errors, handleInputChange }) => {
     return (

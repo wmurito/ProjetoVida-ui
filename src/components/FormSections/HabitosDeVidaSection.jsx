@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormGrid, FieldContainer, InputLabel, StyledInput, StyledCheckbox, CheckboxLabel, ErrorText, SectionContent } from '../../pages/Cadastro/styles';
+import { FormGrid, FieldContainer, InputLabel, StyledInput, StyledCheckbox, CheckboxLabel, ErrorText, SectionContent } from './FormComponents';
 
 const HabitosDeVidaSection = ({ formData, errors, handleInputChange, handleCheckboxChange }) => {
     return (

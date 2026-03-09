@@ -5,7 +5,7 @@ import {
     CheckboxLabel, StyledCheckbox, SectionTitle,
     ListContainer, ActionButtons, RemoveButton,
     SubSectionTitle, SubSectionHeader, AddSubButton, TreatmentSubSection
-} from '../../pages/Cadastro/styles';
+} from './FormComponents';
 
 import CirurgiaList from '../CirurgiaList';
 

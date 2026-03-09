@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormGrid, FieldContainer, InputLabel, StyledInput, StyledCheckbox, CheckboxLabel, ErrorText, SectionContent, AddMoreButton } from '../../pages/Cadastro/styles';
+import { FormGrid, FieldContainer, InputLabel, StyledInput, StyledCheckbox, CheckboxLabel, ErrorText, SectionContent, AddMoreButton } from './FormComponents';
 import MetastaseList from '../MetastaseList';
 
 const DesfechoSection = ({ 

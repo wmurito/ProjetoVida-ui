@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormGrid, FieldContainer, InputLabel, StyledInput, ErrorText, SectionContent, AddMemberButton } from '../../pages/Cadastro/styles';
+import { FormGrid, FieldContainer, InputLabel, StyledInput, ErrorText, SectionContent, AddMemberButton } from './FormComponents';
 // CORREÇÃO: O caminho deve apontar para o componente da LISTA, não do MODAL
 import FamilyMembersList from '../FamilyMembersList'; 
 

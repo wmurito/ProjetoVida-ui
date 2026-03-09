@@ -24,21 +24,15 @@ import TratamentoSection from '../../components/FormSections/TratamentoSection';
 import DesfechoSection from '../../components/FormSections/DesfechoSection';
 import TemposDiagnosticoSection from '../../components/FormSections/TemposDiagnosticoSection';
 
-// Estilos da Página
-import {
-    Container, FormContainer, Section, SectionTitle, Button,
-    FixedSubmitButton, SuccessMessage, ApiErrorContainer, ErrorText, TabNav, TabButton
-} from './styles';
-
 const CadastroPacientePage = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(tabs[0].key);
 
-    const { 
+    const {
         formData, setFormData, errors, isLoading, successMessage,
-        handleChange, handleNestedChange, handleNestedCheckbox, handleSave 
+        handleChange, handleNestedChange, handleNestedCheckbox, handleSave
     } = useCadastroForm(setActiveTab, navigate);
-    
+
     const {
         modalState, openModal, closeModal,
         handleSubmitMember, handleSubmitMetastase, handleSubmitCirurgia,
@@ -66,19 +60,19 @@ const CadastroPacientePage = () => {
             await handleSave();
         }
     };
-    
+
     const handleRemoveMember = (indexToRemove) => {
         if (window.confirm('Tem certeza?')) {
             setFormData(prev => ({ ...prev, familiares: prev.familiares.filter((_, index) => index !== indexToRemove) }));
         }
     };
-    
+
     const handleRemoveMetastase = (indexToRemove) => {
         if (window.confirm('Tem certeza?')) {
             setFormData(prev => ({ ...prev, desfecho: { ...prev.desfecho, metastases: prev.desfecho.metastases.filter((_, index) => index !== indexToRemove) } }));
         }
     };
-    
+
     const handleRemoveCirurgia = (type, indexToRemove) => {
         if (window.confirm('Tem certeza que deseja remover este procedimento?')) {
             setFormData(prev => {
@@ -95,109 +89,156 @@ const CadastroPacientePage = () => {
     const getErrorCountForTab = (tabKey) => {
         return Object.keys(errors).filter(key => errorFieldToTabMap[key] === tabKey).length;
     };
-    
+
+    const SectionBlock = ({ title, children }) => (
+        <div className="mb-6 pb-6 border-b border-slate-200 last:border-0 last:mb-2">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4 pb-1 border-b-2 border-teal-500 inline-block">{title}</h2>
+            {children}
+        </div>
+    );
+
     return (
-        <Container>
+        <div className="flex flex-col h-full animate-fadeIn max-w-[1400px] mx-auto w-full">
             <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
-                    <FamilyMemberModal isOpen={modalState.isFamilyModalOpen} onClose={() => closeModal('Family')} onSubmit={handleSubmitMember} member={modalState.editingData} />
-                    <MetastaseModal isOpen={modalState.isMetastaseModalOpen} onClose={() => closeModal('Metastase')} onSubmit={handleSubmitMetastase} metastaseData={modalState.editingData} />
-                    <CirurgiaModal
-                        isOpen={modalState.isCirurgiaModalOpen}
-                        onClose={() => closeModal('Cirurgia')}
-                        onSubmit={handleSubmitCirurgia}
-                        initialData={modalState.editingData}
-                    />
+            <FamilyMemberModal isOpen={modalState.isFamilyModalOpen} onClose={() => closeModal('Family')} onSubmit={handleSubmitMember} member={modalState.editingData} />
+            <MetastaseModal isOpen={modalState.isMetastaseModalOpen} onClose={() => closeModal('Metastase')} onSubmit={handleSubmitMetastase} metastaseData={modalState.editingData} />
+            <CirurgiaModal isOpen={modalState.isCirurgiaModalOpen} onClose={() => closeModal('Cirurgia')} onSubmit={handleSubmitCirurgia} initialData={modalState.editingData} />
 
-                    <FormContainer onSubmit={handleSubmit} noValidate>
-                        {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
-                        {Object.keys(errors).length > 0 && !isLoading && (
-                            <ApiErrorContainer>
-                                <ErrorText>Por favor, corrija os erros para continuar.</ErrorText>
-                            </ApiErrorContainer>
-                        )}
+            <form onSubmit={handleSubmit} noValidate className="bg-white p-4 md:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 flex-grow relative pb-28">
+                {successMessage && (
+                    <div className="mb-6 p-4 bg-teal-50 border border-teal-200 text-teal-800 rounded-lg text-center font-medium">
+                        {successMessage}
+                    </div>
+                )}
+                {Object.keys(errors).length > 0 && !isLoading && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-left">
+                        <span className="font-semibold block mb-1">Por favor, corrija os erros para continuar.</span>
+                    </div>
+                )}
 
-                        <TabNav>
-                            {tabs.map(tab => (
-                                <TabButton key={tab.key} type="button" $isActive={activeTab === tab.key} onClick={() => setActiveTab(tab.key)}>
-                                    {tab.label}
-                                    {getErrorCountForTab(tab.key) > 0 && (
-                                        <span style={{ marginLeft: '8px', backgroundColor: '#ff7bac', color: 'white', borderRadius: '50%', padding: '2px 8px', fontSize: '0.75em' }}>
-                                            {getErrorCountForTab(tab.key)}
-                                        </span>
-                                    )}
-                                </TabButton>
-                            ))}
-                            <Button 
-                                type="button" 
-                                onClick={() => {
-                                    if (window.confirm('Tem certeza que deseja limpar todos os dados e começar do zero?')) {
-                                        localStorage.removeItem('cadastro_paciente_draft');
-                                        window.location.reload();
-                                    }
-                                }}
-                                style={{ 
-                                    marginLeft: 'auto', 
-                                    backgroundColor: '#dc3545', 
-                                    fontSize: '0.8em', 
-                                    padding: '5px 10px',
-                                    height: 'fit-content'
-                                }}
+                <div className="flex flex-wrap border-b-2 border-slate-200 mb-6 overflow-x-auto whitespace-nowrap hide-scrollbar">
+                    {tabs.map(tab => {
+                        const errorCount = getErrorCountForTab(tab.key);
+                        const isActive = activeTab === tab.key;
+                        return (
+                            <button
+                                key={tab.key}
+                                type="button"
+                                onClick={() => setActiveTab(tab.key)}
+                                className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors duration-200 -mb-[2px] 
+                                    ${isActive ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:text-teal-500 hover:bg-slate-50'}`}
                             >
-                                Limpar Rascunho
-                            </Button>
-                        </TabNav>
-
-                        {/* RENDERIZAÇÃO DAS ABAS */}
-                        {activeTab === 'identificacao' && (<Section><SectionTitle>Identificação e Dados Sociais</SectionTitle><DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} /></Section>)}
-                        
-                        {activeTab === 'historico' && (<><Section><SectionTitle>História Patológica Pregressa</SectionTitle><HistoriaPatologicaSection formData={formData.historia_patologica} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_patologica')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'historia_patologica')} /></Section><Section><SectionTitle>História Familiar</SectionTitle><HistoriaFamiliarSection familiares={formData.familiares} historiaFamiliar={formData.historia_familiar} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_familiar')} onAddMember={() => openModal('Family')} onEditMember={(member, index) => openModal('Family', member, index)} onRemoveMember={handleRemoveMember} /></Section><Section><SectionTitle>Hábitos de Vida</SectionTitle><HabitosDeVidaSection formData={formData.habitos_vida} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'habitos_vida')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'habitos_vida')} /></Section></>)}
-                        
-                        {activeTab === 'dadosClinicos' && (<><Section><SectionTitle>História Ginecológica e Obstétrica</SectionTitle><ParidadeSection formData={formData.paridade} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'paridade')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'paridade')} /></Section><Section><SectionTitle>História da Doença Atual</SectionTitle><HistoriaDoencaSection formData={formData.historia_doenca} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_doenca')} /></Section><Section><SectionTitle>Modelos Preditores de Risco</SectionTitle><ModelosPreditoresSection formData={formData.modelos_preditores} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'modelos_preditores')} /></Section></>)}
-                        
-                        {activeTab === 'tratamento' && (
-                            <Section>
-                                <SectionTitle>Tratamento</SectionTitle>
-                                <TratamentoSection formData={formData} setFormData={setFormData} errors={errors} onOpenModal={openModal} onRemoveCirurgia={handleRemoveCirurgia} />
-                            </Section>
-                        )}
-                        
-                        {activeTab === 'evolucao' && (
-                            <>
-                                <Section>
-                                    <SectionTitle>Desfecho</SectionTitle>
-                                    <DesfechoSection formData={formData.desfecho} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'desfecho')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'desfecho')} onAddMetastase={() => openModal('Metastase')} onEditMetastase={(meta, index) => openModal('Metastase', meta, index)} onRemoveMetastase={handleRemoveMetastase} />
-                                </Section>
-                                <Section>
-                                    <SectionTitle>Data Diagnóstico</SectionTitle>
-                                    <TemposDiagnosticoSection formData={formData.tempos_diagnostico} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'tempos_diagnostico')} />
-                                </Section>
-                            </>
-                        )}
-                        
-                        {/* BOTÕES DE NAVEGAÇÃO */}
-                        <FixedSubmitButton>
-                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'space-between', width: '100%' }}>
-                                {!isFirstTab && (
-                                    <Button type="button" onClick={handlePrevious} style={{ backgroundColor: '#6c757d' }}>
-                                        ← Anterior
-                                    </Button>
+                                {tab.label}
+                                {errorCount > 0 && (
+                                    <span className="ml-2 bg-rose-500 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow-sm">
+                                        {errorCount}
+                                    </span>
                                 )}
-                                
-                                <div style={{ marginLeft: 'auto' }}>
-                                    {!isLastTab ? (
-                                        <Button type="button" onClick={handleNext}>
-                                            Próximo →
-                                        </Button>
-                                    ) : (
-                                        <Button type="submit" disabled={isLoading}>
-                                            {isLoading ? 'Salvando...' : 'Salvar Cadastro'}
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        </FixedSubmitButton>
-                    </FormContainer>
-        </Container>
+                            </button>
+                        );
+                    })}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (window.confirm('Tem certeza que deseja limpar todos os dados e começar do zero?')) {
+                                localStorage.removeItem('cadastro_paciente_draft');
+                                window.location.reload();
+                            }
+                        }}
+                        className="ml-auto bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 text-xs px-3 py-1.5 rounded-md font-medium transition-colors my-auto"
+                    >
+                        Limpar Rascunho
+                    </button>
+                </div>
+
+                {/* RENDERIZAÇÃO DAS ABAS */}
+                {activeTab === 'identificacao' && (
+                    <SectionBlock title="Identificação e Dados Sociais">
+                        <DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} />
+                    </SectionBlock>
+                )}
+
+                {activeTab === 'historico' && (
+                    <>
+                        <SectionBlock title="História Patológica Pregressa">
+                            <HistoriaPatologicaSection formData={formData.historia_patologica} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_patologica')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'historia_patologica')} />
+                        </SectionBlock>
+                        <SectionBlock title="História Familiar">
+                            <HistoriaFamiliarSection familiares={formData.familiares} historiaFamiliar={formData.historia_familiar} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_familiar')} onAddMember={() => openModal('Family')} onEditMember={(member, index) => openModal('Family', member, index)} onRemoveMember={handleRemoveMember} />
+                        </SectionBlock>
+                        <SectionBlock title="Hábitos de Vida">
+                            <HabitosDeVidaSection formData={formData.habitos_vida} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'habitos_vida')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'habitos_vida')} />
+                        </SectionBlock>
+                    </>
+                )}
+
+                {activeTab === 'dadosClinicos' && (
+                    <>
+                        <SectionBlock title="História Ginecológica e Obstétrica">
+                            <ParidadeSection formData={formData.paridade} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'paridade')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'paridade')} />
+                        </SectionBlock>
+                        <SectionBlock title="História da Doença Atual">
+                            <HistoriaDoencaSection formData={formData.historia_doenca} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'historia_doenca')} />
+                        </SectionBlock>
+                        <SectionBlock title="Modelos Preditores de Risco">
+                            <ModelosPreditoresSection formData={formData.modelos_preditores} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'modelos_preditores')} />
+                        </SectionBlock>
+                    </>
+                )}
+
+                {activeTab === 'tratamento' && (
+                    <SectionBlock title="Tratamento">
+                        <TratamentoSection formData={formData} setFormData={setFormData} errors={errors} onOpenModal={openModal} onRemoveCirurgia={handleRemoveCirurgia} />
+                    </SectionBlock>
+                )}
+
+                {activeTab === 'evolucao' && (
+                    <>
+                        <SectionBlock title="Desfecho">
+                            <DesfechoSection formData={formData.desfecho} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'desfecho')} handleCheckboxChange={(e) => handleNestedCheckbox(e, 'desfecho')} onAddMetastase={() => openModal('Metastase')} onEditMetastase={(meta, index) => openModal('Metastase', meta, index)} onRemoveMetastase={handleRemoveMetastase} />
+                        </SectionBlock>
+                        <SectionBlock title="Data Diagnóstico">
+                            <TemposDiagnosticoSection formData={formData.tempos_diagnostico} errors={errors} handleInputChange={(e) => handleNestedChange(e, 'tempos_diagnostico')} />
+                        </SectionBlock>
+                    </>
+                )}
+
+                {/* BOTÕES DE NAVEGAÇÃO FIXOS */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm border-t border-slate-100 flex justify-between items-center rounded-b-xl z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+                    <div>
+                        {!isFirstTab && (
+                            <button
+                                type="button"
+                                onClick={handlePrevious}
+                                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors focus:ring-2 focus:ring-slate-300 focus:outline-none"
+                            >
+                                ← Anterior
+                            </button>
+                        )}
+                    </div>
+
+                    <div>
+                        {!isLastTab ? (
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 focus:outline-none"
+                            >
+                                Próximo →
+                            </button>
+                        ) : (
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 focus:outline-none disabled:bg-slate-300 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? 'Salvando...' : 'Salvar Cadastro'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </form>
+        </div>
     );
 };
 

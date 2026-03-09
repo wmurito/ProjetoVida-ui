@@ -1,5 +1,8 @@
 User-agent: *
-Disallow: /dashboard/
-Disallow: /pacientes/
-Disallow: /relatorios/
-Disallow: /registros/
+Disallow: /admin
+Disallow: /api
+Disallow: /cadastro
+Disallow: /registros
+Allow: /
+
+Sitemap: https://seu-dominio.com/sitemap.xml
