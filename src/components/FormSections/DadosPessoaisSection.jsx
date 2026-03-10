@@ -39,7 +39,7 @@ const FieldContainer = ({ className, children }) => (
 );
 
 const FormGrid = ({ children }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-5 gap-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-x-5 gap-y-6">
         {children}
     </div>
 );
@@ -60,71 +60,71 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
     return (
         <div className="mt-4">
             <FormGrid>
-                <FieldContainer className="lg:col-span-4 md:col-span-4 sm:col-span-2 col-span-1">
+                <FieldContainer className="md:col-span-8">
                     <InputLabel htmlFor="nome_completo">Nome Completo</InputLabel>
                     <StyledInput id="nome_completo" name="nome_completo" value={formData.nome_completo} onChange={handleChange} />
                     {errors.nome_completo && <ErrorText>{errors.nome_completo}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-1 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="idade">Idade</InputLabel>
                     <StyledInput id="idade" name="idade" type="text" value={calcularIdade(formData.data_nascimento)} readOnly disabled />
                 </FieldContainer>
-                <FieldContainer className="lg:col-span-1 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="data_nascimento">Data de Nascimento</InputLabel>
                     <StyledInput id="data_nascimento" name="data_nascimento" type="date" value={formData.data_nascimento} onChange={handleChange} />
                     {errors.data_nascimento && <ErrorText>{errors.data_nascimento}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-3">
                     <InputLabel htmlFor="telefone">Telefone</InputLabel>
                     <StyledInput id="telefone" name="telefone" type="tel" value={formData.telefone} onChange={handleChange} placeholder="11999998888" />
                     {errors.telefone && <ErrorText>{errors.telefone}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-4 md:col-span-4 sm:col-span-2 col-span-1">
+                <FieldContainer className="md:col-span-9">
                     <InputLabel htmlFor="endereco">Endereço</InputLabel>
                     <StyledInput id="endereco" name="endereco" value={formData.endereco} onChange={handleChange} />
                     {errors.endereco && <ErrorText>{errors.endereco}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="cep">CEP</InputLabel>
                     <StyledInput id="cep" name="cep" value={formData.cep} onChange={handleChange} placeholder="00000-000" />
                     {errors.cep && <ErrorText>{errors.cep}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="numero">Número</InputLabel>
                     <StyledInput id="numero" name="numero" value={formData.numero} onChange={handleChange} />
                     {errors.numero && <ErrorText>{errors.numero}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-3">
                     <InputLabel htmlFor="complemento">Complemento</InputLabel>
                     <StyledInput id="complemento" name="complemento" value={formData.complemento} onChange={handleChange} />
                     {errors.complemento && <ErrorText>{errors.complemento}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-5">
                     <InputLabel htmlFor="bairro">Bairro</InputLabel>
                     <StyledInput id="bairro" name="bairro" value={formData.bairro} onChange={handleChange} />
                     {errors.bairro && <ErrorText>{errors.bairro}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-1">
                     <InputLabel htmlFor="uf">UF</InputLabel>
                     <StyledInput id="uf" name="uf" value={formData.uf} onChange={handleChange} maxLength="2" placeholder="SP" />
                     {errors.uf && <ErrorText>{errors.uf}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-5">
                     <InputLabel htmlFor="cidade">Cidade</InputLabel>
                     <StyledInput id="cidade" name="cidade" value={formData.cidade} onChange={handleChange} />
                     {errors.cidade && <ErrorText>{errors.cidade}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-3">
                     <InputLabel htmlFor="genero">Gênero</InputLabel>
                     <StyledSelect id="genero" name="genero" value={formData.genero} onChange={handleChange}>
                         <option value="">Selecione...</option>
@@ -136,7 +136,7 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                     {errors.genero && <ErrorText>{errors.genero}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-3">
                     <InputLabel htmlFor="estado_civil">Estado Civil</InputLabel>
                     <StyledSelect id="estado_civil" name="estado_civil" value={formData.estado_civil} onChange={handleChange}>
                         <option value="">Selecione...</option>
@@ -150,30 +150,30 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                     {errors.estado_civil && <ErrorText>{errors.estado_civil}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-2 col-span-1">
+                <FieldContainer className="md:col-span-4">
                     <InputLabel htmlFor="naturalidade">Naturalidade</InputLabel>
                     <StyledInput id="naturalidade" name="naturalidade" value={formData.naturalidade} onChange={handleChange} />
                     {errors.naturalidade && <ErrorText>{errors.naturalidade}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="altura">Altura (m)</InputLabel>
                     <StyledInput id="altura" name="altura" type="number" step="0.01" value={formData.altura} onChange={handleChange} placeholder="Ex: 1.75" min="0.5" max="3.0" />
                     {errors.altura && <ErrorText>{errors.altura}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="peso">Peso (kg)</InputLabel>
                     <StyledInput id="peso" name="peso" type="number" step="0.1" value={formData.peso} onChange={handleChange} placeholder="Ex: 70.5" min="1" max="500" />
                     {errors.peso && <ErrorText>{errors.peso}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-1 md:col-span-1 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="imc">IMC</InputLabel>
                     <StyledInput id="imc" name="imc" type="text" value={formData.imc} readOnly disabled />
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-2">
                     <InputLabel htmlFor="cor_etnia">Cor/Etnia</InputLabel>
                     <StyledSelect id="cor_etnia" name="cor_etnia" value={formData.cor_etnia} onChange={handleChange}>
                         {corEtniaOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
@@ -181,7 +181,7 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                     {errors.cor_etnia && <ErrorText>{errors.cor_etnia}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-5">
                     <InputLabel htmlFor="escolaridade">Escolaridade</InputLabel>
                     <StyledSelect id="escolaridade" name="escolaridade" value={formData.escolaridade} onChange={handleChange}>
                         {escolaridadeOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
@@ -189,7 +189,7 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                     {errors.escolaridade && <ErrorText>{errors.escolaridade}</ErrorText>}
                 </FieldContainer>
 
-                <FieldContainer className="lg:col-span-2 md:col-span-2 sm:col-span-1 col-span-1">
+                <FieldContainer className="md:col-span-7">
                     <InputLabel htmlFor="renda_familiar">Renda Familiar</InputLabel>
                     <StyledSelect id="renda_familiar" name="renda_familiar" value={formData.renda_familiar} onChange={handleChange}>
                         {rendaFamiliarOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}

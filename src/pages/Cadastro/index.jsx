@@ -104,7 +104,7 @@ const CadastroPacientePage = () => {
             <MetastaseModal isOpen={modalState.isMetastaseModalOpen} onClose={() => closeModal('Metastase')} onSubmit={handleSubmitMetastase} metastaseData={modalState.editingData} />
             <CirurgiaModal isOpen={modalState.isCirurgiaModalOpen} onClose={() => closeModal('Cirurgia')} onSubmit={handleSubmitCirurgia} initialData={modalState.editingData} />
 
-            <form onSubmit={handleSubmit} noValidate className="bg-white p-4 md:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 flex-grow relative pb-28">
+            <form onSubmit={handleSubmit} noValidate className="bg-white p-4 md:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 flex-grow relative flex flex-col">
                 {successMessage && (
                     <div className="mb-6 p-4 bg-teal-50 border border-teal-200 text-teal-800 rounded-lg text-center font-medium">
                         {successMessage}
@@ -204,7 +204,7 @@ const CadastroPacientePage = () => {
                 )}
 
                 {/* BOTÕES DE NAVEGAÇÃO FIXOS */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm border-t border-slate-100 flex justify-between items-center rounded-b-xl z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+                <div className="sticky bottom-0 -mx-4 md:-mx-6 -mb-4 md:-mb-6 mt-8 p-4 bg-white/95 backdrop-blur-sm border-t border-slate-100 flex justify-between items-center rounded-b-xl z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
                     <div>
                         {!isFirstTab && (
                             <button
