@@ -50,11 +50,11 @@ export const useCadastroForm = (setActiveTab, navigate) => {
     const { id } = useParams();
     const isEditMode = !!id;
 
-    // Carregar dados salvos ou usar estado inicial
     const [formData, setFormData] = useState(() => {
         if (!isEditMode) {
             const savedData = loadFromLocalStorage();
-            if (savedData) {
+            // Verifica se o rascunho tem dados reais diferente do inicial
+            if (savedData && JSON.stringify(savedData) !== JSON.stringify(initialState)) {
                 toast.info('Rascunho carregado! Você pode continuar de onde parou.');
                 return savedData;
             }
