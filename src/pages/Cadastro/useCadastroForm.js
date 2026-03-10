@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { initialState, validationSchema, errorFieldToTabMap } from './formConfig';
 import { submitCadastro } from './cadastroService';
+import { getPaciente, updatePaciente } from '../../services/api';
 
 const STORAGE_KEY = 'cadastro_paciente_draft';
 
@@ -45,28 +47,75 @@ const clearLocalStorage = () => {
 };
 
 export const useCadastroForm = (setActiveTab, navigate) => {
+    const { id } = useParams();
+    const isEditMode = !!id;
+
     // Carregar dados salvos ou usar estado inicial
     const [formData, setFormData] = useState(() => {
-        const savedData = loadFromLocalStorage();
-        if (savedData) {
-            toast.info('Rascunho carregado! Você pode continuar de onde parou.');
-            return savedData;
+        if (!isEditMode) {
+            const savedData = loadFromLocalStorage();
+            if (savedData) {
+                toast.info('Rascunho carregado! Você pode continuar de onde parou.');
+                return savedData;
+            }
         }
         return initialState;
     });
-    
+
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetchingData, setIsFetchingData] = useState(isEditMode);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // Salvar automaticamente no localStorage sempre que formData mudar
+    // Efeito para carregar dados do paciente em modo de edição
     useEffect(() => {
+        const fetchPacienteData = async () => {
+            if (isEditMode) {
+                setIsFetchingData(true);
+                try {
+                    const response = await getPaciente(id);
+                    const pacienteData = response.data;
+
+                    if (pacienteData) {
+                        // Mesclar os dados recebidos com o initialState para garantir que a estrutura exista
+                        // e que propriedades não definidas no backend não quebrem o formulário
+
+                        const mergedData = {
+                            ...initialState,
+                            ...pacienteData,
+                            id_paciente: pacienteData.id_paciente || id,
+                        };
+
+                        // Tratamentos específicos para formatos (ex: datas que vêm com timezone e precisam apenas do YYYY-MM-DD)
+                        if (mergedData.data_nascimento) {
+                            mergedData.data_nascimento = mergedData.data_nascimento.split('T')[0];
+                        }
+
+                        setFormData(mergedData);
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar paciente:', error);
+                    toast.error('Não foi possível carregar os dados do paciente.');
+                    navigate('/registros');
+                } finally {
+                    setIsFetchingData(false);
+                }
+            }
+        };
+
+        fetchPacienteData();
+    }, [id, isEditMode, navigate]);
+
+    // Salvar automaticamente no localStorage sempre que formData mudar (Apenas no modo de Criação)
+    useEffect(() => {
+        if (isEditMode || isFetchingData) return;
+
         const timeoutId = setTimeout(() => {
             saveToLocalStorage(formData);
         }, 1000); // Debounce de 1 segundo
-        
+
         return () => clearTimeout(timeoutId);
-    }, [formData]);
+    }, [formData, isEditMode, isFetchingData]);
 
     // Efeito para calcular o IMC
     useEffect(() => {
@@ -84,22 +133,22 @@ export const useCadastroForm = (setActiveTab, navigate) => {
 
     // Efeito para montar a linha do tempo
     useEffect(() => {
-        const { tratamento, histologia, desfecho } = formData;
+        const { tratamento } = formData;
         const eventos = [];
         const addEvento = (data, titulo, descricao = '') => { if (data) eventos.push({ data, titulo, descricao }); };
-        
+
         addEvento(tratamento.inicio_neoadjuvante, 'Início do Tratamento Neoadjuvante', tratamento.qual_neoadjuvante);
         addEvento(tratamento.termino_neoadjuvante, 'Término do Tratamento Neoadjuvante');
 
         const dataInicioTratamento = eventos.length > 0 ? [...eventos].sort((a, b) => new Date(a.data) - new Date(b.data))[0].data : '';
-        
+
         setFormData(prev => {
             if (prev.tempos_diagnostico.data_inicio_tratamento !== dataInicioTratamento || JSON.stringify(prev.tempos_diagnostico.eventos) !== JSON.stringify(eventos)) {
                 return { ...prev, tempos_diagnostico: { ...prev.tempos_diagnostico, data_inicio_tratamento: dataInicioTratamento, eventos: eventos } };
             }
             return prev;
         });
-    }, [formData.tratamento, formData.histologia, formData.desfecho]);
+    }, [formData.tratamento]);
 
     const handleChange = useCallback((e) => {
         const { name, value } = e.target;
@@ -143,7 +192,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         setFormData(initialState);
         setErrors({});
         clearLocalStorage();
-    }, []);
+    }, [setFormData, setErrors]);
 
     // Função de salvar com validação integrada
     const handleSave = async () => {
@@ -157,22 +206,28 @@ export const useCadastroForm = (setActiveTab, navigate) => {
         try {
             await validationSchema.validate(formData, { abortEarly: false });
             console.log('✅ Validação passou com sucesso!');
-            
+
             console.log('=== ENVIANDO PARA API ===');
-            const response = await submitCadastro(formData);
+            let response;
+            if (isEditMode) {
+                response = await updatePaciente(id, formData);
+                setSuccessMessage('Paciente atualizado com sucesso! Redirecionando...');
+                toast.success('Paciente atualizado com sucesso!');
+            } else {
+                response = await submitCadastro(formData);
+                setSuccessMessage('Paciente cadastrado com sucesso! Redirecionando...');
+                toast.success('Paciente cadastrado com sucesso!');
+                // Limpar rascunho após sucesso de criação
+                clearLocalStorage();
+            }
             console.log('✅ Resposta da API:', response.data);
-            
-            // Limpar rascunho após sucesso
-            clearLocalStorage();
-            
-            setSuccessMessage('Paciente cadastrado com sucesso! Redirecionando...');
-            toast.success('Paciente cadastrado com sucesso!');
+
             resetForm();
             setTimeout(() => navigate('/registros'), 2000);
 
         } catch (err) {
             console.log('❌ ERRO NO CADASTRO:', err);
-            
+
             if (err.inner) { // Erro de validação do Yup
                 const validationErrors = {};
                 let firstErrorTab = null;
@@ -186,7 +241,7 @@ export const useCadastroForm = (setActiveTab, navigate) => {
                         firstErrorTab = errorFieldToTabMap[error.path];
                     }
                 });
-                
+
                 setErrors(validationErrors);
                 console.log('Todos os erros:', validationErrors);
                 toast.error('Por favor, corrija os erros indicados no formulário.');
@@ -205,8 +260,8 @@ export const useCadastroForm = (setActiveTab, navigate) => {
     };
 
     return {
-        formData, setFormData, errors, isLoading, successMessage,
-        handleChange, handleNestedChange, handleNestedCheckbox, resetForm, handleSave
+        formData, setFormData, errors, isLoading, isFetchingData, successMessage,
+        handleChange, handleNestedChange, handleNestedCheckbox, resetForm, handleSave, isEditMode
     };
 };
 

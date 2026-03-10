@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePacientes } from '../../hooks/usePacientes';
 import { sanitizeInput } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
-import EditModal from '../../components/ModalsPaciente/EditModal';
 import ViewModal from '../../components/ModalsPaciente/ViewModal';
 import { FiSearch, FiEye, FiEdit2, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 
 const Registros = () => {
+  const navigate = useNavigate();
   const { data: pacientes = [], isLoading: loading, error: queryError, refetch: loadPacientes } = usePacientes(0, 100);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,17 +46,17 @@ const Registros = () => {
   );
 
   const openModal = (paciente, type) => {
-    setSelectedPaciente(paciente);
-    setModalType(type);
+    if (type === 'edit') {
+      navigate(`/editar-paciente/${paciente.id_paciente}`);
+    } else {
+      setSelectedPaciente(paciente);
+      setModalType(type);
+    }
   };
 
   const closeModal = () => {
     setSelectedPaciente(null);
     setModalType(null);
-  };
-
-  const handleSave = () => {
-    closeModal();
   };
 
   if (loading) {
@@ -167,14 +168,6 @@ const Registros = () => {
         <ViewModal
           paciente={selectedPaciente}
           onClose={closeModal}
-        />
-      )}
-
-      {modalType === 'edit' && selectedPaciente && (
-        <EditModal
-          paciente={selectedPaciente}
-          onClose={closeModal}
-          onSave={handleSave}
         />
       )}
     </div>

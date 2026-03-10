@@ -80,6 +80,7 @@ const App = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="registros" element={<Registro />} />
           <Route path="novocadastro" element={<Cadastro />} />
+          <Route path="editar-paciente/:id" element={<Cadastro />} />
           <Route path="relatorios" element={<Relatorio />} />
         </Route>
         <Route path="*" element={<Navigate to={logged ? "/dashboard" : "/login"} replace />} />
