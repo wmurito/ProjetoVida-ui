@@ -7,16 +7,16 @@ export const setupCSP = () => {
     return import('../utils/sriUtils.js').then(({ applySriToExternalResources }) => {
       // Configurar CSP com nonces seguros
       setupCSPWithNonces();
-      
+
       // Aplicar nonces a elementos inline existentes
       applyNonceToInlineScripts();
-      
+
       // Aplicar SRI a recursos externos
       applySriToExternalResources();
-      
+
       // Adicionar cabeçalhos de segurança adicionais
       addSecurityHeaders();
-      
+
       // Configurar detecção de inatividade
       setupInactivityTimeout();
     });
@@ -30,17 +30,17 @@ export const setupCSP = () => {
       style-src 'self' 'nonce-${window.__CSP_NONCE__ || 'fallback'}' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https://*.amazonaws.com;
-      connect-src 'self' https://pteq15e8a6.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
+      connect-src 'self' https://viacep.com.br https://pteq15e8a6.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
       frame-ancestors 'none';
       form-action 'self';
       upgrade-insecure-requests;
       block-all-mixed-content;
     `;
     document.head.appendChild(meta);
-    
+
     // Adicionar cabeçalhos de segurança adicionais
     addSecurityHeaders();
-    
+
     // Configurar detecção de inatividade
     setupInactivityTimeout();
   });
@@ -54,7 +54,7 @@ const addSecurityHeaders = () => {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()'
   };
-  
+
   Object.entries(headers).forEach(([header, value]) => {
     const meta = document.createElement('meta');
     meta.httpEquiv = header;
@@ -95,7 +95,7 @@ export const setupInactivityTimeout = () => {
 // Função aprimorada para sanitizar dados de entrada
 export const sanitizeInput = (input) => {
   if (typeof input !== 'string') return input;
-  
+
   return input
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -119,7 +119,7 @@ export const sanitizeInput = (input) => {
 // Função para sanitizar logs especificamente
 export const sanitizeLog = (input) => {
   if (typeof input !== 'string') return String(input);
-  
+
   return input
     .replace(/[\r\n\t]/g, ' ') // Remover quebras de linha
     .replace(/[<>\"'`]/g, '_') // Substituir caracteres perigosos
@@ -132,11 +132,11 @@ export const sanitizeLog = (input) => {
 // Função para validar tokens JWT
 export const validateJwtFormat = (token) => {
   if (!token) return false;
-  
+
   // Verificar formato básico do JWT (três partes separadas por pontos)
   const parts = token.split('.');
   if (parts.length !== 3) return false;
-  
+
   // Verificar se cada parte é um base64 válido
   try {
     parts.forEach(part => {
@@ -153,28 +153,28 @@ export const validateJwtFormat = (token) => {
 // Função para validar entrada de dados
 export const validateInput = (input, type = 'text', maxLength = 255) => {
   if (!input || typeof input !== 'string') return false;
-  
+
   // Verificar tamanho
   if (input.length > maxLength) return false;
-  
+
   // Validações específicas por tipo
   switch (type) {
     case 'email':
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(input);
-    
+
     case 'cpf':
       const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$|^\d{11}$/;
       return cpfRegex.test(input);
-    
+
     case 'phone':
       const phoneRegex = /^\(\d{2}\)\s\d{4,5}-\d{4}$|^\d{10,11}$/;
       return phoneRegex.test(input);
-    
+
     case 'name':
       const nameRegex = /^[a-zA-ZÀ-ÿ\s]+$/;
       return nameRegex.test(input) && input.length >= 2;
-    
+
     default:
       // Verificar caracteres perigosos
       const dangerousChars = /<script|javascript:|data:|vbscript:|on\w+=/i;
@@ -190,11 +190,11 @@ export const clearSensitiveData = () => {
   sessionStorage.removeItem('rememberMe');
   sessionStorage.removeItem('csrf_token');
   sessionStorage.removeItem('isLoggedIn');
-  
+
   // Limpar localStorage também por segurança
   localStorage.removeItem('username');
   localStorage.removeItem('lsRememberMe');
-  
+
   // Limpar cookies relacionados à autenticação
   document.cookie.split(';').forEach(cookie => {
     const [name] = cookie.trim().split('=');
@@ -205,7 +205,7 @@ export const clearSensitiveData = () => {
 // Função para detectar tentativas de ataque
 export const detectAttack = (input) => {
   if (typeof input !== 'string') return false;
-  
+
   const attackPatterns = [
     // XSS patterns
     /<script/i,
@@ -218,7 +218,7 @@ export const detectAttack = (input) => {
     /url\s*\(/i,
     /import\s*\(/i,
     /@import/i,
-    
+
     // SQL Injection patterns
     /\bUNION\b.*\bSELECT\b/i,
     /\bSELECT\b.*\bFROM\b/i,
@@ -226,21 +226,21 @@ export const detectAttack = (input) => {
     /\bDELETE\b.*\bFROM\b/i,
     /\bUPDATE\b.*\bSET\b/i,
     /\bDROP\b.*\bTABLE\b/i,
-    
+
     // Code injection patterns
     /\$\{.*\}/,
     /<%.*%>/,
     /\{\{.*\}\}/,
-    
+
     // Path traversal
     /\.\.\/|\.\.\\/,
-    
+
     // Command injection
     /[;&|`$()]/
   ];
-  
+
   const hasAttack = attackPatterns.some(pattern => pattern.test(input));
-  
+
   // Log tentativa de ataque se detectada
   if (hasAttack && typeof window !== 'undefined' && window.securityLogger) {
     window.securityLogger.logAttackAttempt('INPUT_VALIDATION', {
@@ -248,7 +248,7 @@ export const detectAttack = (input) => {
       patterns: attackPatterns.filter(p => p.test(input)).map(p => p.toString())
     }, 'high');
   }
-  
+
   return hasAttack;
 };
 

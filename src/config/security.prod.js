@@ -17,7 +17,7 @@ export const PRODUCTION_SECURITY_CONFIG = {
     style-src 'self' 'nonce-${typeof window !== 'undefined' && window.__CSP_NONCE__ || 'fallback'}' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: https://*.amazonaws.com;
-    connect-src 'self' https://pteq15e8a6.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
+    connect-src 'self' https://viacep.com.br https://pteq15e8a6.execute-api.us-east-1.amazonaws.com https://*.amazonaws.com wss://*.amazonaws.com;
     frame-ancestors 'none';
     form-action 'self';
     upgrade-insecure-requests;
