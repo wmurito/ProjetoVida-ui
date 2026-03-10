@@ -7,7 +7,7 @@ const Dashboard = () => {
     <div className="flex flex-col gap-6 w-full max-w-[1600px] mx-auto animate-fadeIn">
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Dashboard de Pacientes</h1>
+          <h1 className="text-2xl font-bold text-pink-700">Dashboard de Pacientes</h1>
           <p className="text-slate-500 text-sm mt-1">Visão geral das estatísticas clínicas e oncológicas.</p>
         </div>
       </div>

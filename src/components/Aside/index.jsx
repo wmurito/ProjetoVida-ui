@@ -74,7 +74,7 @@ const Aside = ({ isClosed, menuAberto, closeMobileMenu }) => {
             onClick={handleLogout}
             title={isClosed ? "Sair" : ""}
             className={`
-              w-full flex items-center px-3 py-3 rounded-lg transition-colors text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200
+              w-full flex items-center px-3 py-3 rounded-lg transition-colors text-pink-600 hover:bg-pink-50 focus:outline-none focus:ring-2 focus:ring-pink-200
               ${isClosed ? 'justify-center' : 'justify-start'}
             `}
           >

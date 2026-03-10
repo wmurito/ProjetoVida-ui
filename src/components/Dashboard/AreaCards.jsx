@@ -106,8 +106,8 @@ const AreaCards = () => {
     <div className="bg-white rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-5 border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
       <h3 className="text-sm font-medium text-slate-500 mb-2 truncate">{title}</h3>
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-bold text-slate-800">{value}</span>
-        <span className="text-xs text-slate-400 font-medium">{label}</span>
+        <span className="text-2xl font-bold text-pink-600">{value}</span>
+        <span className="text-xs text-pink-400/80 font-medium">{label}</span>
       </div>
     </div>
   );
