@@ -39,7 +39,7 @@ const checkAuthorization = async () => {
       }
       return false;
     }
-    
+
     // Verificar se o token é válido e não expirou
     const parts = token.split('.');
     if (parts.length !== 3) {
@@ -48,17 +48,17 @@ const checkAuthorization = async () => {
       }
       return false;
     }
-    
+
     const payload = JSON.parse(atob(parts[1]));
     const currentTime = Math.floor(Date.now() / 1000);
-    
+
     if (payload.exp < currentTime) {
       if (import.meta.env.DEV) {
         console.warn('Token expirado');
       }
       return false;
     }
-    
+
     return true;
   } catch (error) {
     if (import.meta.env.DEV) {
@@ -79,7 +79,7 @@ export const getAuthToken = async () => {
         return token;
       }
     }
-    
+
     return null;
   } catch (error) {
     // Log de erro de autenticação sanitizado
@@ -99,7 +99,7 @@ api.interceptors.request.use(
   async (config) => {
     // Verificar se é uma rota pública
     const isPublicRoute = PUBLIC_ROUTES.some(route => config.url?.includes(route));
-    
+
     // Não adicionar Authorization para requisições OPTIONS (preflight) ou rotas públicas
     if (config.method?.toUpperCase() !== 'OPTIONS' && !isPublicRoute) {
       const token = await getAuthToken();
@@ -107,7 +107,7 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-    
+
     return config;
   },
   (error) => {
@@ -118,12 +118,12 @@ api.interceptors.request.use(
 // Função auxiliar para mostrar toast com cooldown
 const showErrorToast = (message, type = 'error') => {
   const now = Date.now();
-  
+
   // Se já existe um toast ativo com a mesma mensagem, não mostrar outro
   if (lastErrorToast === message && (now - lastErrorTime) < ERROR_TOAST_COOLDOWN) {
     return;
   }
-  
+
   lastErrorToast = message;
   lastErrorTime = now;
   toast[type](message);
@@ -135,7 +135,7 @@ api.interceptors.response.use(
   (error) => {
     // Verificar se é uma rota pública
     const isPublicRoute = PUBLIC_ROUTES.some(route => error.config?.url?.includes(route));
-    
+
     if (error.response) {
       // Não mostrar toasts para rotas públicas (deixar o componente tratar)
       if (!isPublicRoute) {
@@ -151,7 +151,7 @@ api.interceptors.response.use(
           showErrorToast('Erro na operação. Tente novamente.');
         }
       }
-      
+
       // Log de erro sanitizado para produção
     } else if (!isPublicRoute) {
       showErrorToast('Erro de conexão. Verifique sua internet.');
@@ -169,6 +169,26 @@ export const getPacientes = async (skip = 0, limit = 100) => {
     return response;
   } catch (error) {
     console.error('Erro na requisição getPacientes:', error);
+    throw error;
+  }
+};
+
+export const getPaciente = async (id) => {
+  try {
+    const response = await api.get(`/pacientes/${id}`);
+    return response;
+  } catch (error) {
+    console.error(`Erro na requisição getPaciente(${id}):`, error);
+    throw error;
+  }
+};
+
+export const updatePaciente = async (id, data) => {
+  try {
+    const response = await api.put(`/pacientes/${id}`, data);
+    return response;
+  } catch (error) {
+    console.error(`Erro na requisição updatePaciente(${id}):`, error);
     throw error;
   }
 };

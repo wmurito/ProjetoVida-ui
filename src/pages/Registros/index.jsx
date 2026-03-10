@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getPacientes } from '../../services/api';
+import React, { useState } from 'react';
+import { usePacientes } from '../../hooks/usePacientes';
 import { sanitizeInput } from '../../services/securityConfig';
 import { toast } from 'react-toastify';
 import EditModal from '../../components/ModalsPaciente/EditModal';
@@ -7,58 +7,31 @@ import ViewModal from '../../components/ModalsPaciente/ViewModal';
 import { FiSearch, FiEye, FiEdit2, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 
 const Registros = () => {
-  const [pacientes, setPacientes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: pacientes = [], isLoading: loading, error: queryError, refetch: loadPacientes } = usePacientes(0, 100);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPaciente, setSelectedPaciente] = useState(null);
   const [modalType, setModalType] = useState(null);
 
-  useEffect(() => {
-    loadPacientes();
-  }, []);
-
-  const loadPacientes = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      console.log('Iniciando carregamento de pacientes...');
-      const response = await getPacientes(0, 100);
-
-      const pacientesData = response.data || [];
-
-      if (Array.isArray(pacientesData)) {
-        setPacientes(pacientesData);
-      } else {
-        console.warn('Formato de dados inesperado:', pacientesData);
-        setPacientes([]);
-      }
-
-    } catch (err) {
-      console.error('Erro ao carregar pacientes:', {
-        message: sanitizeInput(err.message || 'Erro desconhecido'),
-        status: err.response?.status,
-        errorType: err.name,
-      });
-
-      if (err.response?.status === 403) {
+  React.useEffect(() => {
+    if (queryError) {
+      if (queryError.response?.status === 403) {
         setError('Você não tem permissão para visualizar os registros de pacientes.');
         toast.error('Acesso negado aos registros de pacientes.');
-      } else if (err.response?.status === 401) {
+      } else if (queryError.response?.status === 401) {
         setError('Sua sessão expirou. Por favor, faça login novamente.');
         toast.error('Sessão expirada. Redirecionando...');
-      } else if (err.name === 'NetworkError') {
+      } else if (queryError.name === 'NetworkError') {
         setError('Erro de conexão. Verifique sua internet e tente novamente.');
         toast.error('Erro de conexão com o servidor.');
       } else {
         setError('Erro ao carregar registros. Tente novamente em alguns instantes.');
         toast.error('Erro ao carregar registros de pacientes.');
       }
-    } finally {
-      setLoading(false);
+    } else {
+      setError(null);
     }
-  };
+  }, [queryError]);
 
   const handleSearch = (event) => {
     const value = sanitizeInput(event.target.value);
@@ -81,16 +54,8 @@ const Registros = () => {
     setModalType(null);
   };
 
-  const handleSave = async (updatedPaciente) => {
-    try {
-      // await updatePaciente(updatedPaciente.id, updatedPaciente);
-      toast.success('Paciente atualizado com sucesso!');
-      closeModal();
-      loadPacientes();
-    } catch (error) {
-      console.error('Erro ao salvar paciente:', sanitizeInput(error.message));
-      toast.error('Erro ao salvar alterações. Tente novamente.');
-    }
+  const handleSave = () => {
+    closeModal();
   };
 
   if (loading) {

@@ -9,6 +9,8 @@ import "./App.css";
 import { Amplify } from 'aws-amplify';
 import { setupCSP } from './services/securityConfig';
 import { toast } from 'react-toastify';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './services/queryClient';
 import { securityLogger } from './services/securityLogger';
 
 // Configurar Content Security Policy para proteção contra XSS
@@ -64,11 +66,13 @@ Amplify.configure({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <AuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );
