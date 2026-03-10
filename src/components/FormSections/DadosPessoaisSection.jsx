@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { corEtniaOptions, escolaridadeOptions, rendaFamiliarOptions } from '../../pages/Cadastro/formConfig';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const InputLabel = ({ htmlFor, children }) => (
     <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700 mb-1.5">{children}</label>
@@ -44,7 +46,9 @@ const FormGrid = ({ children }) => (
     </div>
 );
 
-const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
+const DadosPessoaisSection = ({ formData, errors, handleChange, setFormData }) => {
+    const [loadingCep, setLoadingCep] = useState(false);
+
     const calcularIdade = (dataNascimento) => {
         if (!dataNascimento) return '';
         const hoje = new Date();
@@ -55,6 +59,34 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
             idade--;
         }
         return idade;
+    };
+
+    const handleCepBlur = async (e) => {
+        const cepValue = e.target.value.replace(/\D/g, '');
+        if (cepValue.length === 8) {
+            setLoadingCep(true);
+            try {
+                const response = await axios.get(`https://viacep.com.br/ws/${cepValue}/json/`);
+                if (response.data && !response.data.erro) {
+                    if (setFormData) {
+                        setFormData(prev => ({
+                            ...prev,
+                            endereco: response.data.logradouro || prev.endereco,
+                            bairro: response.data.bairro || prev.bairro,
+                            cidade: response.data.localidade || prev.cidade,
+                            uf: response.data.uf || prev.uf,
+                        }));
+                        toast.success('Endereço auto-completado com sucesso!');
+                    }
+                } else {
+                    toast.warning('CEP não encontrado na base de dados.');
+                }
+            } catch (err) {
+                console.error("Erro ao buscar CEP:", err);
+            } finally {
+                setLoadingCep(false);
+            }
+        }
     };
 
     return (
@@ -89,8 +121,10 @@ const DadosPessoaisSection = ({ formData, errors, handleChange }) => {
                 </FieldContainer>
 
                 <FieldContainer className="md:col-span-2">
-                    <InputLabel htmlFor="cep">CEP</InputLabel>
-                    <StyledInput id="cep" name="cep" value={formData.cep} onChange={handleChange} placeholder="00000-000" />
+                    <InputLabel htmlFor="cep">
+                        CEP {loadingCep && <span className="ml-2 text-xs text-pink-500 animate-pulse">Buscando...</span>}
+                    </InputLabel>
+                    <StyledInput id="cep" name="cep" value={formData.cep} onChange={handleChange} onBlur={handleCepBlur} placeholder="00000-000" disabled={loadingCep} />
                     {errors.cep && <ErrorText>{errors.cep}</ErrorText>}
                 </FieldContainer>
 

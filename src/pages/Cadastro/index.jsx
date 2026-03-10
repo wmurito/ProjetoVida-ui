@@ -154,7 +154,7 @@ const CadastroPacientePage = () => {
                 {/* RENDERIZAÇÃO DAS ABAS */}
                 {activeTab === 'identificacao' && (
                     <SectionBlock title="Identificação e Dados Sociais">
-                        <DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} />
+                        <DadosPessoaisSection formData={formData} errors={errors} handleChange={handleChange} setFormData={setFormData} />
                     </SectionBlock>
                 )}
 
