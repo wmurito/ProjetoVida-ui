@@ -63,11 +63,30 @@ export const ErrorText = ({ children, className }) => (
     <span className={`text-rose-500 text-xs mt-1.5 font-medium block ${className || ''}`}>{children}</span>
 );
 
-export const FieldContainer = ({ className, children }) => (
-    <div className={`flex flex-col w-full ${className || ''}`}>
-        {children}
-    </div>
-);
+export const FieldContainer = ({ className, style, children }) => {
+    let colSpanClass = '';
+    let safeStyle = style ? { ...style } : {};
+
+    if (style && style.gridColumn && style.gridColumn.toString().startsWith('span')) {
+        const spanX = parseInt(style.gridColumn.replace('span ', '').trim());
+
+        // Map 6-column logic to sm (2-col) and lg (6-col)
+        if (spanX === 1) colSpanClass = 'col-span-1 sm:col-span-1 lg:col-span-1';
+        else if (spanX === 2) colSpanClass = 'col-span-1 sm:col-span-1 lg:col-span-2';
+        else if (spanX === 3) colSpanClass = 'col-span-1 sm:col-span-1 lg:col-span-3';
+        else if (spanX === 4) colSpanClass = 'col-span-1 sm:col-span-2 lg:col-span-4';
+        else if (spanX === 5) colSpanClass = 'col-span-1 sm:col-span-2 lg:col-span-5';
+        else if (spanX >= 6) colSpanClass = 'col-span-1 sm:col-span-2 lg:col-span-6';
+
+        delete safeStyle.gridColumn; // Remove to prevent explicit override on mobile
+    }
+
+    return (
+        <div className={`flex flex-col w-full ${colSpanClass} ${className || ''}`} style={Object.keys(safeStyle).length > 0 ? safeStyle : undefined}>
+            {children}
+        </div>
+    );
+};
 
 export const FormGrid = ({ children, className, style }) => (
     <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-x-5 gap-y-6 ${className || ''}`} style={style}>
