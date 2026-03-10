@@ -55,7 +55,7 @@ const Aside = ({ isClosed, menuAberto, closeMobileMenu }) => {
               onClick={closeMobileMenu}
               className={({ isActive }) => `
                 flex items-center px-3 py-3 rounded-lg transition-colors group relative
-                ${isActive ? 'bg-teal-50 text-teal-700 font-medium' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}
+                ${isActive ? 'bg-pink-50 text-pink-700 font-medium' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}
                 ${isClosed ? 'justify-center' : 'justify-start'}
               `}
             >

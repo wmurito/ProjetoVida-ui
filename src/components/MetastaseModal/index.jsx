@@ -71,7 +71,7 @@ const MetastaseModal = ({ isOpen, onClose, onSubmit, metastaseData }) => {
                             name="local_metastase"
                             value={currentMetastase.local_metastase}
                             onChange={handleChange}
-                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm transition-colors focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm transition-colors focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
                         />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -81,7 +81,7 @@ const MetastaseModal = ({ isOpen, onClose, onSubmit, metastaseData }) => {
                             name="data_metastase"
                             value={currentMetastase.data_metastase}
                             onChange={handleChange}
-                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm transition-colors focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm transition-colors focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
                         />
                     </div>
                 </div>
@@ -95,7 +95,7 @@ const MetastaseModal = ({ isOpen, onClose, onSubmit, metastaseData }) => {
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="flex items-center gap-2 px-6 py-2.5 border border-transparent rounded-lg text-white font-semibold bg-teal-600 hover:bg-teal-700 transition-colors cursor-pointer shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-6 py-2.5 border border-transparent rounded-lg text-white font-semibold bg-pink-600 hover:bg-pink-700 transition-colors cursor-pointer shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed"
                     >
                         <FaSave /> Salvar
                     </button>

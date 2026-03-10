@@ -8,7 +8,7 @@ const InputLabel = ({ htmlFor, children }) => (
 const StyledInput = (props) => (
     <input
         className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                   focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500
+                   focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500
                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
                    transition-colors"
         {...props}
@@ -18,7 +18,7 @@ const StyledInput = (props) => (
 const StyledSelect = ({ children, ...props }) => (
     <select
         className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm
-                   focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500
+                   focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500
                    disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200
                    transition-colors appearance-none"
         style={{ backgroundImage: `url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%3E%3Cpath%20fill%3D%22%23495057%22%20d%3D%22M10.293%203.293L6%207.586%201.707%203.293A1%201%200%2000.293%204.707l5%205a1%201%200%20001.414%200l5-5a1%201%200%2010-1.414-1.414z%22%2F%3E%3C%2Fsvg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', backgroundSize: '12px', paddingRight: '30px' }}

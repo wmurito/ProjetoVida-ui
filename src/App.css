@@ -1,20 +1,39 @@
 @import "tailwindcss";
 
+@theme {
+    --color-pink-50: #fff5f8;
+    --color-pink-100: #ffeaf2;
+    --color-pink-200: #ffd4e4;
+    --color-pink-300: #ffafd2;
+    --color-pink-400: #ff8abf;
+    --color-pink-500: #ff8ebf;
+    --color-pink-600: #ff7bac;
+    --color-pink-700: #e65a8d;
+    --color-pink-800: #c23b6b;
+    --color-pink-900: #9e2350;
+    --color-pink-950: #6b1031;
+}
+
 body {
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     font-family: "Roboto", sans-serif;
     background-color: #F2F2F2;
-    overflow: hidden; /* Remove overflow da página principal */
+    overflow: hidden;
+    /* Remove overflow da página principal */
 }
 
-html, body, #root {
+html,
+body,
+#root {
     height: 100%;
-    overflow: hidden; /* Garante que não há scroll na página principal */
+    overflow: hidden;
+    /* Garante que não há scroll na página principal */
 }
 
-button, input {
+button,
+input {
     border: 0;
     outline: 0;
     font-family: 'Roboto', sans-serif;

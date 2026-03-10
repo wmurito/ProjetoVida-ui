@@ -62,7 +62,7 @@ const Registros = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] text-slate-500 animate-pulse">
-        <FiRefreshCw className="w-8 h-8 animate-spin mb-4 text-teal-500" />
+        <FiRefreshCw className="w-8 h-8 animate-spin mb-4 text-pink-500" />
         <span className="text-lg font-medium">Carregando registros...</span>
       </div>
     );
@@ -97,7 +97,7 @@ const Registros = () => {
           </div>
           <input
             type="text"
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-colors"
             placeholder="Buscar por nome, telefone ou cidade..."
             value={searchTerm}
             onChange={handleSearch}
@@ -150,7 +150,7 @@ const Registros = () => {
                         </button>
                         <button
                           onClick={() => openModal(paciente, 'edit')}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 rounded-md transition-colors text-xs font-medium"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-700 rounded-md transition-colors text-xs font-medium"
                         >
                           <FiEdit2 className="w-3.5 h-3.5" /> Editar
                         </button>

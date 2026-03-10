@@ -72,7 +72,7 @@ const PalliativeChemoModal = ({ isOpen, onClose, onSubmit, chemoData }) => {
                             name="linha_tratamento_paliativo"
                             value={formData.linha_tratamento_paliativo}
                             onChange={handleChange}
-                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
                         />
                     </div>
                     <div className="flex flex-col">
@@ -81,7 +81,7 @@ const PalliativeChemoModal = ({ isOpen, onClose, onSubmit, chemoData }) => {
                             name="qual_quimioterapia_paliativa"
                             value={formData.qual_quimioterapia_paliativa}
                             onChange={handleChange}
-                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
                         />
                     </div>
                     <div className="flex flex-col">
@@ -91,7 +91,7 @@ const PalliativeChemoModal = ({ isOpen, onClose, onSubmit, chemoData }) => {
                             name="inicio_quimioterapia_paliativa"
                             value={formData.inicio_quimioterapia_paliativa}
                             onChange={handleChange}
-                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
                         />
                     </div>
                     <div className="flex flex-col">
@@ -101,7 +101,7 @@ const PalliativeChemoModal = ({ isOpen, onClose, onSubmit, chemoData }) => {
                             name="fim_quimioterapia_paliativa"
                             value={formData.fim_quimioterapia_paliativa}
                             onChange={handleChange}
-                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                            className="p-2.5 border border-slate-300 rounded-md text-base transition-colors focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
                         />
                     </div>
                 </div>

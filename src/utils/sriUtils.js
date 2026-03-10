@@ -165,7 +165,7 @@ export const applySriToExternalResources = () => {
 };
 
 // Função para verificar se todos os recursos externos têm SRI
-export const validateAllExternalResources = async () => {
+export const validapinklExternalResources = async () => {
   const externalResources = [
     ...document.querySelectorAll('link[rel="stylesheet"][href^="https"]'),
     ...document.querySelectorAll('script[src^="https"]')

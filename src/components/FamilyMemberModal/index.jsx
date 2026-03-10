@@ -140,7 +140,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                 name="genero"
                                 value={genero}
                                 onChange={handleGeneroChange}
-                                className="w-full border border-slate-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
+                                className="w-full border border-slate-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
                             >
                                 <option value="">Selecione...</option>
                                 <option value="masculino">Masculino</option>
@@ -156,7 +156,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                 value={familiarData.parentesco || ''}
                                 onChange={handleChange}
                                 disabled={!genero}
-                                className="w-full border border-slate-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+                                className="w-full border border-slate-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                             >
                                 {parentescoOptions.map(opt => (
                                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -172,16 +172,16 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label className="block text-sm font-semibold text-slate-700 mb-2">Câncer de mama?</label>
                                     <div className="flex items-center gap-4 mb-2">
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} />
+                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} />
                                             Não
                                         </label>
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} />
+                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} />
                                             Sim
                                         </label>
                                     </div>
                                     {familiarData.cancer_mama === 'sim' && (
-                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 mt-1" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} min="0" max="150" />
+                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 mt-1" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </div>
 
@@ -190,16 +190,16 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label className="block text-sm font-semibold text-slate-700 mb-2">Bilateral?</label>
                                     <div className="flex items-center gap-4 mb-2">
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="bilateral" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.bilateral === 'nao'} onChange={() => handleRadioChange('bilateral', 'nao')} />
+                                            <input type="radio" name="bilateral" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.bilateral === 'nao'} onChange={() => handleRadioChange('bilateral', 'nao')} />
                                             Não
                                         </label>
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="bilateral" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.bilateral === 'sim'} onChange={() => handleRadioChange('bilateral', 'sim')} />
+                                            <input type="radio" name="bilateral" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.bilateral === 'sim'} onChange={() => handleRadioChange('bilateral', 'sim')} />
                                             Sim
                                         </label>
                                     </div>
                                     {familiarData.bilateral === 'sim' && (
-                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 mt-1" name="idade_segunda_mama" placeholder="Idade da 2ª mama" value={familiarData.idade_segunda_mama || ''} onChange={handleChange} min="0" max="150" />
+                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 mt-1" name="idade_segunda_mama" placeholder="Idade da 2ª mama" value={familiarData.idade_segunda_mama || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </div>
 
@@ -208,16 +208,16 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label className="block text-sm font-semibold text-slate-700 mb-2">Câncer de ovário?</label>
                                     <div className="flex items-center gap-4 mb-2">
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="cancer_ovario" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.cancer_ovario === 'nao'} onChange={() => handleRadioChange('cancer_ovario', 'nao')} />
+                                            <input type="radio" name="cancer_ovario" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.cancer_ovario === 'nao'} onChange={() => handleRadioChange('cancer_ovario', 'nao')} />
                                             Não
                                         </label>
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="cancer_ovario" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.cancer_ovario === 'sim'} onChange={() => handleRadioChange('cancer_ovario', 'sim')} />
+                                            <input type="radio" name="cancer_ovario" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.cancer_ovario === 'sim'} onChange={() => handleRadioChange('cancer_ovario', 'sim')} />
                                             Sim
                                         </label>
                                     </div>
                                     {familiarData.cancer_ovario === 'sim' && (
-                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 mt-1" name="idade_cancer_ovario" placeholder="Idade no início" value={familiarData.idade_cancer_ovario || ''} onChange={handleChange} min="0" max="150" />
+                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 mt-1" name="idade_cancer_ovario" placeholder="Idade no início" value={familiarData.idade_cancer_ovario || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </div>
 
@@ -227,7 +227,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <div className="flex flex-wrap gap-4">
                                         {['desconhecido', 'normal', 'brca1', 'brca2'].map(opt => (
                                             <label key={opt} className="flex items-center text-sm text-slate-700 capitalize cursor-pointer">
-                                                <input type="radio" name="gene_brca" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.gene_brca === opt} onChange={() => handleRadioChange('gene_brca', opt)} />
+                                                <input type="radio" name="gene_brca" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.gene_brca === opt} onChange={() => handleRadioChange('gene_brca', opt)} />
                                                 {opt}
                                             </label>
                                         ))}
@@ -244,16 +244,16 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <label className="block text-sm font-semibold text-slate-700 mb-2">Câncer de mama?</label>
                                     <div className="flex items-center gap-4 mb-2">
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} />
+                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.cancer_mama === 'nao'} onChange={() => handleRadioChange('cancer_mama', 'nao')} />
                                             Não
                                         </label>
                                         <label className="flex items-center text-sm text-slate-700 cursor-pointer">
-                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} />
+                                            <input type="radio" name="cancer_mama" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.cancer_mama === 'sim'} onChange={() => handleRadioChange('cancer_mama', 'sim')} />
                                             Sim
                                         </label>
                                     </div>
                                     {familiarData.cancer_mama === 'sim' && (
-                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 mt-1" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} min="0" max="150" />
+                                        <input type="number" className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 mt-1" name="idade_cancer_mama" placeholder="Idade no início" value={familiarData.idade_cancer_mama || ''} onChange={handleChange} min="0" max="150" />
                                     )}
                                 </div>
 
@@ -263,7 +263,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                                     <div className="flex flex-wrap gap-4">
                                         {['desconhecido', 'normal', 'brca1', 'brca2'].map(opt => (
                                             <label key={opt} className="flex items-center text-sm text-slate-700 capitalize cursor-pointer">
-                                                <input type="radio" name="gene_brca" className="mr-1.5 text-teal-600 focus:ring-teal-500 cursor-pointer" checked={familiarData.gene_brca === opt} onChange={() => handleRadioChange('gene_brca', opt)} />
+                                                <input type="radio" name="gene_brca" className="mr-1.5 text-pink-600 focus:ring-pink-500 cursor-pointer" checked={familiarData.gene_brca === opt} onChange={() => handleRadioChange('gene_brca', opt)} />
                                                 {opt}
                                             </label>
                                         ))}
@@ -285,7 +285,7 @@ const FamilyMemberModal = ({ isOpen, onClose, onSubmit, member }) => {
                     <button
                         type="button"
                         onClick={handleSave}
-                        className="flex items-center gap-1.5 px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 transition-colors shadow-sm"
+                        className="flex items-center gap-1.5 px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 transition-colors shadow-sm"
                     >
                         <FaSave /> Salvar
                     </button>

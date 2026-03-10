@@ -186,7 +186,7 @@ const AreaCharts = () => {
           smooth: true,
           symbol: 'none',
           lineStyle: {
-            color: '#14b8a6', // teal-500
+            color: '#ff7bac', // pink-600
             width: 3
           },
           areaStyle: {
@@ -197,8 +197,8 @@ const AreaCharts = () => {
               x2: 0,
               y2: 1,
               colorStops: [
-                { offset: 0, color: 'rgba(20, 184, 166, 0.2)' },
-                { offset: 1, color: 'rgba(20, 184, 166, 0)' }
+                { offset: 0, color: 'rgba(255, 123, 172, 0.2)' },
+                { offset: 1, color: 'rgba(255, 123, 172, 0)' }
               ]
             }
           },

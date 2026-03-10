@@ -87,7 +87,7 @@ const ViewModal = ({ paciente, onClose }) => {
 
       return (
         <div key={title} className="mb-6">
-          <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">{title}</h3>
+          <h3 className="text-lg font-semibold text-pink-600 border-b border-slate-200 pb-2 mb-4">{title}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
             {Object.entries(sectionData).map(([key, value]) => {
               if (value === null || value === '' || (typeof value === 'boolean' && !value && !key.includes('has') && !key.includes('uso') && !key.includes('teve'))) return null;
@@ -131,7 +131,7 @@ const ViewModal = ({ paciente, onClose }) => {
         {/* Familiares */}
         {data.familiares && data.familiares.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">Familiares</h3>
+            <h3 className="text-lg font-semibold text-pink-600 border-b border-slate-200 pb-2 mb-4">Familiares</h3>
             {data.familiares.map((familiar, index) => (
               <div key={index} className="mb-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <h4 className="text-sm font-semibold text-slate-600 mb-3">Familiar {index + 1}</h4>
@@ -158,7 +158,7 @@ const ViewModal = ({ paciente, onClose }) => {
         {/* Tratamento */}
         {data.tratamento && (
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">Tratamento</h3>
+            <h3 className="text-lg font-semibold text-pink-600 border-b border-slate-200 pb-2 mb-4">Tratamento</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
               {Object.entries(data.tratamento).map(([key, value]) => {
                 const hiddenKeys = ['id_tratamento', 'id_paciente', 'cirurgias', 'quimioterapia', 'radioterapia', 'endocrinoterapia', 'imunoterapia', 'imunohistoquimicas', 'core_biopsy', 'mamotomia', 'paaf'];
@@ -187,7 +187,7 @@ const ViewModal = ({ paciente, onClose }) => {
         {/* Desfecho */}
         {data.desfecho && (
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-teal-600 border-b border-slate-200 pb-2 mb-4">Desfecho</h3>
+            <h3 className="text-lg font-semibold text-pink-600 border-b border-slate-200 pb-2 mb-4">Desfecho</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
               {Object.entries(data.desfecho).map(([key, value]) => {
                 if (['id_desfecho', 'id_paciente', 'metastases', 'eventos'].includes(key)) return null;
@@ -226,7 +226,7 @@ const ViewModal = ({ paciente, onClose }) => {
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50 shrink-0">
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <FiActivity className="text-teal-500" /> Detalhes do Paciente: <span className="text-teal-700">{pacienteData ? pacienteData.nome_completo : 'Carregando...'}</span>
+            <FiActivity className="text-pink-500" /> Detalhes do Paciente: <span className="text-pink-700">{pacienteData ? pacienteData.nome_completo : 'Carregando...'}</span>
           </h2>
           <button
             onClick={onClose}
@@ -239,7 +239,7 @@ const ViewModal = ({ paciente, onClose }) => {
         <div className="flex-grow overflow-y-auto">
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
             </div>
           ) : pacienteData ? (
             renderDetails(pacienteData)

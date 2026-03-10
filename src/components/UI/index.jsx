@@ -13,13 +13,13 @@ export const Button = React.forwardRef(({ className, variant = 'primary', size =
   }[size] || sizeClasses.default;
 
   const variantClasses = {
-    primary: "border-transparent bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-500",
+    primary: "border-transparent bg-pink-600 text-white hover:bg-pink-700 focus:ring-pink-500",
     secondary: "border-transparent bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-500",
     success: "border-transparent bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500",
     warning: "border-transparent bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-500",
     danger: "border-transparent bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500",
-    outline: "border-teal-600 bg-transparent text-teal-600 hover:bg-teal-50 hover:text-teal-700 focus:ring-teal-500",
-    ghost: "border-transparent bg-transparent text-teal-600 hover:bg-slate-100 hover:text-teal-700 focus:ring-teal-500"
+    outline: "border-pink-600 bg-transparent text-pink-600 hover:bg-pink-50 hover:text-pink-700 focus:ring-pink-500",
+    ghost: "border-transparent bg-transparent text-pink-600 hover:bg-slate-100 hover:text-pink-700 focus:ring-pink-500"
   }[variant] || variantClasses.primary;
 
   return (
@@ -36,7 +36,7 @@ export const Button = React.forwardRef(({ className, variant = 'primary', size =
 Button.displayName = 'Button';
 
 // Inputs
-const inputBaseClasses = "w-full border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors box-border";
+const inputBaseClasses = "w-full border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors box-border";
 
 export const Input = React.forwardRef(({ className, size = 'default', ...props }, ref) => {
   const sizeClasses = {
@@ -87,7 +87,7 @@ export const Checkbox = React.forwardRef(({ className, ...props }, ref) => (
   <input
     type="checkbox"
     ref={ref}
-    className={`w-4 h-4 text-teal-600 bg-white border-slate-300 rounded focus:ring-teal-500 focus:ring-2 cursor-pointer mr-2 accent-teal-600 ${className || ''}`}
+    className={`w-4 h-4 text-pink-600 bg-white border-slate-300 rounded focus:ring-pink-500 focus:ring-2 cursor-pointer mr-2 accent-pink-600 ${className || ''}`}
     {...props}
   />
 ));
@@ -97,7 +97,7 @@ export const Radio = React.forwardRef(({ className, ...props }, ref) => (
   <input
     type="radio"
     ref={ref}
-    className={`w-4 h-4 text-teal-600 bg-white border-slate-300 focus:ring-teal-500 focus:ring-2 cursor-pointer mr-2 accent-teal-600 ${className || ''}`}
+    className={`w-4 h-4 text-pink-600 bg-white border-slate-300 focus:ring-pink-500 focus:ring-2 cursor-pointer mr-2 accent-pink-600 ${className || ''}`}
     {...props}
   />
 ));
@@ -232,7 +232,7 @@ export const Alert = ({ children, className, variant = 'info', ...props }) => {
 // Loading
 export const Spinner = ({ className, size = '20px', ...props }) => (
   <div
-    className={`border-2 border-slate-200 border-t-teal-600 rounded-full animate-spin ${className || ''}`}
+    className={`border-2 border-slate-200 border-t-pink-600 rounded-full animate-spin ${className || ''}`}
     style={{ width: size, height: size }}
     {...props}
   />
@@ -251,8 +251,8 @@ export const Overlay = ({ children, className, ...props }) => (
 // Exports para retrocompatibilidade onde importam "tokens" do UI/index.js (apesar de agora recomendarmos pular eles e usar classes Tailwind)
 export const tokens = {
   colors: {
-    primary: '#0d9488', // teal-600
-    primaryHover: '#0f766e', // teal-700
+    primary: '#ff7bac', // pink-600
+    primaryHover: '#e65a8d', // pink-700
     secondary: '#475569', // slate-600
     success: '#10b981', // emerald-500
     warning: '#f59e0b', // amber-500

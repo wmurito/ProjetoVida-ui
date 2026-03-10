@@ -28,7 +28,7 @@ const FormFields = ({ fields, data, handleChange }) => (
                             name={field.name}
                             value={data[field.name] || ''}
                             onChange={handleChange}
-                            className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[42px]"
+                            className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500 min-h-[42px]"
                         >
                             {field.options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
@@ -39,7 +39,7 @@ const FormFields = ({ fields, data, handleChange }) => (
                                 name={field.name}
                                 checked={!!data[field.name]}
                                 onChange={handleChange}
-                                className="w-4 h-4 text-teal-600 bg-white border border-slate-300 rounded cursor-pointer accent-teal-600 focus:ring-teal-500 focus:ring-2"
+                                className="w-4 h-4 text-pink-600 bg-white border border-slate-300 rounded cursor-pointer accent-pink-600 focus:ring-pink-500 focus:ring-2"
                             />
                             <span className="text-sm text-slate-700 select-none font-medium">{field.checkboxLabel || ''}</span>
                         </label>
@@ -50,7 +50,7 @@ const FormFields = ({ fields, data, handleChange }) => (
                             value={data[field.name] || ''}
                             onChange={handleChange}
                             step={field.step}
-                            className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[42px] appearance-auto"
+                            className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500 min-h-[42px] appearance-auto"
                         />
                     )}
                 </div>
@@ -135,7 +135,7 @@ const CirurgiaModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 name="contexto_cirurgico"
                                 value={procedimentoData.contexto_cirurgico || ''}
                                 onChange={handleChange}
-                                className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                                className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500"
                             >
                                 <option value="">Não se aplica</option>
                                 <option value="upfront">Upfront</option>
@@ -149,7 +149,7 @@ const CirurgiaModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 value={procedimentoData.tipo_procedimento || ''}
                                 onChange={handleChange}
                                 disabled={!!initialData}
-                                className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+                                className="p-2.5 bg-white border border-slate-300 rounded-md text-slate-700 text-sm transition-colors focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                             >
                                 <option value="">Selecione...</option>
                                 <option value="mamas">Cirurgia da Mama</option>

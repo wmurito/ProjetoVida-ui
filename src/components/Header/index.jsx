@@ -8,7 +8,7 @@ const Header = ({ isAsideClosed, toggleAside }) => {
             <div className="flex items-center gap-4">
                 <button
                     onClick={toggleAside}
-                    className="p-2 -ml-2 rounded-md hover:bg-slate-100 text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="p-2 -ml-2 rounded-md hover:bg-slate-100 text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
                     aria-label="Toggle Menu"
                 >
                     <AiOutlineMenu size={24} />

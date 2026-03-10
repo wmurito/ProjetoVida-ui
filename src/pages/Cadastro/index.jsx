@@ -92,7 +92,7 @@ const CadastroPacientePage = () => {
 
     const SectionBlock = ({ title, children }) => (
         <div className="mb-6 pb-6 border-b border-slate-200 last:border-0 last:mb-2">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 pb-1 border-b-2 border-teal-500 inline-block">{title}</h2>
+            <h2 className="text-lg font-semibold text-slate-800 mb-4 pb-1 border-b-2 border-pink-500 inline-block">{title}</h2>
             {children}
         </div>
     );
@@ -106,7 +106,7 @@ const CadastroPacientePage = () => {
 
             <form onSubmit={handleSubmit} noValidate className="bg-white p-4 md:p-6 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 flex-grow relative flex flex-col">
                 {successMessage && (
-                    <div className="mb-6 p-4 bg-teal-50 border border-teal-200 text-teal-800 rounded-lg text-center font-medium">
+                    <div className="mb-6 p-4 bg-pink-50 border border-pink-200 text-pink-800 rounded-lg text-center font-medium">
                         {successMessage}
                     </div>
                 )}
@@ -126,7 +126,7 @@ const CadastroPacientePage = () => {
                                 type="button"
                                 onClick={() => setActiveTab(tab.key)}
                                 className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors duration-200 -mb-[2px] 
-                                    ${isActive ? 'border-teal-500 text-teal-600' : 'border-transparent text-slate-500 hover:text-teal-500 hover:bg-slate-50'}`}
+                                    ${isActive ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-500 hover:text-pink-500 hover:bg-slate-50'}`}
                             >
                                 {tab.label}
                                 {errorCount > 0 && (
@@ -222,7 +222,7 @@ const CadastroPacientePage = () => {
                             <button
                                 type="button"
                                 onClick={handleNext}
-                                className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-1 focus:outline-none"
+                                className="px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-pink-500 focus:ring-offset-1 focus:outline-none"
                             >
                                 Próximo →
                             </button>
