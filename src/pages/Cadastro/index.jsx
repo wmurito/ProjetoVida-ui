@@ -24,6 +24,13 @@ import TratamentoSection from '../../components/FormSections/TratamentoSection';
 import DesfechoSection from '../../components/FormSections/DesfechoSection';
 import TemposDiagnosticoSection from '../../components/FormSections/TemposDiagnosticoSection';
 
+const SectionBlock = ({ title, children }) => (
+    <div className="mb-6 pb-6 border-b border-slate-200 last:border-0 last:mb-2">
+        <h2 className="text-lg font-semibold text-slate-800 mb-4 pb-1 border-b-2 border-pink-500 inline-block">{title}</h2>
+        {children}
+    </div>
+);
+
 const CadastroPacientePage = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(tabs[0].key);
@@ -89,13 +96,6 @@ const CadastroPacientePage = () => {
     const getErrorCountForTab = (tabKey) => {
         return Object.keys(errors).filter(key => errorFieldToTabMap[key] === tabKey).length;
     };
-
-    const SectionBlock = ({ title, children }) => (
-        <div className="mb-6 pb-6 border-b border-slate-200 last:border-0 last:mb-2">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 pb-1 border-b-2 border-pink-500 inline-block">{title}</h2>
-            {children}
-        </div>
-    );
 
     return (
         <div className="flex flex-col h-full animate-fadeIn max-w-[1400px] mx-auto w-full">
