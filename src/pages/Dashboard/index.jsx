@@ -1,6 +1,7 @@
 import React from 'react';
 import AreaCards from "../../components/Dashboard/AreaCards";
 import AreaCharts from "../../components/Dashboard/AreaCharts";
+import SUSMetricsCharts from "../../components/Dashboard/SUSMetricsCharts";
 
 const Dashboard = () => {
   return (
@@ -14,6 +15,10 @@ const Dashboard = () => {
 
       <div className="w-full">
         <AreaCards />
+      </div>
+
+      <div className="w-full">
+        <SUSMetricsCharts />
       </div>
 
       <div className="w-full">
